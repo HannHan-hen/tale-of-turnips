@@ -15,7 +15,40 @@ export const palette = {
   bulb: 0xf3efe2, // turnip body
   bulbTop: 0xb5567f, // turnip pink-purple crown
   skin: 0xf2c79b,
+  skinDark: 0xd9a574, // shading on skin (jaw, under nose)
+  cheek: 0xe88f7a, // rosy cheek blush
+  eyeWhite: 0xf8f4ea,
+  eyeDark: 0x3a2f3a, // default dark iris
+  eyeGray: 0x8c95a3, // Jay's gray eyes
   hair: 0x6b4a8a,
+  // Farmer: blonde hair + blue denim overalls over a cream shirt.
+  blonde: 0xe6c463,
+  blondeDark: 0xc69a3a,
+  denim: 0x4f6fa8,
+  denimDark: 0x3a5384,
+  farmerShirt: 0xf6ede0,
+  farmerShirtDark: 0xd9cdba,
+  overallButton: 0xe8c46a,
+  // Jay: black hair, white shirt, black pants.
+  jayBlackHair: 0x2b2730,
+  jayBlackHairDark: 0x1b1820,
+  jayWhite: 0xf4f1e8,
+  jayWhiteDark: 0xd6d1c4,
+  jayBlackPants: 0x33303a,
+  jayBlackPantsDark: 0x23212a,
+  // Generic villager tones.
+  hairBrown: 0x7a5236,
+  hairBrownDark: 0x593a24,
+  hairGray: 0xb8b0bf,
+  hairGrayDark: 0x938a9e,
+  villagerShirt: 0x8a6abf,
+  villagerShirtDark: 0x6e4f9e,
+  blacksmithShirt: 0x6b6470,
+  blacksmithShirtDark: 0x4f4955,
+  leatherApron: 0x7a4a2e,
+  leatherApronDark: 0x5a3520,
+  shoe: 0x6e4a2e,
+  shoeDark: 0x4a3020,
   cloth: 0xd96a8a,
   clothDark: 0xb04a6a,
   floorWood: 0xc89b63,
