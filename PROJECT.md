@@ -219,10 +219,11 @@ combat damage/drop logic, affection gain.
 Build in slices; each stays runnable and visually pleasant. **The current slice is the only
 thing implemented in code; everything below it lives here until its turn.**
 
-1. **MVP (this effort):** player moves; one cute farm map; one crop plant→grow→harvest;
+1. **MVP — done.** player moves; one cute farm map; one crop plant→grow→harvest;
    inventory; sell at shipping box for gold; versioned save/load; general interaction system;
    minimal UI. *Deliverable: a playable, persistent, polished farming loop.*
-2. **House + chest:** house interior, map transition, chest using the shared storage model.
+2. **House + chest — done.** house interior, centralized map transitions (door/cottage
+   exits), and a chest reusing the shared inventory model via a keyboard chest screen.
 3. **Village + shops:** village map, seed seller, blacksmith; data-driven shop purchasing.
 4. **Animals & more crops:** chickens (pet/eggs), bushes (foraging + regrow), crops 2 & 3.
 5. **Ruins + combat:** ruins map, hearts/HP, one attack, enemy data/behavior/drops.

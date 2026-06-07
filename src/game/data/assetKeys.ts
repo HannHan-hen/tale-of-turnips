@@ -4,8 +4,13 @@
 export const TextureKey = {
   GrassTile: 'tile_grass',
   SoilTile: 'tile_soil',
+  WoodFloor: 'tile_wood_floor',
+  Wall: 'tile_wall',
   Player: 'player',
   ShippingBox: 'shipping_box',
+  Cottage: 'cottage',
+  Door: 'door',
+  Chest: 'chest',
   IconTurnipSeed: 'icon_turnip_seed',
   IconTurnip: 'icon_turnip',
 } as const;

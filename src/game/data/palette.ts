@@ -18,9 +18,18 @@ export const palette = {
   hair: 0x6b4a8a,
   cloth: 0xd96a8a,
   clothDark: 0xb04a6a,
+  floorWood: 0xc89b63,
+  floorWoodDark: 0xa97c46,
+  wall: 0x7a5e8a,
+  wallDark: 0x5e486b,
+  roof: 0xc4566a,
+  roofDark: 0xa03f54,
+  window: 0xbfe3e0,
+  metal: 0xe8d28a,
   outline: 0x33293f,
   uiInk: 0xfdf6e3,
   uiPanel: 0x3a3047,
+  uiHighlight: 0x5a4a6b,
   gold: 0xf2c14e,
 } as const;
 

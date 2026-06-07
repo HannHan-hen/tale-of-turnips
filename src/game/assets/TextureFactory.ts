@@ -32,8 +32,13 @@ function rect(g: Phaser.GameObjects.Graphics, color: number, x: number, y: numbe
 export function buildTextures(scene: Phaser.Scene): void {
   buildGrassTile(scene);
   buildSoilTile(scene);
+  buildWoodFloorTile(scene);
+  buildWallTile(scene);
   buildPlayer(scene);
   buildShippingBox(scene);
+  buildCottage(scene);
+  buildDoor(scene);
+  buildChest(scene);
   buildIcons(scene);
   buildCropStages(scene);
 }
@@ -57,6 +62,27 @@ function buildSoilTile(scene: Phaser.Scene): void {
     rect(g, palette.soilDark, 6, 4, 2, TILE - 8);
     rect(g, palette.soilDark, 15, 4, 2, TILE - 8);
     rect(g, palette.soilDark, 24, 4, 2, TILE - 8);
+  });
+}
+
+function buildWoodFloorTile(scene: Phaser.Scene): void {
+  make(scene, TextureKey.WoodFloor, TILE, TILE, (g) => {
+    rect(g, palette.floorWood, 0, 0, TILE, TILE);
+    // plank seams
+    rect(g, palette.floorWoodDark, 0, 10, TILE, 1);
+    rect(g, palette.floorWoodDark, 0, 21, TILE, 1);
+    rect(g, palette.floorWoodDark, 10, 0, 1, 10);
+    rect(g, palette.floorWoodDark, 22, 11, 1, 10);
+  });
+}
+
+function buildWallTile(scene: Phaser.Scene): void {
+  make(scene, TextureKey.Wall, TILE, TILE, (g) => {
+    rect(g, palette.wallDark, 0, 0, TILE, TILE);
+    rect(g, palette.wall, 1, 1, TILE - 2, TILE - 3);
+    // brick seams
+    rect(g, palette.wallDark, 0, 15, TILE, 1);
+    rect(g, palette.wallDark, 15, 0, 1, 15);
   });
 }
 
@@ -97,6 +123,57 @@ function buildShippingBox(scene: Phaser.Scene): void {
     // open lid lip
     rect(g, palette.woodDark, 0, 0, w, 6);
     rect(g, palette.outline, 4, 2, w - 8, 3);
+  });
+}
+
+function buildCottage(scene: Phaser.Scene): void {
+  // A cute cottage placed on the farm; its doorway sits at the bottom center.
+  const w = 60;
+  const h = 56;
+  make(scene, TextureKey.Cottage, w, h, (g) => {
+    // walls
+    rect(g, palette.outline, 6, 22, w - 12, h - 24);
+    rect(g, palette.floorWood, 8, 24, w - 16, h - 26);
+    // roof
+    rect(g, palette.roofDark, 2, 12, w - 4, 12);
+    rect(g, palette.roof, 4, 8, w - 8, 8);
+    rect(g, palette.roof, 10, 4, w - 20, 6);
+    // window
+    rect(g, palette.outline, 12, 28, 12, 12);
+    rect(g, palette.window, 14, 30, 8, 8);
+    rect(g, palette.outline, 17, 30, 2, 8);
+    // door
+    rect(g, palette.outline, w / 2 - 7, h - 18, 14, 18);
+    rect(g, palette.woodDark, w / 2 - 5, h - 16, 10, 16);
+    rect(g, palette.metal, w / 2 + 1, h - 9, 2, 2);
+  });
+}
+
+function buildDoor(scene: Phaser.Scene): void {
+  const w = 22;
+  const h = 28;
+  make(scene, TextureKey.Door, w, h, (g) => {
+    rect(g, palette.outline, 0, 0, w, h);
+    rect(g, palette.woodDark, 2, 2, w - 4, h - 2);
+    rect(g, palette.wood, 4, 4, w - 8, h - 6);
+    rect(g, palette.woodDark, w / 2 - 1, 4, 2, h - 6);
+    rect(g, palette.metal, w - 7, h / 2, 2, 3);
+  });
+}
+
+function buildChest(scene: Phaser.Scene): void {
+  const w = 28;
+  const h = 22;
+  make(scene, TextureKey.Chest, w, h, (g) => {
+    // body
+    rect(g, palette.outline, 1, 8, w - 2, h - 8);
+    rect(g, palette.wood, 2, 9, w - 4, h - 10);
+    // lid
+    rect(g, palette.outline, 0, 1, w, 8);
+    rect(g, palette.woodDark, 1, 2, w - 2, 6);
+    // metal bands + lock
+    rect(g, palette.metal, w / 2 - 1, 1, 2, h - 1);
+    rect(g, palette.metal, w / 2 - 3, 9, 6, 4);
   });
 }
 

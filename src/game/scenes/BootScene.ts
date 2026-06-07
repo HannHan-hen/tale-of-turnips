@@ -20,7 +20,7 @@ export class BootScene extends Phaser.Scene {
     const store = new GameStateStore(loadGame());
     this.registry.set(STORE_KEY, store);
 
-    this.scene.start(SceneKey.Farm);
+    this.scene.start(SceneKey.World);
     this.scene.launch(SceneKey.UI);
   }
 }

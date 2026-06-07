@@ -14,13 +14,20 @@ export type CropId = (typeof CropId)[keyof typeof CropId];
 
 export const MapId = {
   Farm: 'farm',
+  House: 'house',
 } as const;
 export type MapId = (typeof MapId)[keyof typeof MapId];
 
+export const ChestId = {
+  House: 'house_chest',
+} as const;
+export type ChestId = (typeof ChestId)[keyof typeof ChestId];
+
 export const SceneKey = {
   Boot: 'boot',
-  Farm: 'farm',
+  World: 'world',
   UI: 'ui',
+  Chest: 'chest',
 } as const;
 export type SceneKey = (typeof SceneKey)[keyof typeof SceneKey];
 
@@ -28,5 +35,7 @@ export type SceneKey = (typeof SceneKey)[keyof typeof SceneKey];
 export const InteractionKind = {
   Plot: 'plot',
   ShippingBox: 'shipping_box',
+  Chest: 'chest',
+  Door: 'door',
 } as const;
 export type InteractionKind = (typeof InteractionKind)[keyof typeof InteractionKind];

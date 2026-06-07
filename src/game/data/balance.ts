@@ -6,6 +6,7 @@ export const Balance = {
   startingGold: 50,
   startingSeeds: 5,
   inventoryCapacity: 24, // number of stacks the backpack can hold
+  chestCapacity: 30, // number of stacks a chest can hold
   playerSpeed: 130, // pixels per second
   interactRadius: 30, // how close (px) the player must be to interact
   autosaveMs: 4000, // how often the game autosaves

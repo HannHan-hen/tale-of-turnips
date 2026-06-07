@@ -2,7 +2,10 @@
 // invalid or unreadable saves fall back to a new game so the player is never stuck.
 
 import { Balance } from '../data/balance';
+import { MAPS } from '../data/maps';
+import { createInventory } from '../systems/InventorySystem';
 import { createNewGameState } from '../state/newGameState';
+import { MapId } from '../types/ids';
 import type { GameState, SaveData } from '../types/models';
 
 export const SAVE_KEY = 'story-of-turnips/save';
@@ -20,7 +23,8 @@ export function migrate(data: unknown): SaveData | null {
   if (typeof candidate.version !== 'number' || !candidate.state) return null;
 
   const state = candidate.state as Partial<GameState>;
-  if (!state.player || !state.maps || !state.time) return null;
+  // Player and time are essential; maps/chests are reconstructed below if absent.
+  if (!state.player || !state.time) return null;
 
   // Fill fields that may be missing in older saves rather than discarding the save.
   state.stats ??= { cropsHarvested: 0 };
@@ -29,6 +33,28 @@ export function migrate(data: unknown): SaveData | null {
   }
   state.player.inventory.capacity ??= Balance.inventoryCapacity;
   state.player.inventory.slots ??= [];
+
+  // Ensure every registered map and chest exists, so saves from before a map/chest was
+  // added still load (the new ones simply start empty).
+  state.maps ??= {};
+  state.chests ??= {};
+  for (const def of Object.values(MAPS)) {
+    state.maps[def.mapId] ??= { mapId: def.mapId, crops: [] };
+    for (const placement of def.chests) {
+      state.chests[placement.chestId] ??= {
+        id: placement.chestId,
+        inventory: createInventory(Balance.chestCapacity),
+      };
+    }
+  }
+
+  // Recover gracefully if the player was saved on a map that no longer exists.
+  if (!MAPS[state.player.mapId as MapId]) {
+    const farm = MAPS[MapId.Farm];
+    state.player.mapId = MapId.Farm;
+    state.player.x = (farm.spawnTile.x + 0.5) * 32;
+    state.player.y = (farm.spawnTile.y + 0.5) * 32;
+  }
 
   // Future schema upgrades branch on candidate.version here.
   return { version: SAVE_VERSION, state: state as GameState };

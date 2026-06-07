@@ -8,7 +8,7 @@ export interface ItemStack {
   count: number;
 }
 
-// Shared by the player's backpack and (later) chests — one storage model everywhere.
+// Shared by the player's backpack and chests — one storage model everywhere.
 export interface Inventory {
   slots: ItemStack[];
   capacity: number;
@@ -39,6 +39,12 @@ export interface MapState {
   crops: CropInstance[];
 }
 
+// A stored chest. Uses the same Inventory model as the backpack.
+export interface ChestState {
+  id: string;
+  inventory: Inventory;
+}
+
 export interface TimeState {
   tick: number;
   day: number;
@@ -52,6 +58,7 @@ export interface Stats {
 export interface GameState {
   player: PlayerState;
   maps: Record<string, MapState>;
+  chests: Record<string, ChestState>;
   time: TimeState;
   stats: Stats;
 }
@@ -68,4 +75,6 @@ export interface InteractionTarget {
   x: number; // pixel center, for proximity tests
   y: number;
   plotIndex?: number; // set when kind === Plot
+  chestId?: string; // set when kind === Chest
+  exitIndex?: number; // set when kind === Door
 }

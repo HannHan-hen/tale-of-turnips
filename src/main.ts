@@ -5,7 +5,8 @@ import { palette, toCss } from './game/data/palette';
 import { MAPS, TILE } from './game/data/maps';
 import { MapId } from './game/types/ids';
 import { BootScene } from './game/scenes/BootScene';
-import { FarmScene } from './game/scenes/FarmScene';
+import { WorldScene } from './game/scenes/WorldScene';
+import { ChestScene } from './game/scenes/ChestScene';
 import { UIScene } from './game/scenes/UIScene';
 
 const farm = MAPS[MapId.Farm];
@@ -21,5 +22,6 @@ new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, FarmScene, UIScene],
+  // UI is listed last so the HUD/toast render on top of the chest overlay.
+  scene: [BootScene, WorldScene, ChestScene, UIScene],
 });
