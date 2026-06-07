@@ -7,6 +7,7 @@ import { palette, toCss } from '../data/palette';
 import { availableItems, SHOPS, type ShopItem } from '../data/shops';
 import { GameStateStore } from '../state/GameStateStore';
 import { buy } from '../systems/EconomySystem';
+import { recalcMaxHp } from '../systems/EquipmentSystem';
 import { SceneKey, ShopId } from '../types/ids';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
@@ -120,6 +121,8 @@ export class ShopScene extends Phaser.Scene {
     if (!item) return;
     const result = buy(this.store.player, item.itemId, item.price);
     if (result === 'ok') {
+      // carried gear can change max hearts (e.g. the Padded Vest) — reconcile right away
+      recalcMaxHp(this.store.player, this.store.state.armor);
       this.toast(`Bought ${ITEMS[item.itemId].displayName}.`);
       this.game.events.emit(UiEvent.Hud);
       this.refresh();

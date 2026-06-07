@@ -61,7 +61,7 @@ export const ENEMIES: Record<EnemyId, EnemyDef> = {
   [EnemyId.RuinHeart]: {
     enemyId: EnemyId.RuinHeart,
     displayName: 'The Ruin Heart',
-    maxHp: 16,
+    maxHp: 18,
     contactDamage: 1,
     speed: 46,
     textureKey: TextureKey.EnemyRuinHeart,

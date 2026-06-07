@@ -98,7 +98,8 @@ export class WorldScene extends Phaser.Scene {
     this.cropSprites = new Map();
     this.bushSprites = new Map();
     this.cacheSprites = new Map();
-    this.loadout = computeLoadout(this.store.state.armor);
+    recalcMaxHp(this.store.player, this.store.state.armor);
+    this.loadout = computeLoadout(this.store.state.armor, this.store.player.inventory);
     this.combat = undefined;
     this.isRaid = false;
     this.tickAccum = 0;
@@ -699,7 +700,7 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
     // recompute effects and reward the find with a full heal
-    this.loadout = computeLoadout(armor);
+    this.loadout = computeLoadout(armor, this.store.player.inventory);
     recalcMaxHp(this.store.player, armor);
     this.store.player.hp = this.store.player.maxHp;
 

@@ -3,7 +3,7 @@
 // data here; EquipmentSystem sums them into a loadout. The full set opens the boss door
 // (consumed by the boss slice).
 
-import { ArmorPieceId } from '../types/ids';
+import { ArmorPieceId, ItemId } from '../types/ids';
 import { TextureKey } from './assetKeys';
 
 export const SET_NAME = 'Starless Set';
@@ -68,6 +68,13 @@ export const ARMOR_PIECES: Record<ArmorPieceId, ArmorPieceDef> = {
     iconKey: TextureKey.IconStarlessBlade,
     effect: { bonusDamage: 1 },
   },
+};
+
+// Basic gear from the blacksmith gives a small edge while simply carried — enough to help
+// early ruin survival, but the legendary set (bigger bonuses + the boss gate) still matters.
+export const BASIC_GEAR: Partial<Record<ItemId, ArmorEffect>> = {
+  [ItemId.WornSword]: { bonusDamage: 1 },
+  [ItemId.PaddedVest]: { bonusHearts: 1 },
 };
 
 // Display order (helmet, armor, gloves, boots, weapon).

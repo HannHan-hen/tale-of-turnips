@@ -8,7 +8,8 @@ import {
   hasPiece,
   recalcMaxHp,
 } from '../src/game/systems/EquipmentSystem';
-import { ArmorPieceId } from '../src/game/types/ids';
+import { add } from '../src/game/systems/InventorySystem';
+import { ArmorPieceId, ItemId } from '../src/game/types/ids';
 
 describe('EquipmentSystem', () => {
   it('starts with no pieces and an empty loadout', () => {
@@ -33,6 +34,17 @@ describe('EquipmentSystem', () => {
     collectPiece(state.armor, ArmorPieceId.Plate);
     recalcMaxHp(state.player, state.armor);
     expect(state.player.maxHp).toBe(Balance.playerMaxHp + 2);
+  });
+
+  it('carried basic gear gives a small edge that stacks with the set', () => {
+    const state = createNewGameState();
+    add(state.player.inventory, ItemId.WornSword, 1);
+    add(state.player.inventory, ItemId.PaddedVest, 1);
+    const loadout = computeLoadout(state.armor, state.player.inventory);
+    expect(loadout.bonusDamage).toBe(1); // worn sword
+    expect(loadout.bonusHearts).toBe(1); // padded vest
+    recalcMaxHp(state.player, state.armor);
+    expect(state.player.maxHp).toBe(Balance.playerMaxHp + 1);
   });
 
   it('marks the set complete and opens the boss only with all pieces', () => {

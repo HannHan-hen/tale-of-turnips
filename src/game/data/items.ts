@@ -48,7 +48,7 @@ export const ITEMS: Record<ItemId, ItemDef> = {
   [ItemId.Pumpkin]: {
     itemId: ItemId.Pumpkin,
     displayName: 'Pumpkin',
-    sellPrice: 34,
+    sellPrice: 44,
     maxStack: 99,
     iconKey: TextureKey.IconPumpkin,
   },
