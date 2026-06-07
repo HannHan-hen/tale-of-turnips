@@ -10,6 +10,15 @@ use `localStorage`. No backend, no accounts.
 
 ## Play
 
+**▶ Play in your browser — no install needed:**
+**https://hannhan-hen.github.io/tale-of-turnips/**
+
+Just click the link above on any computer, phone, or tablet. Your progress is
+saved automatically in that browser. (The link is published automatically from
+`main` by the GitHub Pages workflow below.)
+
+To run it locally instead (for development):
+
 ```bash
 npm install
 npm run dev      # local dev server (open the printed URL)
