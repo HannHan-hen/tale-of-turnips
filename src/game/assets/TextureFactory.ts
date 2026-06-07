@@ -48,6 +48,8 @@ export function buildTextures(scene: Phaser.Scene): void {
   buildStoneFloorTile(scene);
   buildRubble(scene);
   buildEnemies(scene);
+  buildRuinHeart(scene);
+  buildSealedDoor(scene);
   buildSlash(scene);
   buildHearts(scene);
   buildCaches(scene);
@@ -354,6 +356,41 @@ function buildEnemies(scene: Phaser.Scene): void {
     rect(g, palette.uiInk, 7, 12, 4, 2); // teeth
     rect(g, palette.nibblerDark, 1, 6, 3, 3); // ears
     rect(g, palette.nibblerDark, 14, 6, 3, 3);
+  });
+}
+
+function buildRuinHeart(scene: Phaser.Scene): void {
+  // A looming dark crystalline mass with a pulsing red core.
+  const w = 44;
+  const h = 44;
+  make(scene, TextureKey.EnemyRuinHeart, w, h, (g) => {
+    rect(g, palette.bossDark, 8, 10, 28, 30);
+    rect(g, palette.boss, 10, 12, 24, 26);
+    // jagged crystal shoulders
+    rect(g, palette.bossDark, 4, 16, 6, 14);
+    rect(g, palette.bossDark, 34, 16, 6, 14);
+    rect(g, palette.boss, 14, 6, 16, 8); // crown
+    rect(g, palette.bossDark, 18, 2, 8, 6);
+    // glowing core
+    rect(g, palette.bossCore, 17, 20, 10, 10);
+    rect(g, palette.bossGlow, 20, 23, 4, 4);
+    // eyes
+    rect(g, palette.bossGlow, 14, 15, 3, 3);
+    rect(g, palette.bossGlow, 27, 15, 3, 3);
+  });
+}
+
+function buildSealedDoor(scene: Phaser.Scene): void {
+  const w = 26;
+  const h = 32;
+  make(scene, TextureKey.SealedDoor, w, h, (g) => {
+    rect(g, palette.outline, 0, 0, w, h);
+    rect(g, palette.stoneDark, 2, 2, w - 4, h - 2);
+    rect(g, palette.stone, 4, 4, w - 8, h - 6);
+    // starlit seal across the middle
+    rect(g, palette.starlessTrim, 3, h / 2 - 2, w - 6, 4);
+    rect(g, palette.starlight, w / 2 - 2, 6, 4, h - 10);
+    rect(g, palette.starlight, w / 2 - 1, h / 2 - 1, 2, 2);
   });
 }
 

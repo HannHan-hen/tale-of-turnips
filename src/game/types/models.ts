@@ -103,6 +103,7 @@ export interface GameState {
   threat: ThreatState;
   armor: ArmorState;
   affection: Record<string, NpcAffectionState>;
+  bossDefeated: boolean;
   stats: Stats;
 }
 

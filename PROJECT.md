@@ -240,7 +240,11 @@ thing implemented in code; everything below it lives here until its turn.**
 8. **Village boy — done.** Jay (grandson of Bramble & Marigold), a shy, honest boy by the
    gate. Talk once/day and gift once/day via a modal screen; tiered dialogue; loved/liked
    gifts; completing the Starless Set bumps affection. Outcome feeds the ending.
-9. **Boss + ending:** boss fight gated by the set; result screen with the full stat summary.
+9. **Boss + ending — done.** a set-gated sealed door opens the boss arena; defeating the
+   Ruin Heart shows the result screen (final gold = high score, days, crops, chickens,
+   monsters, Starless pieces, outcome with Jay) and banks a persistent high score.
+
+**All nine slices are complete — the game is a finished, playable loop end to end.**
 
 ## 18. Risks & anti-overengineering guardrails
 

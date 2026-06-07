@@ -20,6 +20,7 @@ export interface EnemyDef {
   speed: number; // px/sec when chasing
   textureKey: string;
   loot: LootDrop[];
+  isBoss?: boolean; // defeating it wins the game
 }
 
 export const ENEMIES: Record<EnemyId, EnemyDef> = {
@@ -54,5 +55,17 @@ export const ENEMIES: Record<EnemyId, EnemyDef> = {
     speed: 34,
     textureKey: TextureKey.EnemyCropNibbler,
     loot: [],
+  },
+  // The ruins' heart. Slow but tanky — beatable once the Starless Set's edge and hearts
+  // are in hand (the sealed door only opens with the full set anyway).
+  [EnemyId.RuinHeart]: {
+    enemyId: EnemyId.RuinHeart,
+    displayName: 'The Ruin Heart',
+    maxHp: 16,
+    contactDamage: 1,
+    speed: 46,
+    textureKey: TextureKey.EnemyRuinHeart,
+    loot: [],
+    isBoss: true,
   },
 };

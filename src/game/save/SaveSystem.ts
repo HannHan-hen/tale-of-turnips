@@ -48,6 +48,7 @@ export function migrate(data: unknown): SaveData | null {
   for (const npc of Object.values(NPCS)) {
     if (npc.romance) state.affection[npc.npcId] ??= createAffection(npc.npcId);
   }
+  state.bossDefeated ??= false;
 
   // Ensure every registered map, chest, chicken, and bush exists, so saves from before an
   // entry was added still load (the new ones simply start empty/fresh).
@@ -105,4 +106,23 @@ export function saveGame(state: GameState): void {
 
 export function clearSave(): void {
   storage()?.removeItem(SAVE_KEY);
+}
+
+const HIGHSCORE_KEY = 'story-of-turnips/highscore';
+
+export function loadHighScore(): number {
+  const raw = storage()?.getItem(HIGHSCORE_KEY);
+  const n = raw ? Number(raw) : 0;
+  return Number.isFinite(n) ? n : 0;
+}
+
+// Records `gold` if it beats the stored best. Returns the resulting high score.
+export function recordHighScore(gold: number): number {
+  const best = Math.max(loadHighScore(), gold);
+  try {
+    storage()?.setItem(HIGHSCORE_KEY, String(best));
+  } catch {
+    // ignore storage errors
+  }
+  return best;
 }

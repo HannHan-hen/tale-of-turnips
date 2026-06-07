@@ -19,7 +19,8 @@ export interface ExitDef {
   toMap: MapId;
   toSpawn: TilePos; // spawn tile on the destination map
   label: string;
-  art: 'cottage' | 'door' | 'signpost'; // how the exit is drawn
+  art: 'cottage' | 'door' | 'signpost' | 'sealed'; // how the exit is drawn
+  requiresSet?: boolean; // only passable with the full legendary set
 }
 
 export interface ChestPlacement {
@@ -199,6 +200,36 @@ export const MAPS: Record<MapId, MapDef> = {
     ],
     exits: [
       { tile: { x: 6, y: 10 }, toMap: MapId.Village, toSpawn: { x: 13, y: 1 }, label: 'Leave ruins', art: 'signpost' },
+      {
+        tile: { x: 6, y: 1 },
+        toMap: MapId.BossArena,
+        toSpawn: { x: 5, y: 9 },
+        label: 'Sealed door',
+        art: 'sealed',
+        requiresSet: true,
+      },
+    ],
+  },
+  [MapId.BossArena]: {
+    mapId: MapId.BossArena,
+    widthTiles: 11,
+    heightTiles: 11,
+    floor: 'stone',
+    wallThickness: 1,
+    spawnTile: { x: 5, y: 9 },
+    plots: [],
+    chests: [],
+    npcs: [],
+    props: [
+      { art: 'rubble', tile: { x: 2, y: 3 } },
+      { art: 'rubble', tile: { x: 8, y: 3 } },
+    ],
+    chickens: [],
+    bushes: [],
+    enemySpawns: [{ enemyId: EnemyId.RuinHeart, tile: { x: 5, y: 3 } }],
+    caches: [],
+    exits: [
+      { tile: { x: 5, y: 9 }, toMap: MapId.Ruins, toSpawn: { x: 6, y: 1 }, label: 'Retreat', art: 'door' },
     ],
   },
 };

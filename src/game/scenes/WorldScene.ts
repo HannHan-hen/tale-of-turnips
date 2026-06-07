@@ -7,6 +7,7 @@ import Phaser from 'phaser';
 import { cropTextureKey, TextureKey } from '../data/assetKeys';
 import { ARMOR_PIECES, SET_NAME } from '../data/armor';
 import { Balance } from '../data/balance';
+import { ENEMIES } from '../data/enemies';
 import { CROP_ORDER, CROPS } from '../data/crops';
 import { ITEMS } from '../data/items';
 import { MAPS, TILE, tileCenter, type MapDef } from '../data/maps';
@@ -44,6 +45,7 @@ const EXIT_TEXTURE = {
   cottage: TextureKey.Cottage,
   door: TextureKey.Door,
   signpost: TextureKey.Signpost,
+  sealed: TextureKey.SealedDoor,
 } as const;
 
 const PROP_TEXTURE = {
@@ -114,10 +116,13 @@ export class WorldScene extends Phaser.Scene {
 
     for (const crop of this.store.currentMap().crops) this.addCropSprite(crop);
 
-    // Ruins-style combat: enemies chase the player.
-    if (this.def.enemySpawns.length > 0) {
+    // Ruins-style combat: enemies chase the player. A defeated boss never respawns.
+    const spawns = this.def.enemySpawns.filter(
+      (s) => !(ENEMIES[s.enemyId].isBoss && this.store.state.bossDefeated),
+    );
+    if (spawns.length > 0) {
       this.combat = new CombatController(this, this.bounds);
-      this.combat.spawn(this.def.enemySpawns);
+      this.combat.spawn(spawns);
     }
 
     const p = this.store.player;
@@ -216,7 +221,9 @@ export class WorldScene extends Phaser.Scene {
     }
     for (const exit of def.exits) {
       const c = tileCenter(exit.tile);
-      const key = EXIT_TEXTURE[exit.art];
+      // A set-gated door shows sealed until the legendary set is whole.
+      const key =
+        exit.requiresSet && !this.loadout.opensBoss ? TextureKey.SealedDoor : EXIT_TEXTURE[exit.art];
       this.add.image(c.x, c.y, key).setOrigin(0.5, 0.9).setDepth(c.y - 2);
     }
     for (const prop of def.props) {
@@ -346,8 +353,11 @@ export class WorldScene extends Phaser.Scene {
         return 'Sell  [E]';
       case InteractionKind.Chest:
         return 'Open chest  [E]';
-      case InteractionKind.Door:
-        return `${this.def.exits[target.exitIndex!].label}  [E]`;
+      case InteractionKind.Door: {
+        const exit = this.def.exits[target.exitIndex!];
+        if (exit.requiresSet && !this.loadout.opensBoss) return `Sealed — needs the ${SET_NAME}`;
+        return `${exit.label}  [E]`;
+      }
       case InteractionKind.Npc: {
         const npc = NPCS[target.npcId as keyof typeof NPCS];
         return `${npc.shopId ? 'Shop' : 'Talk'}: ${npc.displayName}  [E]`;
@@ -432,6 +442,10 @@ export class WorldScene extends Phaser.Scene {
 
   private useExit(exitIndex: number): void {
     const exit = this.def.exits[exitIndex];
+    if (exit.requiresSet && !this.loadout.opensBoss) {
+      this.toast(`A sealed door. The ${SET_NAME} might open it…`);
+      return;
+    }
     transitionTo(this.store.state, exit.toMap, exit.toSpawn);
     saveGame(this.store.state);
     this.scene.restart();
@@ -542,6 +556,10 @@ export class WorldScene extends Phaser.Scene {
 
     const damage = Balance.attackDamage + this.loadout.bonusDamage;
     const defeated = this.combat!.attackAt(ax, ay, Balance.attackRange, damage);
+    if (defeated.some((d) => d.isBoss)) {
+      this.onVictory();
+      return;
+    }
     for (const def of defeated) {
       this.store.state.stats.monstersDefeated += 1;
       reduceThreat(this.store.state.threat); // clearing monsters eases the pressure
@@ -558,6 +576,18 @@ export class WorldScene extends Phaser.Scene {
       this.game.events.emit(UiEvent.Hud);
       saveGame(this.store.state);
     }
+  }
+
+  private onVictory(): void {
+    this.store.state.bossDefeated = true;
+    this.store.state.stats.monstersDefeated += 1;
+    const jay = this.store.state.affection[NpcId.Jay];
+    if (jay) grantMilestone(jay, 'boss', Balance.affectionStorySet * 2);
+    saveGame(this.store.state);
+    this.game.events.emit(UiEvent.Prompt, null);
+    this.game.events.emit(UiEvent.Hud);
+    this.scene.pause();
+    this.scene.launch(SceneKey.End);
   }
 
   private takeDamage(amount: number): void {

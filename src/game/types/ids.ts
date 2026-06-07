@@ -29,6 +29,7 @@ export const MapId = {
   House: 'house',
   Village: 'village',
   Ruins: 'ruins',
+  BossArena: 'boss_arena',
 } as const;
 export type MapId = (typeof MapId)[keyof typeof MapId];
 
@@ -36,6 +37,7 @@ export const EnemyId = {
   RuinMite: 'ruin_mite',
   ShadePup: 'shade_pup',
   CropNibbler: 'crop_nibbler',
+  RuinHeart: 'ruin_heart',
 } as const;
 export type EnemyId = (typeof EnemyId)[keyof typeof EnemyId];
 
@@ -75,6 +77,7 @@ export const SceneKey = {
   Chest: 'chest',
   Shop: 'shop',
   Talk: 'talk',
+  End: 'end',
 } as const;
 export type SceneKey = (typeof SceneKey)[keyof typeof SceneKey];
 

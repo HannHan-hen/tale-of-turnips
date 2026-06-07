@@ -65,6 +65,7 @@ export function createNewGameState(): GameState {
     threat: { ruinThreat: 0 },
     armor: { collectedPieces: [] },
     affection,
+    bossDefeated: false,
     stats: { cropsHarvested: 0, chickensPetted: 0, monstersDefeated: 0 },
   };
 }
