@@ -228,7 +228,9 @@ thing implemented in code; everything below it lives here until its turn.**
    blacksmith, hint villager), and data-driven shop purchasing via a keyboard shop screen.
 4. **Animals & more crops — done.** chickens (pet once/day → egg), bushes (forage + regrow),
    carrot & pumpkin crops, a number-key seed selector, and a day counter.
-5. **Ruins + combat:** ruins map, hearts/HP, one attack, enemy data/behavior/drops.
+5. **Ruins + combat — done.** ruins map (reached via the village), player hearts with
+   i-frames, a one-button swing, two data-driven enemies with chase AI and loot drops, and
+   a gentle faint-and-retreat on defeat.
 6. **Threat:** `ruinThreat` rising daily, farm monster incursions, warnings, crop damage.
 7. **Legendary set:** five pieces found in ruins, per-piece effects, set completion gate.
 8. **Village boy:** daily talk, affection tiers, rare gifts, story-progress affection.

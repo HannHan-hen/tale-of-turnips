@@ -45,6 +45,11 @@ export function buildTextures(scene: Phaser.Scene): void {
   buildNpcs(scene);
   buildChicken(scene);
   buildBushes(scene);
+  buildStoneFloorTile(scene);
+  buildRubble(scene);
+  buildEnemies(scene);
+  buildSlash(scene);
+  buildHearts(scene);
   buildIcons(scene);
   buildCropStages(scene);
 }
@@ -287,6 +292,81 @@ function buildBushes(scene: Phaser.Scene): void {
   make(scene, TextureKey.BushEmpty, w, h, leaves);
 }
 
+function buildStoneFloorTile(scene: Phaser.Scene): void {
+  make(scene, TextureKey.StoneFloor, TILE, TILE, (g) => {
+    rect(g, palette.stoneFloorDark, 0, 0, TILE, TILE);
+    rect(g, palette.stoneFloor, 1, 1, TILE - 2, TILE - 2);
+    // cracked flagstones
+    rect(g, palette.stoneFloorDark, 0, 16, TILE, 1);
+    rect(g, palette.stoneFloorDark, 16, 0, 1, 16);
+    rect(g, palette.stoneFloorDark, 8, 16, 1, 16);
+  });
+}
+
+function buildRubble(scene: Phaser.Scene): void {
+  const w = 30;
+  const h = 22;
+  make(scene, TextureKey.Rubble, w, h, (g) => {
+    rect(g, palette.stoneDark, 3, 10, 24, 10);
+    rect(g, palette.stone, 5, 8, 9, 9);
+    rect(g, palette.stone, 16, 11, 8, 8);
+    rect(g, palette.stoneFloorDark, 12, 4, 6, 6);
+    rect(g, palette.stone, 13, 5, 4, 4);
+  });
+}
+
+function buildEnemies(scene: Phaser.Scene): void {
+  // Ruin Mite: a small mossy blob with big eyes.
+  make(scene, TextureKey.EnemyRuinMite, 20, 18, (g) => {
+    rect(g, palette.outline, 3, 6, 14, 11);
+    rect(g, palette.mite, 4, 7, 12, 9);
+    rect(g, palette.miteDark, 4, 13, 12, 3);
+    rect(g, palette.uiInk, 6, 9, 3, 3); // eyes
+    rect(g, palette.uiInk, 11, 9, 3, 3);
+    rect(g, palette.outline, 7, 10, 1, 1);
+    rect(g, palette.outline, 12, 10, 1, 1);
+    rect(g, palette.miteDark, 2, 16, 3, 2); // little feet
+    rect(g, palette.miteDark, 15, 16, 3, 2);
+  });
+  // Shade Pup: a dark four-legged critter with glowing eyes.
+  make(scene, TextureKey.EnemyShadePup, 24, 20, (g) => {
+    rect(g, palette.shadeDark, 4, 6, 16, 10);
+    rect(g, palette.shade, 5, 7, 14, 8);
+    rect(g, palette.shadeDark, 5, 15, 3, 4); // legs
+    rect(g, palette.shadeDark, 16, 15, 3, 4);
+    rect(g, palette.shade, 17, 4, 6, 7); // head
+    rect(g, palette.shadeDark, 17, 3, 6, 2);
+    rect(g, palette.glow, 19, 6, 2, 2); // glowing eye
+    rect(g, palette.shadeDark, 2, 8, 4, 2); // tail
+  });
+}
+
+function buildSlash(scene: Phaser.Scene): void {
+  const s = 30;
+  make(scene, TextureKey.Slash, s, s, (g) => {
+    rect(g, palette.slash, 20, 4, 4, 6);
+    rect(g, palette.slash, 17, 9, 4, 5);
+    rect(g, palette.slash, 13, 13, 4, 5);
+    rect(g, palette.slash, 9, 17, 4, 5);
+    rect(g, palette.slash, 6, 22, 4, 4);
+  });
+}
+
+function buildHearts(scene: Phaser.Scene): void {
+  const s = 14;
+  const heart = (g: Phaser.GameObjects.Graphics, color: number) => {
+    rect(g, color, 2, 4, 4, 5);
+    rect(g, color, 8, 4, 4, 5);
+    rect(g, color, 2, 3, 4, 2);
+    rect(g, color, 8, 3, 4, 2);
+    rect(g, color, 3, 9, 8, 2);
+    rect(g, color, 4, 11, 6, 1);
+    rect(g, color, 6, 12, 2, 1);
+  };
+  make(scene, TextureKey.HeartFull, s, s, (g) => heart(g, palette.heartRed));
+  make(scene, TextureKey.HeartEmpty, s, s, (g) => heart(g, palette.heartEmpty));
+}
+
 function buildIcons(scene: Phaser.Scene): void {
   const s = 20;
   // seed: a small pip
@@ -354,6 +434,22 @@ function buildIcons(scene: Phaser.Scene): void {
     rect(g, palette.berry, 9, 13, 4, 4);
     rect(g, palette.berryLeaf, 8, 4, 2, 4);
     rect(g, palette.berryLeaf, 11, 4, 2, 3);
+  });
+  // ruin shard: a cyan crystal
+  make(scene, TextureKey.IconRuinShard, s, s, (g) => {
+    rect(g, palette.outline, 8, 3, 4, 14);
+    rect(g, palette.shard, 9, 4, 2, 12);
+    rect(g, palette.uiInk, 9, 6, 1, 4);
+    rect(g, palette.shard, 6, 8, 2, 5);
+    rect(g, palette.shard, 12, 7, 2, 6);
+  });
+  // shadow wisp: a wispy purple flame
+  make(scene, TextureKey.IconShadowWisp, s, s, (g) => {
+    rect(g, palette.wisp, 8, 4, 4, 10);
+    rect(g, palette.wisp, 6, 7, 2, 6);
+    rect(g, palette.wisp, 12, 8, 2, 5);
+    rect(g, palette.glow, 9, 6, 2, 3);
+    rect(g, palette.shadeDark, 7, 14, 6, 3);
   });
 }
 

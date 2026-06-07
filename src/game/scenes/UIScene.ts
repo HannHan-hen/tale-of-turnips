@@ -2,6 +2,7 @@
 // and transient toast feedback. Reads game state on demand; never mutates it.
 
 import Phaser from 'phaser';
+import { TextureKey } from '../data/assetKeys';
 import { palette, toCss } from '../data/palette';
 import { CROP_ORDER, CROPS } from '../data/crops';
 import { ITEMS } from '../data/items';
@@ -17,6 +18,7 @@ export class UIScene extends Phaser.Scene {
   private store!: GameStateStore;
   private dayText!: Phaser.GameObjects.Text;
   private goldText!: Phaser.GameObjects.Text;
+  private heartImages: Phaser.GameObjects.Image[] = [];
   private seedCountTexts: Phaser.GameObjects.Text[] = [];
   private selectHighlight!: Phaser.GameObjects.Rectangle;
   private slotXs: number[] = [];
@@ -37,7 +39,13 @@ export class UIScene extends Phaser.Scene {
 
     const label = { fontFamily: 'monospace', fontSize: '13px' };
     this.dayText = this.add.text(10, 7, '', { ...label, color: toCss(palette.uiInk) });
-    this.goldText = this.add.text(86, 7, '', { ...label, color: toCss(palette.gold) });
+    this.goldText = this.add.text(70, 7, '', { ...label, color: toCss(palette.gold) });
+
+    // hearts
+    this.heartImages = [];
+    for (let i = 0; i < this.store.player.maxHp; i++) {
+      this.heartImages.push(this.add.image(140 + i * 16, 14, TextureKey.HeartFull));
+    }
 
     // Seed selector on the right: one slot per crop (icon + count), selected one highlighted.
     const startX = w - CROP_ORDER.length * SLOT_W - 6;
@@ -95,6 +103,9 @@ export class UIScene extends Phaser.Scene {
     const inv = this.store.player.inventory;
     this.dayText.setText(`Day ${this.store.state.time.day}`);
     this.goldText.setText(`${this.store.player.gold}g`);
+    for (let i = 0; i < this.heartImages.length; i++) {
+      this.heartImages[i].setTexture(i < this.store.player.hp ? TextureKey.HeartFull : TextureKey.HeartEmpty);
+    }
     CROP_ORDER.forEach((cropId, i) => {
       this.seedCountTexts[i].setText(`${count(inv, CROPS[cropId].seedItem)}`);
     });

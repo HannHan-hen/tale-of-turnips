@@ -27,14 +27,17 @@ export function migrate(data: unknown): SaveData | null {
   if (!state.player || !state.time) return null;
 
   // Fill fields that may be missing in older saves rather than discarding the save.
-  state.stats ??= { cropsHarvested: 0, chickensPetted: 0 };
+  state.stats ??= { cropsHarvested: 0, chickensPetted: 0, monstersDefeated: 0 };
   state.stats.chickensPetted ??= 0;
+  state.stats.monstersDefeated ??= 0;
   if (!state.player.inventory) {
     state.player.inventory = { slots: [], capacity: Balance.inventoryCapacity };
   }
   state.player.inventory.capacity ??= Balance.inventoryCapacity;
   state.player.inventory.slots ??= [];
   state.player.selectedCropId ??= CropId.Turnip;
+  state.player.maxHp ??= Balance.playerMaxHp;
+  state.player.hp ??= state.player.maxHp;
 
   // Ensure every registered map, chest, chicken, and bush exists, so saves from before an
   // entry was added still load (the new ones simply start empty/fresh).

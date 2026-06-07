@@ -38,6 +38,8 @@ export function createNewGameState(): GameState {
       y: spawn.y,
       facing: 'down',
       gold: Balance.startingGold,
+      hp: Balance.playerMaxHp,
+      maxHp: Balance.playerMaxHp,
       inventory,
       selectedCropId: CropId.Turnip,
     },
@@ -46,6 +48,6 @@ export function createNewGameState(): GameState {
     chickens,
     bushes,
     time: { tick: 0, day: 1 },
-    stats: { cropsHarvested: 0, chickensPetted: 0 },
+    stats: { cropsHarvested: 0, chickensPetted: 0, monstersDefeated: 0 },
   };
 }

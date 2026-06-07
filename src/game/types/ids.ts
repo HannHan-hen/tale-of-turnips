@@ -12,6 +12,8 @@ export const ItemId = {
   Berry: 'berry',
   WornSword: 'worn_sword',
   PaddedVest: 'padded_vest',
+  RuinShard: 'ruin_shard',
+  ShadowWisp: 'shadow_wisp',
 } as const;
 export type ItemId = (typeof ItemId)[keyof typeof ItemId];
 
@@ -26,8 +28,15 @@ export const MapId = {
   Farm: 'farm',
   House: 'house',
   Village: 'village',
+  Ruins: 'ruins',
 } as const;
 export type MapId = (typeof MapId)[keyof typeof MapId];
+
+export const EnemyId = {
+  RuinMite: 'ruin_mite',
+  ShadePup: 'shade_pup',
+} as const;
+export type EnemyId = (typeof EnemyId)[keyof typeof EnemyId];
 
 export const NpcId = {
   SeedSeller: 'seed_seller',

@@ -7,12 +7,15 @@ import Phaser from 'phaser';
 import { cropTextureKey, TextureKey } from '../data/assetKeys';
 import { Balance } from '../data/balance';
 import { CROP_ORDER, CROPS } from '../data/crops';
+import { ITEMS } from '../data/items';
 import { MAPS, TILE, tileCenter, type MapDef } from '../data/maps';
 import { NPCS } from '../data/npcs';
+import { CombatController } from '../combat/CombatController';
 import { GameStateStore } from '../state/GameStateStore';
 import { saveGame } from '../save/SaveSystem';
 import { cropAt, growthStage, isMature, plant, removeCrop } from '../systems/FarmingSystem';
 import { petChicken } from '../systems/ChickenSystem';
+import { applyDamage, rollLoot } from '../systems/CombatSystem';
 import { harvestBush, isBushReady } from '../systems/ForagingSystem';
 import { sellAll } from '../systems/EconomySystem';
 import { findNearestTarget } from '../systems/InteractionSystem';
@@ -21,8 +24,8 @@ import { add, has, remove } from '../systems/InventorySystem';
 import { movePlayer, type Bounds } from '../systems/PlayerController';
 import { transitionTo } from '../systems/MapTransitionSystem';
 import { advanceTick } from '../systems/TimeSystem';
-import { InteractionKind, ItemId, SceneKey } from '../types/ids';
-import type { CropInstance, InteractionTarget } from '../types/models';
+import { InteractionKind, ItemId, MapId, SceneKey } from '../types/ids';
+import type { CropInstance, Facing, InteractionTarget } from '../types/models';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
 
@@ -36,7 +39,21 @@ const EXIT_TEXTURE = {
 const PROP_TEXTURE = {
   stall: TextureKey.Stall,
   anvil: TextureKey.Anvil,
+  rubble: TextureKey.Rubble,
 } as const;
+
+const FLOOR_TEXTURE = {
+  grass: TextureKey.GrassTile,
+  wood: TextureKey.WoodFloor,
+  stone: TextureKey.StoneFloor,
+} as const;
+
+const FACE_DIR: Record<Facing, { x: number; y: number }> = {
+  up: { x: 0, y: -1 },
+  down: { x: 0, y: 1 },
+  left: { x: -1, y: 0 },
+  right: { x: 1, y: 0 },
+};
 
 export class WorldScene extends Phaser.Scene {
   private store!: GameStateStore;
@@ -45,12 +62,15 @@ export class WorldScene extends Phaser.Scene {
   private playerSprite!: Phaser.GameObjects.Image;
   private cropSprites!: Map<CropInstance, Phaser.GameObjects.Image>;
   private bushSprites!: Map<string, Phaser.GameObjects.Image>;
+  private combat?: CombatController;
   private bounds!: Bounds;
   private targets: InteractionTarget[] = [];
 
   private tickAccum = 0;
   private saveAccum = 0;
   private lastPrompt: string | null = null;
+  private invulnUntil = 0;
+  private attackReadyAt = 0;
 
   constructor() {
     super(SceneKey.World);
@@ -62,9 +82,14 @@ export class WorldScene extends Phaser.Scene {
     this.def = MAPS[this.store.player.mapId];
     this.cropSprites = new Map();
     this.bushSprites = new Map();
+    this.combat = undefined;
     this.tickAccum = 0;
     this.saveAccum = 0;
     this.lastPrompt = null;
+    this.invulnUntil = 0;
+    this.attackReadyAt = 0;
+
+    this.bounds = this.computeBounds();
 
     this.drawGround();
     this.drawObjects();
@@ -73,16 +98,24 @@ export class WorldScene extends Phaser.Scene {
 
     for (const crop of this.store.currentMap().crops) this.addCropSprite(crop);
 
+    // Combat is created only for maps that have enemies, keeping farm maps combat-free.
+    if (this.def.enemySpawns.length > 0) {
+      this.combat = new CombatController(this, this.bounds);
+      this.combat.spawn(this.def.enemySpawns);
+    }
+
     const p = this.store.player;
     this.playerSprite = this.add.image(p.x, p.y, TextureKey.Player).setOrigin(0.5, 0.9);
 
-    this.bounds = this.computeBounds();
     this.controls = new InputSystem(this);
 
     this.game.events.emit(UiEvent.Hud);
     this.game.events.emit(UiEvent.Prompt, null);
 
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => saveGame(this.store.state));
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.combat?.destroy();
+      saveGame(this.store.state);
+    });
   }
 
   update(_time: number, deltaMs: number): void {
@@ -114,6 +147,8 @@ export class WorldScene extends Phaser.Scene {
       this.game.events.emit(UiEvent.Hud);
     }
 
+    if (this.combat) this.updateCombat(player.x, player.y, dt);
+
     const target = findNearestTarget(player.x, player.y, this.targets, Balance.interactRadius);
     this.updatePrompt(target);
     if (target && this.controls.interactJustPressed()) this.handleInteract(target);
@@ -129,7 +164,7 @@ export class WorldScene extends Phaser.Scene {
 
   private drawGround(): void {
     const def = this.def;
-    const floorKey = def.floor === 'wood' ? TextureKey.WoodFloor : TextureKey.GrassTile;
+    const floorKey = FLOOR_TEXTURE[def.floor];
     const wt = def.wallThickness;
     for (let ty = 0; ty < def.heightTiles; ty++) {
       for (let tx = 0; tx < def.widthTiles; tx++) {
@@ -402,6 +437,77 @@ export class WorldScene extends Phaser.Scene {
     } else {
       this.toast('Inventory full.');
     }
+  }
+
+  // --- combat (only runs in maps with enemies) ---
+
+  private updateCombat(px: number, py: number, dt: number): void {
+    const now = this.time.now;
+
+    // player swing
+    if (this.controls.attackJustPressed() && now >= this.attackReadyAt) {
+      this.attackReadyAt = now + Balance.attackCooldownMs;
+      this.swing(px, py);
+    }
+
+    // enemy movement + contact damage
+    const contactDamage = this.combat!.update(dt, px, py);
+    if (contactDamage > 0 && now >= this.invulnUntil) this.takeDamage(contactDamage);
+  }
+
+  private swing(px: number, py: number): void {
+    const dir = FACE_DIR[this.store.player.facing];
+    const ax = px + dir.x * Balance.attackOffset;
+    const ay = py - 8 + dir.y * Balance.attackOffset;
+
+    const slash = this.add.image(ax, ay, TextureKey.Slash).setDepth(ay + 20);
+    slash.setFlipX(dir.x < 0);
+    this.tweens.add({ targets: slash, alpha: 0, duration: 160, onComplete: () => slash.destroy() });
+
+    const defeated = this.combat!.attackAt(ax, ay, Balance.attackRange, Balance.attackDamage);
+    for (const def of defeated) {
+      this.store.state.stats.monstersDefeated += 1;
+      for (const drop of rollLoot(def)) {
+        if (add(this.store.player.inventory, drop.itemId, drop.count)) {
+          this.toast(`Defeated ${def.displayName}! +${drop.count} ${ITEMS[drop.itemId].displayName}`);
+        } else {
+          this.toast(`Defeated ${def.displayName}!`);
+        }
+      }
+      if (def.loot.length === 0) this.toast(`Defeated ${def.displayName}!`);
+    }
+    if (defeated.length > 0) {
+      this.game.events.emit(UiEvent.Hud);
+      saveGame(this.store.state);
+    }
+  }
+
+  private takeDamage(amount: number): void {
+    const player = this.store.player;
+    player.hp = applyDamage(player.hp, amount);
+    this.invulnUntil = this.time.now + Balance.invulnMs;
+    this.game.events.emit(UiEvent.Hud);
+
+    this.tweens.add({
+      targets: this.playerSprite,
+      alpha: 0.3,
+      duration: 110,
+      yoyo: true,
+      repeat: Math.floor(Balance.invulnMs / 220),
+      onComplete: () => this.playerSprite.setAlpha(1),
+    });
+
+    if (player.hp <= 0) this.retreat();
+  }
+
+  private retreat(): void {
+    const player = this.store.player;
+    player.hp = player.maxHp;
+    const farm = MAPS[MapId.Farm];
+    transitionTo(this.store.state, MapId.Farm, farm.spawnTile);
+    this.toast('You faint and wake up safe on the farm…');
+    saveGame(this.store.state);
+    this.scene.restart();
   }
 
   private petChickenAction(chickenId: string): void {

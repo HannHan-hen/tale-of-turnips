@@ -13,4 +13,14 @@ export const Balance = {
   playerSpeed: 130, // pixels per second
   interactRadius: 30, // how close (px) the player must be to interact
   autosaveMs: 4000, // how often the game autosaves
+
+  // Combat (only matters in the ruins; hearts are global state)
+  playerMaxHp: 5, // hearts
+  attackOffset: 18, // px ahead of the player the swing lands
+  attackRange: 26, // px radius of the swing
+  attackDamage: 1,
+  attackCooldownMs: 350,
+  invulnMs: 900, // i-frames after taking a hit
+  enemyAggroRange: 96, // px at which an enemy starts chasing
+  enemyContactRange: 18, // px at which an enemy deals contact damage
 } as const;

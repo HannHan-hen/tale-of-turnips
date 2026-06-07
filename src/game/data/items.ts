@@ -80,4 +80,19 @@ export const ITEMS: Record<ItemId, ItemDef> = {
     maxStack: 1,
     iconKey: TextureKey.IconArmor,
   },
+  // Monster drops from the ruins — sellable trinkets (some become gifts in a later slice).
+  [ItemId.RuinShard]: {
+    itemId: ItemId.RuinShard,
+    displayName: 'Ruin Shard',
+    sellPrice: 14,
+    maxStack: 99,
+    iconKey: TextureKey.IconRuinShard,
+  },
+  [ItemId.ShadowWisp]: {
+    itemId: ItemId.ShadowWisp,
+    displayName: 'Shadow Wisp',
+    sellPrice: 40,
+    maxStack: 99,
+    iconKey: TextureKey.IconShadowWisp,
+  },
 };

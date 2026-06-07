@@ -43,6 +43,8 @@ export interface PlayerState {
   y: number;
   facing: Facing;
   gold: number;
+  hp: number; // current hearts
+  maxHp: number; // maximum hearts
   inventory: Inventory;
   selectedCropId: CropId; // which seed planting uses
 }
@@ -67,6 +69,7 @@ export interface TimeState {
 export interface Stats {
   cropsHarvested: number;
   chickensPetted: number;
+  monstersDefeated: number;
 }
 
 export interface GameState {

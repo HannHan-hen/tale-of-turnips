@@ -78,8 +78,9 @@ These files are safe to edit without touching game logic:
   bush, NPC and prop placements, and exits (doors/cottage/signpost) that link maps.
 - `src/game/data/shops.ts` — shop titles, goods, prices, optional unlock conditions.
 - `src/game/data/npcs.ts` — NPC names, sprites, shop links, and dialogue/hint lines.
-- `src/game/data/balance.ts` — tick length, starting gold, threat rates, tuning constants.
-- (Later) `enemies.ts`, `armor.ts`, `loot.ts`, dialogue tables.
+- `src/game/data/enemies.ts` — enemy stats, speed, sprites, and loot tables.
+- `src/game/data/balance.ts` — tick length, starting gold, combat tuning, threat rates.
+- (Later) `armor.ts`, `loot.ts`, dialogue tables.
 
 If you add a new tweakable, put it in `data/` and document it here.
 

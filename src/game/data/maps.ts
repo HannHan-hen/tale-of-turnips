@@ -2,11 +2,11 @@
 // shipping box, chests, and exits. Coordinates are in tiles. Add maps here without
 // touching the world scene (it renders whatever these definitions describe).
 
-import { ChestId, MapId, NpcId } from '../types/ids';
+import { ChestId, EnemyId, MapId, NpcId } from '../types/ids';
 
 export const TILE = 32; // pixel size of one tile
 
-export type FloorKind = 'grass' | 'wood';
+export type FloorKind = 'grass' | 'wood' | 'stone';
 
 export interface TilePos {
   x: number;
@@ -32,8 +32,13 @@ export interface NpcPlacement {
   tile: TilePos;
 }
 
+export interface EnemySpawn {
+  enemyId: EnemyId;
+  tile: TilePos;
+}
+
 // Purely decorative scenery (no interaction).
-export type PropArt = 'stall' | 'anvil';
+export type PropArt = 'stall' | 'anvil' | 'rubble';
 
 export interface PropPlacement {
   art: PropArt;
@@ -64,6 +69,7 @@ export interface MapDef {
   props: PropPlacement[];
   chickens: ChickenPlacement[];
   bushes: BushPlacement[];
+  enemySpawns: EnemySpawn[];
   exits: ExitDef[];
 }
 
@@ -100,6 +106,7 @@ export const MAPS: Record<MapId, MapDef> = {
       { id: 'bush_2', tile: { x: 12, y: 5 } },
       { id: 'bush_3', tile: { x: 10, y: 7 } },
     ],
+    enemySpawns: [],
     exits: [
       { tile: { x: 3, y: 3 }, toMap: MapId.House, toSpawn: { x: 5, y: 7 }, label: 'Enter house', art: 'cottage' },
       { tile: { x: 14, y: 9 }, toMap: MapId.Village, toSpawn: { x: 7, y: 8 }, label: 'To village', art: 'signpost' },
@@ -118,6 +125,7 @@ export const MAPS: Record<MapId, MapDef> = {
     props: [],
     chickens: [],
     bushes: [],
+    enemySpawns: [],
     exits: [
       { tile: { x: 5, y: 7 }, toMap: MapId.Farm, toSpawn: { x: 3, y: 3 }, label: 'Leave', art: 'door' },
     ],
@@ -142,8 +150,36 @@ export const MAPS: Record<MapId, MapDef> = {
     ],
     chickens: [],
     bushes: [],
+    enemySpawns: [],
     exits: [
       { tile: { x: 7, y: 9 }, toMap: MapId.Farm, toSpawn: { x: 13, y: 9 }, label: 'To farm', art: 'signpost' },
+      { tile: { x: 13, y: 1 }, toMap: MapId.Ruins, toSpawn: { x: 6, y: 10 }, label: 'To ruins', art: 'signpost' },
+    ],
+  },
+  [MapId.Ruins]: {
+    mapId: MapId.Ruins,
+    widthTiles: 13,
+    heightTiles: 12,
+    floor: 'stone',
+    wallThickness: 1,
+    spawnTile: { x: 6, y: 10 },
+    plots: [],
+    chests: [],
+    npcs: [],
+    props: [
+      { art: 'rubble', tile: { x: 3, y: 4 } },
+      { art: 'rubble', tile: { x: 9, y: 3 } },
+      { art: 'rubble', tile: { x: 7, y: 6 } },
+    ],
+    chickens: [],
+    bushes: [],
+    enemySpawns: [
+      { enemyId: EnemyId.RuinMite, tile: { x: 4, y: 5 } },
+      { enemyId: EnemyId.RuinMite, tile: { x: 8, y: 6 } },
+      { enemyId: EnemyId.ShadePup, tile: { x: 6, y: 3 } },
+    ],
+    exits: [
+      { tile: { x: 6, y: 10 }, toMap: MapId.Village, toSpawn: { x: 13, y: 1 }, label: 'Leave ruins', art: 'signpost' },
     ],
   },
 };

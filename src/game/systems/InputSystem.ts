@@ -9,17 +9,16 @@ export class InputSystem {
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd: Record<'W' | 'A' | 'S' | 'D', Phaser.Input.Keyboard.Key>;
   private interactKeys: Phaser.Input.Keyboard.Key[];
+  private attackKeys: Phaser.Input.Keyboard.Key[];
   private hotkeys: Phaser.Input.Keyboard.Key[];
 
   constructor(scene: Phaser.Scene) {
     const kb = scene.input.keyboard!;
     this.cursors = kb.createCursorKeys();
     this.wasd = kb.addKeys('W,A,S,D') as Record<'W' | 'A' | 'S' | 'D', Phaser.Input.Keyboard.Key>;
-    this.interactKeys = [
-      kb.addKey(Phaser.Input.Keyboard.KeyCodes.E),
-      kb.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
-    ];
     const codes = Phaser.Input.Keyboard.KeyCodes;
+    this.interactKeys = [kb.addKey(codes.E)];
+    this.attackKeys = [kb.addKey(codes.SPACE), kb.addKey(codes.J)];
     this.hotkeys = [
       kb.addKey(codes.ONE),
       kb.addKey(codes.TWO),
@@ -45,6 +44,10 @@ export class InputSystem {
 
   interactJustPressed(): boolean {
     return this.interactKeys.some((k) => Phaser.Input.Keyboard.JustDown(k));
+  }
+
+  attackJustPressed(): boolean {
+    return this.attackKeys.some((k) => Phaser.Input.Keyboard.JustDown(k));
   }
 
   // Returns the 0-based number-key index pressed this frame (1->0, 2->1, ...), or undefined.

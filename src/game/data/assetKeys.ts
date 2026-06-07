@@ -20,6 +20,13 @@ export const TextureKey = {
   Chicken: 'chicken',
   BushFull: 'bush_full',
   BushEmpty: 'bush_empty',
+  StoneFloor: 'tile_stone_floor',
+  Rubble: 'rubble',
+  Slash: 'slash',
+  EnemyRuinMite: 'enemy_ruin_mite',
+  EnemyShadePup: 'enemy_shade_pup',
+  HeartFull: 'heart_full',
+  HeartEmpty: 'heart_empty',
   IconTurnipSeed: 'icon_turnip_seed',
   IconTurnip: 'icon_turnip',
   IconCarrotSeed: 'icon_carrot_seed',
@@ -30,6 +37,8 @@ export const TextureKey = {
   IconBerry: 'icon_berry',
   IconSword: 'icon_sword',
   IconArmor: 'icon_armor',
+  IconRuinShard: 'icon_ruin_shard',
+  IconShadowWisp: 'icon_shadow_wisp',
 } as const;
 export type TextureKey = (typeof TextureKey)[keyof typeof TextureKey];
 
