@@ -101,29 +101,140 @@ function buildWallTile(scene: Phaser.Scene): void {
   });
 }
 
+// All humans share one detailed 24x32 figure (drawn facing down) so the cast stays
+// coherent. A CharStyle describes the palette + outfit; flipX in the scene gives "left".
+interface CharStyle {
+  hair: number;
+  hairDark: number;
+  hairStyle: 'short' | 'tuft' | 'long';
+  eye: number; // iris color
+  shirt: number; // undershirt / top
+  shirtDark: number;
+  legs: number; // trousers / overall lower half
+  legsDark: number;
+  outfit?: number; // overalls or apron overlay over the shirt
+  outfitDark?: number;
+  outfitStyle?: 'overalls' | 'apron';
+}
+
+function drawCharacter(g: Phaser.GameObjects.Graphics, s: CharStyle): void {
+  const O = palette.outline;
+
+  // ---- Boots ----
+  rect(g, O, 6, 28, 5, 4);
+  rect(g, palette.shoe, 6, 28, 4, 3);
+  rect(g, palette.shoeDark, 6, 30, 5, 2);
+  rect(g, O, 13, 28, 5, 4);
+  rect(g, palette.shoe, 14, 28, 4, 3);
+  rect(g, palette.shoeDark, 13, 30, 5, 2);
+
+  // ---- Legs ----
+  rect(g, O, 6, 22, 5, 7);
+  rect(g, s.legs, 7, 22, 3, 6);
+  rect(g, s.legsDark, 7, 26, 3, 2);
+  rect(g, O, 13, 22, 5, 7);
+  rect(g, s.legs, 14, 22, 3, 6);
+  rect(g, s.legsDark, 14, 26, 3, 2);
+
+  // ---- Torso (undershirt) ----
+  rect(g, O, 4, 12, 16, 11);
+  rect(g, s.shirt, 5, 13, 14, 9);
+  rect(g, s.shirtDark, 5, 20, 14, 2); // hem shade
+  rect(g, s.shirtDark, 5, 13, 2, 9); // side shade
+
+  // ---- Arms + hands ----
+  rect(g, O, 3, 13, 3, 9);
+  rect(g, s.shirt, 4, 14, 2, 5); // left sleeve
+  rect(g, palette.skin, 4, 19, 2, 3); // left hand
+  rect(g, palette.skinDark, 4, 21, 2, 1);
+  rect(g, O, 18, 13, 3, 9);
+  rect(g, s.shirt, 18, 14, 2, 5); // right sleeve
+  rect(g, palette.skin, 18, 19, 2, 3); // right hand
+  rect(g, palette.skinDark, 18, 21, 2, 1);
+
+  // ---- Outfit overlay ----
+  if (s.outfitStyle === 'overalls' && s.outfit !== undefined) {
+    const od = s.outfitDark ?? s.outfit;
+    rect(g, s.outfit, 7, 15, 10, 8); // bib + waist
+    rect(g, s.outfit, 7, 12, 2, 4); // left strap
+    rect(g, s.outfit, 15, 12, 2, 4); // right strap
+    rect(g, od, 7, 21, 10, 2); // waist shade
+    rect(g, od, 10, 17, 4, 4); // front pocket
+    rect(g, s.outfit, 11, 18, 2, 2);
+    rect(g, palette.overallButton, 7, 15, 1, 1); // strap buttons
+    rect(g, palette.overallButton, 16, 15, 1, 1);
+  } else if (s.outfitStyle === 'apron' && s.outfit !== undefined) {
+    const od = s.outfitDark ?? s.outfit;
+    rect(g, s.outfit, 8, 14, 8, 9); // apron bib
+    rect(g, od, 8, 18, 8, 1); // pocket seam
+    rect(g, od, 8, 21, 8, 2); // hem
+  }
+
+  // ---- Neck ----
+  rect(g, palette.skin, 10, 11, 4, 2);
+  rect(g, palette.skinDark, 10, 12, 4, 1);
+
+  // ---- Head ----
+  rect(g, O, 6, 2, 12, 10);
+  rect(g, palette.skin, 7, 3, 10, 8);
+  rect(g, palette.skinDark, 7, 10, 10, 1); // jaw shade
+  rect(g, palette.skinDark, 7, 6, 1, 4); // side shade
+
+  // ---- Eyes ----
+  rect(g, palette.eyeWhite, 9, 6, 2, 3);
+  rect(g, palette.eyeWhite, 13, 6, 2, 3);
+  rect(g, s.eye, 9, 7, 2, 2);
+  rect(g, s.eye, 13, 7, 2, 2);
+  rect(g, O, 10, 7, 1, 1); // pupils
+  rect(g, O, 14, 7, 1, 1);
+  rect(g, palette.eyeWhite, 9, 8, 1, 1); // catchlight sparkle
+  rect(g, palette.eyeWhite, 13, 8, 1, 1);
+
+  // ---- Cheeks + mouth ----
+  rect(g, palette.cheek, 8, 9, 1, 1);
+  rect(g, palette.cheek, 15, 9, 1, 1);
+  rect(g, O, 11, 9, 2, 1);
+
+  // ---- Hair ----
+  rect(g, s.hair, 6, 1, 12, 4); // cap
+  rect(g, s.hair, 8, 0, 8, 1);
+  rect(g, s.hairDark, 6, 4, 12, 1); // cap underside shade
+  rect(g, s.hair, 6, 4, 2, 4); // left sidelock
+  rect(g, s.hair, 16, 4, 2, 4); // right sidelock
+  // spiky fringe over the forehead
+  rect(g, s.hair, 7, 4, 3, 2);
+  rect(g, s.hair, 11, 4, 2, 2);
+  rect(g, s.hair, 14, 4, 2, 2);
+  if (s.hairStyle === 'tuft') {
+    rect(g, s.hair, 11, 0, 2, 2); // cowlick
+    rect(g, s.hairDark, 12, 0, 1, 2);
+  } else if (s.hairStyle === 'long') {
+    rect(g, s.hair, 5, 4, 2, 7); // longer side hair past the cheeks
+    rect(g, s.hair, 17, 4, 2, 7);
+    rect(g, s.hairDark, 5, 9, 2, 2);
+    rect(g, s.hairDark, 17, 9, 2, 2);
+  }
+  rect(g, s.hairDark, 7, 1, 2, 1); // top highlights -> shade
+  rect(g, s.hairDark, 14, 1, 2, 1);
+}
+
 function buildPlayer(scene: Phaser.Scene): void {
-  // 24x30 cute farmer with a clear silhouette, drawn facing down.
-  const w = 24;
-  const h = 30;
-  make(scene, TextureKey.Player, w, h, (g) => {
-    // legs
-    rect(g, palette.clothDark, 7, 23, 4, 6);
-    rect(g, palette.clothDark, 13, 23, 4, 6);
-    // body / smock
-    rect(g, palette.outline, 5, 13, 14, 12);
-    rect(g, palette.cloth, 6, 14, 12, 10);
-    rect(g, palette.clothDark, 6, 20, 12, 2);
-    // head
-    rect(g, palette.outline, 6, 2, 12, 12);
-    rect(g, palette.skin, 7, 3, 10, 10);
-    // hair
-    rect(g, palette.hair, 7, 2, 10, 4);
-    rect(g, palette.hair, 6, 4, 2, 4);
-    rect(g, palette.hair, 16, 4, 2, 4);
-    // eyes
-    rect(g, palette.outline, 9, 8, 2, 2);
-    rect(g, palette.outline, 14, 8, 2, 2);
-  });
+  // The farmer: blonde hair and cute blue denim overalls over a cream shirt.
+  make(scene, TextureKey.Player, 24, 32, (g) =>
+    drawCharacter(g, {
+      hair: palette.blonde,
+      hairDark: palette.blondeDark,
+      hairStyle: 'tuft',
+      eye: palette.eyeDark,
+      shirt: palette.farmerShirt,
+      shirtDark: palette.farmerShirtDark,
+      legs: palette.denim,
+      legsDark: palette.denimDark,
+      outfit: palette.denim,
+      outfitDark: palette.denimDark,
+      outfitStyle: 'overalls',
+    }),
+  );
 }
 
 function buildShippingBox(scene: Phaser.Scene): void {
@@ -235,30 +346,62 @@ function buildAnvil(scene: Phaser.Scene): void {
   });
 }
 
-// One villager body drawn in three color schemes so the cast stays coherent.
+// The villager cast, each a CharStyle variation of the shared figure.
 function buildNpcs(scene: Phaser.Scene): void {
-  buildVillager(scene, TextureKey.NpcSeedSeller, palette.apronGreen, palette.hair);
-  buildVillager(scene, TextureKey.NpcBlacksmith, palette.apronRed, palette.outline);
-  buildVillager(scene, TextureKey.NpcVillager, palette.wall, palette.steel);
-  buildVillager(scene, TextureKey.NpcJay, palette.jayShirt, palette.jayHair);
+  // Seed seller: brown hair, tan shirt, green gardening apron.
+  buildVillager(scene, TextureKey.NpcSeedSeller, {
+    hair: palette.hairBrown,
+    hairDark: palette.hairBrownDark,
+    hairStyle: 'long',
+    eye: palette.eyeDark,
+    shirt: palette.wood,
+    shirtDark: palette.woodDark,
+    legs: palette.woodDark,
+    legsDark: palette.soilDark,
+    outfit: palette.apronGreen,
+    outfitDark: palette.leafDark,
+    outfitStyle: 'apron',
+  });
+  // Blacksmith: gray hair, sturdy shirt, leather apron.
+  buildVillager(scene, TextureKey.NpcBlacksmith, {
+    hair: palette.hairGray,
+    hairDark: palette.hairGrayDark,
+    hairStyle: 'short',
+    eye: palette.eyeDark,
+    shirt: palette.blacksmithShirt,
+    shirtDark: palette.blacksmithShirtDark,
+    legs: palette.stoneDark,
+    legsDark: palette.outline,
+    outfit: palette.leatherApron,
+    outfitDark: palette.leatherApronDark,
+    outfitStyle: 'apron',
+  });
+  // Generic villager: brown hair, plum tunic.
+  buildVillager(scene, TextureKey.NpcVillager, {
+    hair: palette.hairBrown,
+    hairDark: palette.hairBrownDark,
+    hairStyle: 'short',
+    eye: palette.eyeDark,
+    shirt: palette.villagerShirt,
+    shirtDark: palette.villagerShirtDark,
+    legs: palette.shoeDark,
+    legsDark: palette.outline,
+  });
+  // Jay: black hair, gray eyes, white shirt, black pants.
+  buildVillager(scene, TextureKey.NpcJay, {
+    hair: palette.jayBlackHair,
+    hairDark: palette.jayBlackHairDark,
+    hairStyle: 'tuft',
+    eye: palette.eyeGray,
+    shirt: palette.jayWhite,
+    shirtDark: palette.jayWhiteDark,
+    legs: palette.jayBlackPants,
+    legsDark: palette.jayBlackPantsDark,
+  });
 }
 
-function buildVillager(scene: Phaser.Scene, key: string, cloth: number, hair: number): void {
-  const w = 24;
-  const h = 30;
-  make(scene, key, w, h, (g) => {
-    rect(g, palette.clothDark, 7, 23, 4, 6); // legs
-    rect(g, palette.clothDark, 13, 23, 4, 6);
-    rect(g, palette.outline, 5, 13, 14, 12); // body
-    rect(g, cloth, 6, 14, 12, 10);
-    rect(g, palette.outline, 6, 2, 12, 12); // head
-    rect(g, palette.skin, 7, 3, 10, 10);
-    rect(g, hair, 7, 2, 10, 4); // hair
-    rect(g, hair, 6, 4, 2, 3);
-    rect(g, hair, 16, 4, 2, 3);
-    rect(g, palette.outline, 9, 8, 2, 2); // eyes
-    rect(g, palette.outline, 14, 8, 2, 2);
-  });
+function buildVillager(scene: Phaser.Scene, key: string, style: CharStyle): void {
+  make(scene, key, 24, 32, (g) => drawCharacter(g, style));
 }
 
 function buildChicken(scene: Phaser.Scene): void {
