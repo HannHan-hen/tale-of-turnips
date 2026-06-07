@@ -11,8 +11,16 @@ export const TextureKey = {
   Cottage: 'cottage',
   Door: 'door',
   Chest: 'chest',
+  Signpost: 'signpost',
+  Stall: 'stall',
+  Anvil: 'anvil',
+  NpcSeedSeller: 'npc_seed_seller',
+  NpcBlacksmith: 'npc_blacksmith',
+  NpcVillager: 'npc_villager',
   IconTurnipSeed: 'icon_turnip_seed',
   IconTurnip: 'icon_turnip',
+  IconSword: 'icon_sword',
+  IconArmor: 'icon_armor',
 } as const;
 export type TextureKey = (typeof TextureKey)[keyof typeof TextureKey];
 

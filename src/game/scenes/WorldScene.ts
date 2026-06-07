@@ -8,6 +8,7 @@ import { cropTextureKey, TextureKey } from '../data/assetKeys';
 import { Balance } from '../data/balance';
 import { CROPS } from '../data/crops';
 import { MAPS, TILE, tileCenter, type MapDef } from '../data/maps';
+import { NPCS } from '../data/npcs';
 import { GameStateStore } from '../state/GameStateStore';
 import { saveGame } from '../save/SaveSystem';
 import { cropAt, growthStage, isMature, plant, removeCrop } from '../systems/FarmingSystem';
@@ -22,6 +23,18 @@ import { InteractionKind, ItemId, SceneKey } from '../types/ids';
 import type { CropInstance, InteractionTarget } from '../types/models';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
+
+// Map the data-driven art tags to texture keys (keeps the scene free of art branching).
+const EXIT_TEXTURE = {
+  cottage: TextureKey.Cottage,
+  door: TextureKey.Door,
+  signpost: TextureKey.Signpost,
+} as const;
+
+const PROP_TEXTURE = {
+  stall: TextureKey.Stall,
+  anvil: TextureKey.Anvil,
+} as const;
 
 export class WorldScene extends Phaser.Scene {
   private store!: GameStateStore;
@@ -128,8 +141,16 @@ export class WorldScene extends Phaser.Scene {
     }
     for (const exit of def.exits) {
       const c = tileCenter(exit.tile);
-      const key = exit.art === 'cottage' ? TextureKey.Cottage : TextureKey.Door;
+      const key = EXIT_TEXTURE[exit.art];
       this.add.image(c.x, c.y, key).setOrigin(0.5, 0.9).setDepth(c.y - 2);
+    }
+    for (const prop of def.props) {
+      const c = tileCenter(prop.tile);
+      this.add.image(c.x, c.y, PROP_TEXTURE[prop.art]).setOrigin(0.5, 0.85).setDepth(c.y - 3);
+    }
+    for (const npc of def.npcs) {
+      const c = tileCenter(npc.tile);
+      this.add.image(c.x, c.y, NPCS[npc.npcId].textureKey).setOrigin(0.5, 0.9).setDepth(c.y);
     }
   }
 
@@ -180,6 +201,10 @@ export class WorldScene extends Phaser.Scene {
       const c = tileCenter(exit.tile);
       targets.push({ kind: InteractionKind.Door, x: c.x, y: c.y, exitIndex: i });
     });
+    def.npcs.forEach((npc) => {
+      const c = tileCenter(npc.tile);
+      targets.push({ kind: InteractionKind.Npc, x: c.x, y: c.y, npcId: npc.npcId });
+    });
     return targets;
   }
 
@@ -199,6 +224,10 @@ export class WorldScene extends Phaser.Scene {
         return 'Open chest  [E]';
       case InteractionKind.Door:
         return `${this.def.exits[target.exitIndex!].label}  [E]`;
+      case InteractionKind.Npc: {
+        const npc = NPCS[target.npcId as keyof typeof NPCS];
+        return `${npc.shopId ? 'Shop' : 'Talk'}: ${npc.displayName}  [E]`;
+      }
       case InteractionKind.Plot: {
         const crop = this.cropAtTarget(target);
         if (!crop) {
@@ -222,6 +251,9 @@ export class WorldScene extends Phaser.Scene {
       case InteractionKind.Door:
         this.useExit(target.exitIndex!);
         return; // scene restarts
+      case InteractionKind.Npc:
+        this.useNpc(target.npcId as keyof typeof NPCS);
+        return; // shop scene takes over, or a dialogue toast shows
       case InteractionKind.Plot:
         this.usePlot(target);
         break;
@@ -235,6 +267,18 @@ export class WorldScene extends Phaser.Scene {
     saveGame(this.store.state);
     this.scene.pause();
     this.scene.launch(SceneKey.Chest, { chestId });
+  }
+
+  private useNpc(npcId: keyof typeof NPCS): void {
+    const npc = NPCS[npcId];
+    if (npc.shopId) {
+      this.game.events.emit(UiEvent.Prompt, null);
+      saveGame(this.store.state);
+      this.scene.pause();
+      this.scene.launch(SceneKey.Shop, { shopId: npc.shopId });
+    } else if (npc.lines && npc.lines.length > 0) {
+      this.toast(`${npc.displayName}: ${Phaser.Utils.Array.GetRandom(npc.lines)}`);
+    }
   }
 
   private useExit(exitIndex: number): void {

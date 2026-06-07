@@ -3,8 +3,8 @@
 
 import { ITEMS } from '../data/items';
 import type { ItemId } from '../types/ids';
-import type { Inventory } from '../types/models';
-import { remove } from './InventorySystem';
+import type { Inventory, PlayerState } from '../types/models';
+import { add, canAdd, remove } from './InventorySystem';
 
 export function sellPriceOf(itemId: ItemId): number {
   return ITEMS[itemId].sellPrice ?? 0;
@@ -28,4 +28,15 @@ export function sellAll(inv: Inventory): SaleResult {
     }
   }
   return { gold, itemsSold };
+}
+
+export type BuyResult = 'ok' | 'not_enough_gold' | 'no_room';
+
+// Buys one of an item at the given price: checks gold and space, then applies both.
+export function buy(player: PlayerState, itemId: ItemId, price: number): BuyResult {
+  if (player.gold < price) return 'not_enough_gold';
+  if (!canAdd(player.inventory, itemId, 1)) return 'no_room';
+  player.gold -= price;
+  add(player.inventory, itemId, 1);
+  return 'ok';
 }

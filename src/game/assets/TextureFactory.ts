@@ -39,6 +39,10 @@ export function buildTextures(scene: Phaser.Scene): void {
   buildCottage(scene);
   buildDoor(scene);
   buildChest(scene);
+  buildSignpost(scene);
+  buildStall(scene);
+  buildAnvil(scene);
+  buildNpcs(scene);
   buildIcons(scene);
   buildCropStages(scene);
 }
@@ -177,6 +181,74 @@ function buildChest(scene: Phaser.Scene): void {
   });
 }
 
+function buildSignpost(scene: Phaser.Scene): void {
+  const w = 24;
+  const h = 30;
+  make(scene, TextureKey.Signpost, w, h, (g) => {
+    rect(g, palette.outline, 10, 10, 4, 20); // post
+    rect(g, palette.woodDark, 11, 11, 2, 18);
+    rect(g, palette.outline, 2, 4, 20, 9); // sign board
+    rect(g, palette.wood, 4, 6, 16, 5);
+    rect(g, palette.woodDark, 6, 8, 10, 1);
+  });
+}
+
+function buildStall(scene: Phaser.Scene): void {
+  // a little market stall with a striped awning
+  const w = 56;
+  const h = 44;
+  make(scene, TextureKey.Stall, w, h, (g) => {
+    rect(g, palette.outline, 4, 24, w - 8, h - 24); // counter
+    rect(g, palette.wood, 6, 26, w - 12, h - 28);
+    rect(g, palette.outline, 2, 22, w - 4, 4); // counter top
+    rect(g, palette.outline, 6, 4, 4, 22); // posts
+    rect(g, palette.outline, w - 10, 4, 4, 22);
+    // striped awning
+    for (let i = 0; i < w - 8; i += 12) {
+      rect(g, palette.cloth, 4 + i, 2, 6, 10);
+      rect(g, palette.uiInk, 10 + i, 2, 6, 10);
+    }
+    rect(g, palette.outline, 2, 0, w - 4, 3);
+  });
+}
+
+function buildAnvil(scene: Phaser.Scene): void {
+  const w = 30;
+  const h = 26;
+  make(scene, TextureKey.Anvil, w, h, (g) => {
+    rect(g, palette.stoneDark, 8, 18, 14, 8); // base
+    rect(g, palette.stone, 11, 10, 8, 8); // waist
+    rect(g, palette.outline, 4, 4, w - 8, 7); // top
+    rect(g, palette.steel, 6, 5, w - 12, 4);
+    rect(g, palette.steelDark, 2, 5, 5, 3); // horn
+  });
+}
+
+// One villager body drawn in three color schemes so the cast stays coherent.
+function buildNpcs(scene: Phaser.Scene): void {
+  buildVillager(scene, TextureKey.NpcSeedSeller, palette.apronGreen, palette.hair);
+  buildVillager(scene, TextureKey.NpcBlacksmith, palette.apronRed, palette.outline);
+  buildVillager(scene, TextureKey.NpcVillager, palette.wall, palette.steel);
+}
+
+function buildVillager(scene: Phaser.Scene, key: string, cloth: number, hair: number): void {
+  const w = 24;
+  const h = 30;
+  make(scene, key, w, h, (g) => {
+    rect(g, palette.clothDark, 7, 23, 4, 6); // legs
+    rect(g, palette.clothDark, 13, 23, 4, 6);
+    rect(g, palette.outline, 5, 13, 14, 12); // body
+    rect(g, cloth, 6, 14, 12, 10);
+    rect(g, palette.outline, 6, 2, 12, 12); // head
+    rect(g, palette.skin, 7, 3, 10, 10);
+    rect(g, hair, 7, 2, 10, 4); // hair
+    rect(g, hair, 6, 4, 2, 3);
+    rect(g, hair, 16, 4, 2, 3);
+    rect(g, palette.outline, 9, 8, 2, 2); // eyes
+    rect(g, palette.outline, 14, 8, 2, 2);
+  });
+}
+
 function buildIcons(scene: Phaser.Scene): void {
   const s = 20;
   // seed: a small pip
@@ -193,6 +265,20 @@ function buildIcons(scene: Phaser.Scene): void {
     rect(g, palette.leaf, 7, 1, 2, 6);
     rect(g, palette.leaf, 11, 1, 2, 6);
     rect(g, palette.leafDark, 9, 2, 2, 5);
+  });
+  // sword: a simple steel blade
+  make(scene, TextureKey.IconSword, s, s, (g) => {
+    rect(g, palette.steel, 9, 2, 2, 11);
+    rect(g, palette.steelDark, 11, 3, 1, 10);
+    rect(g, palette.metal, 6, 13, 8, 2); // guard
+    rect(g, palette.woodDark, 9, 15, 2, 4); // grip
+  });
+  // armor: a padded vest
+  make(scene, TextureKey.IconArmor, s, s, (g) => {
+    rect(g, palette.outline, 5, 4, 10, 13);
+    rect(g, palette.cloth, 6, 5, 8, 11);
+    rect(g, palette.clothDark, 9, 5, 2, 11);
+    rect(g, palette.skin, 8, 3, 4, 2); // collar gap
   });
 }
 

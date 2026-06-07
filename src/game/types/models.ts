@@ -77,4 +77,5 @@ export interface InteractionTarget {
   plotIndex?: number; // set when kind === Plot
   chestId?: string; // set when kind === Chest
   exitIndex?: number; // set when kind === Door
+  npcId?: string; // set when kind === Npc
 }

@@ -224,7 +224,8 @@ thing implemented in code; everything below it lives here until its turn.**
    minimal UI. *Deliverable: a playable, persistent, polished farming loop.*
 2. **House + chest — done.** house interior, centralized map transitions (door/cottage
    exits), and a chest reusing the shared inventory model via a keyboard chest screen.
-3. **Village + shops:** village map, seed seller, blacksmith; data-driven shop purchasing.
+3. **Village + shops — done.** village map, signpost link from the farm, NPCs (seed seller,
+   blacksmith, hint villager), and data-driven shop purchasing via a keyboard shop screen.
 4. **Animals & more crops:** chickens (pet/eggs), bushes (foraging + regrow), crops 2 & 3.
 5. **Ruins + combat:** ruins map, hearts/HP, one attack, enemy data/behavior/drops.
 6. **Threat:** `ruinThreat` rising daily, farm monster incursions, warnings, crop damage.

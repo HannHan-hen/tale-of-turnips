@@ -26,4 +26,18 @@ export const ITEMS: Record<ItemId, ItemDef> = {
     maxStack: 99,
     iconKey: TextureKey.IconTurnip,
   },
+  // Basic gear bought from the blacksmith. Inert for now; gains combat effects when the
+  // combat/equipment slices land. Not sellable so a careless shipping-box sweep keeps it.
+  [ItemId.WornSword]: {
+    itemId: ItemId.WornSword,
+    displayName: 'Worn Sword',
+    maxStack: 1,
+    iconKey: TextureKey.IconSword,
+  },
+  [ItemId.PaddedVest]: {
+    itemId: ItemId.PaddedVest,
+    displayName: 'Padded Vest',
+    maxStack: 1,
+    iconKey: TextureKey.IconArmor,
+  },
 };

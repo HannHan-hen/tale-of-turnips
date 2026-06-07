@@ -57,6 +57,8 @@ export class UIScene extends Phaser.Scene {
         fontFamily: 'monospace',
         fontSize: '14px',
         color: toCss(palette.uiInk),
+        align: 'center',
+        wordWrap: { width: w - 40 },
       })
       .setOrigin(0.5)
       .setAlpha(0);

@@ -4,6 +4,8 @@
 export const ItemId = {
   TurnipSeed: 'turnip_seed',
   Turnip: 'turnip',
+  WornSword: 'worn_sword',
+  PaddedVest: 'padded_vest',
 } as const;
 export type ItemId = (typeof ItemId)[keyof typeof ItemId];
 
@@ -15,8 +17,22 @@ export type CropId = (typeof CropId)[keyof typeof CropId];
 export const MapId = {
   Farm: 'farm',
   House: 'house',
+  Village: 'village',
 } as const;
 export type MapId = (typeof MapId)[keyof typeof MapId];
+
+export const NpcId = {
+  SeedSeller: 'seed_seller',
+  Blacksmith: 'blacksmith',
+  Hint: 'old_pip',
+} as const;
+export type NpcId = (typeof NpcId)[keyof typeof NpcId];
+
+export const ShopId = {
+  Seeds: 'seed_shop',
+  Blacksmith: 'blacksmith_shop',
+} as const;
+export type ShopId = (typeof ShopId)[keyof typeof ShopId];
 
 export const ChestId = {
   House: 'house_chest',
@@ -28,6 +44,7 @@ export const SceneKey = {
   World: 'world',
   UI: 'ui',
   Chest: 'chest',
+  Shop: 'shop',
 } as const;
 export type SceneKey = (typeof SceneKey)[keyof typeof SceneKey];
 
@@ -37,5 +54,6 @@ export const InteractionKind = {
   ShippingBox: 'shipping_box',
   Chest: 'chest',
   Door: 'door',
+  Npc: 'npc',
 } as const;
 export type InteractionKind = (typeof InteractionKind)[keyof typeof InteractionKind];

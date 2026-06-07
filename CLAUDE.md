@@ -74,10 +74,12 @@ These files are safe to edit without touching game logic:
 
 - `src/game/data/items.ts` — item names, sell prices, stack behaviour.
 - `src/game/data/crops.ts` — crop seed/harvest items, growth duration & stages.
-- `src/game/data/maps.ts` — map layouts, spawn points, plots, chests, shipping box, and
-  exits (doors/cottage) that link maps.
+- `src/game/data/maps.ts` — map layouts, spawn points, plots, chests, shipping box, NPC and
+  prop placements, and exits (doors/cottage/signpost) that link maps.
+- `src/game/data/shops.ts` — shop titles, goods, prices, optional unlock conditions.
+- `src/game/data/npcs.ts` — NPC names, sprites, shop links, and dialogue/hint lines.
 - `src/game/data/balance.ts` — tick length, starting gold, threat rates, tuning constants.
-- (Later) `shops.ts`, `enemies.ts`, `npcs.ts`, `armor.ts`, `loot.ts`, dialogue tables.
+- (Later) `enemies.ts`, `armor.ts`, `loot.ts`, dialogue tables.
 
 If you add a new tweakable, put it in `data/` and document it here.
 

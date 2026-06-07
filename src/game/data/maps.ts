@@ -2,7 +2,7 @@
 // shipping box, chests, and exits. Coordinates are in tiles. Add maps here without
 // touching the world scene (it renders whatever these definitions describe).
 
-import { ChestId, MapId } from '../types/ids';
+import { ChestId, MapId, NpcId } from '../types/ids';
 
 export const TILE = 32; // pixel size of one tile
 
@@ -19,11 +19,24 @@ export interface ExitDef {
   toMap: MapId;
   toSpawn: TilePos; // spawn tile on the destination map
   label: string;
-  art: 'cottage' | 'door'; // how the exit is drawn
+  art: 'cottage' | 'door' | 'signpost'; // how the exit is drawn
 }
 
 export interface ChestPlacement {
   chestId: ChestId;
+  tile: TilePos;
+}
+
+export interface NpcPlacement {
+  npcId: NpcId;
+  tile: TilePos;
+}
+
+// Purely decorative scenery (no interaction).
+export type PropArt = 'stall' | 'anvil';
+
+export interface PropPlacement {
+  art: PropArt;
   tile: TilePos;
 }
 
@@ -37,6 +50,8 @@ export interface MapDef {
   plots: TilePos[];
   shippingBox?: TilePos;
   chests: ChestPlacement[];
+  npcs: NpcPlacement[];
+  props: PropPlacement[];
   exits: ExitDef[];
 }
 
@@ -61,8 +76,11 @@ export const MAPS: Record<MapId, MapDef> = {
     plots: plotGrid(3, 4, 3, 3),
     shippingBox: { x: 13, y: 2 },
     chests: [],
+    npcs: [],
+    props: [],
     exits: [
       { tile: { x: 3, y: 3 }, toMap: MapId.House, toSpawn: { x: 5, y: 7 }, label: 'Enter house', art: 'cottage' },
+      { tile: { x: 14, y: 9 }, toMap: MapId.Village, toSpawn: { x: 7, y: 8 }, label: 'To village', art: 'signpost' },
     ],
   },
   [MapId.House]: {
@@ -74,8 +92,32 @@ export const MAPS: Record<MapId, MapDef> = {
     spawnTile: { x: 5, y: 7 },
     plots: [],
     chests: [{ chestId: ChestId.House, tile: { x: 3, y: 2 } }],
+    npcs: [],
+    props: [],
     exits: [
       { tile: { x: 5, y: 7 }, toMap: MapId.Farm, toSpawn: { x: 3, y: 3 }, label: 'Leave', art: 'door' },
+    ],
+  },
+  [MapId.Village]: {
+    mapId: MapId.Village,
+    widthTiles: 15,
+    heightTiles: 10,
+    floor: 'grass',
+    wallThickness: 0,
+    spawnTile: { x: 7, y: 8 },
+    plots: [],
+    chests: [],
+    npcs: [
+      { npcId: NpcId.SeedSeller, tile: { x: 4, y: 5 } },
+      { npcId: NpcId.Blacksmith, tile: { x: 10, y: 5 } },
+      { npcId: NpcId.Hint, tile: { x: 7, y: 3 } },
+    ],
+    props: [
+      { art: 'stall', tile: { x: 4, y: 4 } },
+      { art: 'anvil', tile: { x: 11, y: 5 } },
+    ],
+    exits: [
+      { tile: { x: 7, y: 9 }, toMap: MapId.Farm, toSpawn: { x: 13, y: 9 }, label: 'To farm', art: 'signpost' },
     ],
   },
 };

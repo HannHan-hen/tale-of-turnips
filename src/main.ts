@@ -7,6 +7,7 @@ import { MapId } from './game/types/ids';
 import { BootScene } from './game/scenes/BootScene';
 import { WorldScene } from './game/scenes/WorldScene';
 import { ChestScene } from './game/scenes/ChestScene';
+import { ShopScene } from './game/scenes/ShopScene';
 import { UIScene } from './game/scenes/UIScene';
 
 const farm = MAPS[MapId.Farm];
@@ -22,6 +23,6 @@ new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  // UI is listed last so the HUD/toast render on top of the chest overlay.
-  scene: [BootScene, WorldScene, ChestScene, UIScene],
+  // UI is listed last so the HUD/toast render on top of the modal overlays.
+  scene: [BootScene, WorldScene, ChestScene, ShopScene, UIScene],
 });
