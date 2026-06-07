@@ -2,7 +2,7 @@
 // shipping box, chests, and exits. Coordinates are in tiles. Add maps here without
 // touching the world scene (it renders whatever these definitions describe).
 
-import { ChestId, EnemyId, MapId, NpcId } from '../types/ids';
+import { ArmorPieceId, ChestId, EnemyId, MapId, NpcId } from '../types/ids';
 
 export const TILE = 32; // pixel size of one tile
 
@@ -34,6 +34,13 @@ export interface NpcPlacement {
 
 export interface EnemySpawn {
   enemyId: EnemyId;
+  tile: TilePos;
+}
+
+// A one-time cache holding a legendary piece (considered opened once the piece is owned).
+export interface CachePlacement {
+  id: string;
+  pieceId: ArmorPieceId;
   tile: TilePos;
 }
 
@@ -70,6 +77,7 @@ export interface MapDef {
   chickens: ChickenPlacement[];
   bushes: BushPlacement[];
   enemySpawns: EnemySpawn[];
+  caches: CachePlacement[];
   exits: ExitDef[];
 }
 
@@ -107,6 +115,7 @@ export const MAPS: Record<MapId, MapDef> = {
       { id: 'bush_3', tile: { x: 10, y: 7 } },
     ],
     enemySpawns: [],
+    caches: [],
     exits: [
       { tile: { x: 3, y: 3 }, toMap: MapId.House, toSpawn: { x: 5, y: 7 }, label: 'Enter house', art: 'cottage' },
       { tile: { x: 14, y: 9 }, toMap: MapId.Village, toSpawn: { x: 7, y: 8 }, label: 'To village', art: 'signpost' },
@@ -126,6 +135,7 @@ export const MAPS: Record<MapId, MapDef> = {
     chickens: [],
     bushes: [],
     enemySpawns: [],
+    caches: [],
     exits: [
       { tile: { x: 5, y: 7 }, toMap: MapId.Farm, toSpawn: { x: 3, y: 3 }, label: 'Leave', art: 'door' },
     ],
@@ -151,6 +161,7 @@ export const MAPS: Record<MapId, MapDef> = {
     chickens: [],
     bushes: [],
     enemySpawns: [],
+    caches: [],
     exits: [
       { tile: { x: 7, y: 9 }, toMap: MapId.Farm, toSpawn: { x: 13, y: 9 }, label: 'To farm', art: 'signpost' },
       { tile: { x: 13, y: 1 }, toMap: MapId.Ruins, toSpawn: { x: 6, y: 10 }, label: 'To ruins', art: 'signpost' },
@@ -177,6 +188,13 @@ export const MAPS: Record<MapId, MapDef> = {
       { enemyId: EnemyId.RuinMite, tile: { x: 4, y: 5 } },
       { enemyId: EnemyId.RuinMite, tile: { x: 8, y: 6 } },
       { enemyId: EnemyId.ShadePup, tile: { x: 6, y: 3 } },
+    ],
+    caches: [
+      { id: 'cache_helm', pieceId: ArmorPieceId.Helm, tile: { x: 2, y: 2 } },
+      { id: 'cache_plate', pieceId: ArmorPieceId.Plate, tile: { x: 10, y: 2 } },
+      { id: 'cache_gauntlets', pieceId: ArmorPieceId.Gauntlets, tile: { x: 2, y: 8 } },
+      { id: 'cache_greaves', pieceId: ArmorPieceId.Greaves, tile: { x: 10, y: 8 } },
+      { id: 'cache_blade', pieceId: ArmorPieceId.Blade, tile: { x: 6, y: 5 } },
     ],
     exits: [
       { tile: { x: 6, y: 10 }, toMap: MapId.Village, toSpawn: { x: 13, y: 1 }, label: 'Leave ruins', art: 'signpost' },

@@ -4,8 +4,10 @@
 import Phaser from 'phaser';
 import { TextureKey } from '../data/assetKeys';
 import { palette, toCss } from '../data/palette';
+import { ARMOR_ORDER, ARMOR_PIECES, SET_NAME } from '../data/armor';
 import { CROP_ORDER, CROPS } from '../data/crops';
 import { ITEMS } from '../data/items';
+import { hasPiece } from '../systems/EquipmentSystem';
 import { GameStateStore } from '../state/GameStateStore';
 import { count } from '../systems/InventorySystem';
 import { SceneKey } from '../types/ids';
@@ -20,6 +22,7 @@ export class UIScene extends Phaser.Scene {
   private goldText!: Phaser.GameObjects.Text;
   private heartImages: Phaser.GameObjects.Image[] = [];
   private threatText!: Phaser.GameObjects.Text;
+  private setIcons: Phaser.GameObjects.Image[] = [];
   private seedCountTexts: Phaser.GameObjects.Text[] = [];
   private selectHighlight!: Phaser.GameObjects.Rectangle;
   private slotXs: number[] = [];
@@ -65,6 +68,12 @@ export class UIScene extends Phaser.Scene {
       const t = this.add.text(x + 12, 7, '', { ...label, color: toCss(palette.uiInk) });
       this.seedCountTexts.push(t);
     });
+
+    // Starless Set tracker, bottom-left (dim until each piece is found).
+    this.add.text(10, h - 32, SET_NAME, { fontFamily: 'monospace', fontSize: '10px', color: toCss(palette.starlessTrim) });
+    this.setIcons = ARMOR_ORDER.map((pieceId, i) =>
+      this.add.image(18 + i * 18, h - 14, ARMOR_PIECES[pieceId].iconKey).setScale(0.8),
+    );
 
     this.promptText = this.add
       .text(w / 2, h - 16, '', {
@@ -112,6 +121,10 @@ export class UIScene extends Phaser.Scene {
     }
     const threat = this.store.state.threat.ruinThreat;
     this.threatText.setText(threat > 0 ? `Threat ${threat}` : '');
+    ARMOR_ORDER.forEach((pieceId, i) => {
+      const owned = hasPiece(this.store.state.armor, pieceId);
+      this.setIcons[i].setAlpha(owned ? 1 : 0.25);
+    });
     CROP_ORDER.forEach((cropId, i) => {
       this.seedCountTexts[i].setText(`${count(inv, CROPS[cropId].seedItem)}`);
     });

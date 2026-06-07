@@ -40,6 +40,8 @@ export function migrate(data: unknown): SaveData | null {
   state.player.hp ??= state.player.maxHp;
   state.threat ??= { ruinThreat: 0 };
   state.threat.ruinThreat ??= 0;
+  state.armor ??= { collectedPieces: [] };
+  state.armor.collectedPieces ??= [];
 
   // Ensure every registered map, chest, chicken, and bush exists, so saves from before an
   // entry was added still load (the new ones simply start empty/fresh).

@@ -5,6 +5,7 @@
 
 import Phaser from 'phaser';
 import { cropTextureKey, TextureKey } from '../data/assetKeys';
+import { ARMOR_PIECES, SET_NAME } from '../data/armor';
 import { Balance } from '../data/balance';
 import { CROP_ORDER, CROPS } from '../data/crops';
 import { ITEMS } from '../data/items';
@@ -16,6 +17,7 @@ import { saveGame } from '../save/SaveSystem';
 import { cropAt, growthStage, isMature, plant, removeCrop } from '../systems/FarmingSystem';
 import { petChicken } from '../systems/ChickenSystem';
 import { applyDamage, rollLoot } from '../systems/CombatSystem';
+import { collectPiece, computeLoadout, hasPiece, recalcMaxHp, type Loadout } from '../systems/EquipmentSystem';
 import { harvestBush, isBushReady } from '../systems/ForagingSystem';
 import { sellAll } from '../systems/EconomySystem';
 import {
@@ -31,7 +33,7 @@ import { add, has, remove } from '../systems/InventorySystem';
 import { movePlayer, type Bounds } from '../systems/PlayerController';
 import { transitionTo } from '../systems/MapTransitionSystem';
 import { advanceTick } from '../systems/TimeSystem';
-import { EnemyId, InteractionKind, ItemId, MapId, SceneKey } from '../types/ids';
+import { ArmorPieceId, EnemyId, InteractionKind, ItemId, MapId, SceneKey } from '../types/ids';
 import type { CropInstance, Facing, InteractionTarget } from '../types/models';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
@@ -69,6 +71,8 @@ export class WorldScene extends Phaser.Scene {
   private playerSprite!: Phaser.GameObjects.Image;
   private cropSprites!: Map<CropInstance, Phaser.GameObjects.Image>;
   private bushSprites!: Map<string, Phaser.GameObjects.Image>;
+  private cacheSprites!: Map<string, Phaser.GameObjects.Image>;
+  private loadout!: Loadout;
   private combat?: CombatController;
   private isRaid = false;
   private bounds!: Bounds;
@@ -90,6 +94,8 @@ export class WorldScene extends Phaser.Scene {
     this.def = MAPS[this.store.player.mapId];
     this.cropSprites = new Map();
     this.bushSprites = new Map();
+    this.cacheSprites = new Map();
+    this.loadout = computeLoadout(this.store.state.armor);
     this.combat = undefined;
     this.isRaid = false;
     this.tickAccum = 0;
@@ -134,7 +140,7 @@ export class WorldScene extends Phaser.Scene {
     const dt = deltaMs / 1000;
     const player = this.store.player;
 
-    movePlayer(player, this.controls.getMovement(), Balance.playerSpeed, dt, this.bounds);
+    movePlayer(player, this.controls.getMovement(), Balance.playerSpeed + this.loadout.bonusSpeed, dt, this.bounds);
     this.playerSprite.setPosition(player.x, player.y).setDepth(player.y);
     this.playerSprite.setFlipX(player.facing === 'left');
 
@@ -219,6 +225,15 @@ export class WorldScene extends Phaser.Scene {
     for (const npc of def.npcs) {
       const c = tileCenter(npc.tile);
       this.add.image(c.x, c.y, NPCS[npc.npcId].textureKey).setOrigin(0.5, 0.9).setDepth(c.y);
+    }
+    for (const cache of def.caches) {
+      const c = tileCenter(cache.tile);
+      const opened = hasPiece(this.store.state.armor, cache.pieceId);
+      const spr = this.add
+        .image(c.x, c.y, opened ? TextureKey.CacheOpen : TextureKey.CacheClosed)
+        .setOrigin(0.5, 0.8)
+        .setDepth(c.y);
+      this.cacheSprites.set(cache.id, spr);
     }
   }
 
@@ -309,6 +324,10 @@ export class WorldScene extends Phaser.Scene {
       const c = tileCenter(bush.tile);
       targets.push({ kind: InteractionKind.Bush, x: c.x, y: c.y, bushId: bush.id });
     });
+    def.caches.forEach((cache) => {
+      const c = tileCenter(cache.tile);
+      targets.push({ kind: InteractionKind.Cache, x: c.x, y: c.y, cacheId: cache.id, pieceId: cache.pieceId });
+    });
     return targets;
   }
 
@@ -338,6 +357,10 @@ export class WorldScene extends Phaser.Scene {
         return isBushReady(this.store.state.bushes[target.bushId!], this.store.state.time.tick)
           ? 'Gather berries  [E]'
           : 'Bush is bare';
+      case InteractionKind.Cache:
+        return hasPiece(this.store.state.armor, target.pieceId!)
+          ? 'Empty cache'
+          : `Open cache  [E]`;
       case InteractionKind.Plot: {
         const crop = this.cropAtTarget(target);
         if (!crop) {
@@ -373,6 +396,9 @@ export class WorldScene extends Phaser.Scene {
         break;
       case InteractionKind.Bush:
         this.harvestBushAction(target.bushId!);
+        break;
+      case InteractionKind.Cache:
+        this.openCache(target.cacheId!, target.pieceId!);
         break;
     }
     this.lastPrompt = null; // force a prompt refresh after the action
@@ -441,14 +467,15 @@ export class WorldScene extends Phaser.Scene {
     }
 
     const def = CROPS[crop.cropId];
-    if (add(inv, def.harvestItem, def.harvestYield)) {
+    const yield_ = def.harvestYield + this.loadout.bonusYield;
+    if (add(inv, def.harvestItem, yield_)) {
       removeCrop(map, crop);
       const spr = this.cropSprites.get(crop);
       if (spr) {
         spr.destroy();
         this.cropSprites.delete(crop);
       }
-      this.store.state.stats.cropsHarvested += def.harvestYield;
+      this.store.state.stats.cropsHarvested += yield_;
       this.toast(`Harvested ${def.displayName}.`);
       this.game.events.emit(UiEvent.Hud);
     } else {
@@ -507,7 +534,8 @@ export class WorldScene extends Phaser.Scene {
     slash.setFlipX(dir.x < 0);
     this.tweens.add({ targets: slash, alpha: 0, duration: 160, onComplete: () => slash.destroy() });
 
-    const defeated = this.combat!.attackAt(ax, ay, Balance.attackRange, Balance.attackDamage);
+    const damage = Balance.attackDamage + this.loadout.bonusDamage;
+    const defeated = this.combat!.attackAt(ax, ay, Balance.attackRange, damage);
     for (const def of defeated) {
       this.store.state.stats.monstersDefeated += 1;
       reduceThreat(this.store.state.threat); // clearing monsters eases the pressure
@@ -626,6 +654,30 @@ export class WorldScene extends Phaser.Scene {
     } else {
       this.toast('Inventory full.');
     }
+  }
+
+  private openCache(cacheId: string, pieceId: ArmorPieceId): void {
+    const armor = this.store.state.armor;
+    if (!collectPiece(armor, pieceId)) {
+      this.toast('The cache is empty.');
+      return;
+    }
+    // recompute effects and reward the find with a full heal
+    this.loadout = computeLoadout(armor);
+    recalcMaxHp(this.store.player, armor);
+    this.store.player.hp = this.store.player.maxHp;
+
+    const spr = this.cacheSprites.get(cacheId);
+    spr?.setTexture(TextureKey.CacheOpen);
+
+    const piece = ARMOR_PIECES[pieceId];
+    this.toast(`Found the ${piece.displayName}! (${piece.blurb})`);
+    if (this.loadout.setComplete) {
+      this.time.delayedCall(1200, () =>
+        this.toast(`The ${SET_NAME} is whole. The ruins' heart can now be reached…`),
+      );
+    }
+    this.game.events.emit(UiEvent.Hud);
   }
 
   private cropAtTarget(target: InteractionTarget): CropInstance | undefined {

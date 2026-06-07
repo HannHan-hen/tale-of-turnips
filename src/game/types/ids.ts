@@ -39,6 +39,16 @@ export const EnemyId = {
 } as const;
 export type EnemyId = (typeof EnemyId)[keyof typeof EnemyId];
 
+// The Starless Set — five legendary pieces found in the ruins.
+export const ArmorPieceId = {
+  Helm: 'starless_helm',
+  Plate: 'starless_plate',
+  Gauntlets: 'starless_gauntlets',
+  Greaves: 'starless_greaves',
+  Blade: 'starless_blade',
+} as const;
+export type ArmorPieceId = (typeof ArmorPieceId)[keyof typeof ArmorPieceId];
+
 export const NpcId = {
   SeedSeller: 'seed_seller',
   Blacksmith: 'blacksmith',
@@ -75,5 +85,6 @@ export const InteractionKind = {
   Npc: 'npc',
   Chicken: 'chicken',
   Bush: 'bush',
+  Cache: 'cache',
 } as const;
 export type InteractionKind = (typeof InteractionKind)[keyof typeof InteractionKind];

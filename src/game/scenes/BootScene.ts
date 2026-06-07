@@ -4,6 +4,7 @@
 import Phaser from 'phaser';
 import { buildTextures } from '../assets/TextureFactory';
 import { GameStateStore } from '../state/GameStateStore';
+import { recalcMaxHp } from '../systems/EquipmentSystem';
 import { loadGame } from '../save/SaveSystem';
 import { SceneKey } from '../types/ids';
 
@@ -18,6 +19,8 @@ export class BootScene extends Phaser.Scene {
     buildTextures(this);
 
     const store = new GameStateStore(loadGame());
+    // Reconcile max hearts with collected armor (a saved set should restore its bonus).
+    recalcMaxHp(store.player, store.state.armor);
     this.registry.set(STORE_KEY, store);
 
     this.scene.start(SceneKey.World);

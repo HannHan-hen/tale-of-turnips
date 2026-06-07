@@ -50,6 +50,8 @@ export function buildTextures(scene: Phaser.Scene): void {
   buildEnemies(scene);
   buildSlash(scene);
   buildHearts(scene);
+  buildCaches(scene);
+  buildArmorIcons(scene);
   buildIcons(scene);
   buildCropStages(scene);
 }
@@ -378,6 +380,65 @@ function buildHearts(scene: Phaser.Scene): void {
   };
   make(scene, TextureKey.HeartFull, s, s, (g) => heart(g, palette.heartRed));
   make(scene, TextureKey.HeartEmpty, s, s, (g) => heart(g, palette.heartEmpty));
+}
+
+function buildCaches(scene: Phaser.Scene): void {
+  const w = 28;
+  const h = 24;
+  // Closed: a dark starlit reliquary with a glowing seam.
+  make(scene, TextureKey.CacheClosed, w, h, (g) => {
+    rect(g, palette.outline, 2, 4, w - 4, h - 4);
+    rect(g, palette.starlessDark, 3, 5, w - 6, h - 6);
+    rect(g, palette.starless, 5, 7, w - 10, h - 11);
+    rect(g, palette.starlight, 4, 12, w - 8, 1); // glowing seam
+    rect(g, palette.cacheGold, w / 2 - 1, 6, 2, h - 9); // clasp
+    rect(g, palette.starlessTrim, 8, 9, 2, 2); // little stars
+    rect(g, palette.starlessTrim, 17, 10, 2, 2);
+  });
+  // Open: emptied, lid ajar.
+  make(scene, TextureKey.CacheOpen, w, h, (g) => {
+    rect(g, palette.outline, 2, 8, w - 4, h - 8);
+    rect(g, palette.starlessDark, 3, 9, w - 6, h - 10);
+    rect(g, palette.outline, 0, 2, w, 5); // tilted-open lid
+    rect(g, palette.starless, 2, 3, w - 4, 3);
+  });
+}
+
+// The five Starless pieces share a deep-blue palette with starlight accents.
+function buildArmorIcons(scene: Phaser.Scene): void {
+  const s = 20;
+  make(scene, TextureKey.IconStarlessHelm, s, s, (g) => {
+    rect(g, palette.starless, 5, 4, 10, 9);
+    rect(g, palette.starlessDark, 5, 11, 10, 4);
+    rect(g, palette.starlight, 8, 6, 4, 2);
+    rect(g, palette.starlessTrim, 9, 2, 2, 3); // crest
+  });
+  make(scene, TextureKey.IconStarlessPlate, s, s, (g) => {
+    rect(g, palette.starless, 4, 4, 12, 12);
+    rect(g, palette.starlessDark, 9, 4, 2, 12);
+    rect(g, palette.starlight, 7, 8, 2, 2);
+    rect(g, palette.starlight, 11, 8, 2, 2);
+    rect(g, palette.starlessTrim, 4, 4, 12, 1);
+  });
+  make(scene, TextureKey.IconStarlessGauntlets, s, s, (g) => {
+    rect(g, palette.starless, 5, 6, 5, 10);
+    rect(g, palette.starless, 11, 6, 4, 10);
+    rect(g, palette.starlessDark, 5, 12, 10, 2);
+    rect(g, palette.starlight, 6, 8, 2, 2);
+  });
+  make(scene, TextureKey.IconStarlessGreaves, s, s, (g) => {
+    rect(g, palette.starless, 5, 4, 4, 12);
+    rect(g, palette.starless, 11, 4, 4, 12);
+    rect(g, palette.starlessDark, 4, 14, 6, 3);
+    rect(g, palette.starlessDark, 10, 14, 6, 3);
+    rect(g, palette.starlight, 6, 7, 2, 2);
+  });
+  make(scene, TextureKey.IconStarlessBlade, s, s, (g) => {
+    rect(g, palette.starlight, 9, 2, 2, 11);
+    rect(g, palette.starless, 11, 3, 1, 10);
+    rect(g, palette.starlessTrim, 6, 13, 8, 2); // guard
+    rect(g, palette.starlessDark, 9, 15, 2, 4); // grip
+  });
 }
 
 function buildIcons(scene: Phaser.Scene): void {

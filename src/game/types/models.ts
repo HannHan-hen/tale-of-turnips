@@ -1,7 +1,7 @@
 // Plain-data game state structures. These are independent of Phaser — no sprites here.
 // Phaser scenes read/render these and call systems that mutate them.
 
-import type { CropId, InteractionKind, ItemId, MapId } from './ids';
+import type { ArmorPieceId, CropId, InteractionKind, ItemId, MapId } from './ids';
 
 // A petable chicken. Position comes from map data; this tracks the daily pet.
 export interface ChickenState {
@@ -71,6 +71,11 @@ export interface ThreatState {
   ruinThreat: number;
 }
 
+// Legendary pieces collected (auto-equipped on pickup).
+export interface ArmorState {
+  collectedPieces: ArmorPieceId[];
+}
+
 // Lightweight run stats, surfaced on the (future) ending screen.
 export interface Stats {
   cropsHarvested: number;
@@ -86,6 +91,7 @@ export interface GameState {
   bushes: Record<string, BushState>;
   time: TimeState;
   threat: ThreatState;
+  armor: ArmorState;
   stats: Stats;
 }
 
@@ -106,4 +112,6 @@ export interface InteractionTarget {
   npcId?: string; // set when kind === Npc
   chickenId?: string; // set when kind === Chicken
   bushId?: string; // set when kind === Bush
+  cacheId?: string; // set when kind === Cache
+  pieceId?: ArmorPieceId; // set when kind === Cache
 }

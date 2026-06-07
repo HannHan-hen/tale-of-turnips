@@ -234,7 +234,9 @@ thing implemented in code; everything below it lives here until its turn.**
 6. **Threat — done.** `ruinThreat` rises daily after a 7-day grace period and falls as
    monsters are defeated; above a threshold, nibblers raid the farm and eat crops unless
    intercepted. Clear arrival warnings (safe / rustling / raid) and a HUD threat readout.
-7. **Legendary set:** five pieces found in ruins, per-piece effects, set completion gate.
+7. **Legendary set — done.** the Starless Set: five pieces found in ruin caches,
+   auto-equipped, each with a live effect (+attack/+hearts/+speed/+harvest, helmet opens the
+   boss door). HUD set tracker; completion gates the boss (consumed by the boss slice).
 8. **Village boy:** daily talk, affection tiers, rare gifts, story-progress affection.
 9. **Boss + ending:** boss fight gated by the set; result screen with the full stat summary.
 
