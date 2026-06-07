@@ -8,6 +8,8 @@ import { CROPS } from '../data/crops';
 import { palette } from '../data/palette';
 import { TILE } from '../data/maps';
 import { CropId } from '../types/ids';
+import { resolvePixels, type PixelSprite } from './sprites/spriteGrid';
+import { FARMER } from './sprites/farmer';
 
 // Draw into a Graphics, bake it into a texture of size w x h, then discard the Graphics.
 function make(
@@ -34,6 +36,20 @@ function rect(
 ): void {
   g.fillStyle(color, 1);
   g.fillRect(x, y, w, h);
+}
+
+// Paint a pixel-grid sprite (see sprites/spriteGrid) into a texture, one pixel per cell.
+// This is the path for hand-authored pixel art; the older rect()-based builders below are
+// being migrated onto it sprite by sprite.
+function paintSprite(scene: Phaser.Scene, key: string, sprite: PixelSprite): void {
+  if (scene.textures.exists(key)) return;
+  const g = scene.add.graphics();
+  for (const px of resolvePixels(sprite)) {
+    g.fillStyle(px.color, 1);
+    g.fillRect(px.x, px.y, 1, 1);
+  }
+  g.generateTexture(key, sprite.width, sprite.height);
+  g.destroy();
 }
 
 export function buildTextures(scene: Phaser.Scene): void {
@@ -226,22 +242,9 @@ function drawCharacter(g: Phaser.GameObjects.Graphics, s: CharStyle): void {
 }
 
 function buildPlayer(scene: Phaser.Scene): void {
-  // The farmer: blonde hair and cute blue denim overalls over a cream shirt.
-  make(scene, TextureKey.Player, 24, 32, (g) =>
-    drawCharacter(g, {
-      hair: palette.blonde,
-      hairDark: palette.blondeDark,
-      hairStyle: 'tuft',
-      eye: palette.eyeDark,
-      shirt: palette.farmerShirt,
-      shirtDark: palette.farmerShirtDark,
-      legs: palette.denim,
-      legsDark: palette.denimDark,
-      outfit: palette.denim,
-      outfitDark: palette.denimDark,
-      outfitStyle: 'overalls',
-    }),
-  );
+  // The farmer is now a hand-authored pixel grid (sprites/farmer). The villager cast still
+  // uses the shared rect-based drawCharacter below until we migrate them too.
+  paintSprite(scene, TextureKey.Player, FARMER);
 }
 
 function buildShippingBox(scene: Phaser.Scene): void {

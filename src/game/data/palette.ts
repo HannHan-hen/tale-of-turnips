@@ -16,6 +16,7 @@ export const palette = {
   bulbTop: 0xb5567f, // turnip pink-purple crown
   skin: 0xf2c79b,
   skinDark: 0xd9a574, // shading on skin (jaw, under nose)
+  skinLight: 0xfbdcb8, // lit skin (forehead, nose bridge)
   cheek: 0xe88f7a, // rosy cheek blush
   eyeWhite: 0xf8f4ea,
   eyeDark: 0x3a2f3a, // default dark iris
@@ -24,8 +25,10 @@ export const palette = {
   // Farmer: blonde hair + blue denim overalls over a cream shirt.
   blonde: 0xe6c463,
   blondeDark: 0xc69a3a,
+  blondeLight: 0xf4dc8c, // sheen on the top of the hair
   denim: 0x4f6fa8,
   denimDark: 0x3a5384,
+  denimLight: 0x6f8ec8, // lit denim (overall highlights)
   farmerShirt: 0xf6ede0,
   farmerShirtDark: 0xd9cdba,
   overallButton: 0xe8c46a,
