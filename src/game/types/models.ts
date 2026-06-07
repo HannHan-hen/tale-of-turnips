@@ -76,6 +76,16 @@ export interface ArmorState {
   collectedPieces: ArmorPieceId[];
 }
 
+// Per-NPC affection (the village boy). Talk once/day, gift once/day.
+export interface NpcAffectionState {
+  npcId: string;
+  points: number;
+  lastTalkedDay: number;
+  lastGiftedDay: number;
+  giftedItemIds: ItemId[];
+  milestones: string[]; // story beats already rewarded (e.g. 'set_complete')
+}
+
 // Lightweight run stats, surfaced on the (future) ending screen.
 export interface Stats {
   cropsHarvested: number;
@@ -92,6 +102,7 @@ export interface GameState {
   time: TimeState;
   threat: ThreatState;
   armor: ArmorState;
+  affection: Record<string, NpcAffectionState>;
   stats: Stats;
 }
 

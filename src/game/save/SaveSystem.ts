@@ -3,7 +3,9 @@
 
 import { Balance } from '../data/balance';
 import { MAPS } from '../data/maps';
+import { NPCS } from '../data/npcs';
 import { createInventory } from '../systems/InventorySystem';
+import { createAffection } from '../systems/AffectionSystem';
 import { createNewGameState } from '../state/newGameState';
 import { CropId, MapId } from '../types/ids';
 import type { GameState, SaveData } from '../types/models';
@@ -42,6 +44,10 @@ export function migrate(data: unknown): SaveData | null {
   state.threat.ruinThreat ??= 0;
   state.armor ??= { collectedPieces: [] };
   state.armor.collectedPieces ??= [];
+  state.affection ??= {};
+  for (const npc of Object.values(NPCS)) {
+    if (npc.romance) state.affection[npc.npcId] ??= createAffection(npc.npcId);
+  }
 
   // Ensure every registered map, chest, chicken, and bush exists, so saves from before an
   // entry was added still load (the new ones simply start empty/fresh).

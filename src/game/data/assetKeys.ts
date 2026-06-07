@@ -17,6 +17,7 @@ export const TextureKey = {
   NpcSeedSeller: 'npc_seed_seller',
   NpcBlacksmith: 'npc_blacksmith',
   NpcVillager: 'npc_villager',
+  NpcJay: 'npc_jay',
   Chicken: 'chicken',
   BushFull: 'bush_full',
   BushEmpty: 'bush_empty',

@@ -237,7 +237,9 @@ thing implemented in code; everything below it lives here until its turn.**
 7. **Legendary set — done.** the Starless Set: five pieces found in ruin caches,
    auto-equipped, each with a live effect (+attack/+hearts/+speed/+harvest, helmet opens the
    boss door). HUD set tracker; completion gates the boss (consumed by the boss slice).
-8. **Village boy:** daily talk, affection tiers, rare gifts, story-progress affection.
+8. **Village boy — done.** Jay (grandson of Bramble & Marigold), a shy, honest boy by the
+   gate. Talk once/day and gift once/day via a modal screen; tiered dialogue; loved/liked
+   gifts; completing the Starless Set bumps affection. Outcome feeds the ending.
 9. **Boss + ending:** boss fight gated by the set; result screen with the full stat summary.
 
 ## 18. Risks & anti-overengineering guardrails

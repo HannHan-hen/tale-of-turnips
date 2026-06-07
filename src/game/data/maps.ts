@@ -153,6 +153,7 @@ export const MAPS: Record<MapId, MapDef> = {
       { npcId: NpcId.SeedSeller, tile: { x: 4, y: 5 } },
       { npcId: NpcId.Blacksmith, tile: { x: 10, y: 5 } },
       { npcId: NpcId.Hint, tile: { x: 7, y: 3 } },
+      { npcId: NpcId.Jay, tile: { x: 9, y: 8 } }, // by the gate to the farm
     ],
     props: [
       { art: 'stall', tile: { x: 4, y: 4 } },

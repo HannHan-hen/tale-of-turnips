@@ -53,6 +53,7 @@ export const NpcId = {
   SeedSeller: 'seed_seller',
   Blacksmith: 'blacksmith',
   Hint: 'old_pip',
+  Jay: 'jay',
 } as const;
 export type NpcId = (typeof NpcId)[keyof typeof NpcId];
 
@@ -73,6 +74,7 @@ export const SceneKey = {
   UI: 'ui',
   Chest: 'chest',
   Shop: 'shop',
+  Talk: 'talk',
 } as const;
 export type SceneKey = (typeof SceneKey)[keyof typeof SceneKey];
 

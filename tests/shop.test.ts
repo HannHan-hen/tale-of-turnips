@@ -54,14 +54,14 @@ describe('shop & npc registries are consistent', () => {
     }
   });
 
-  it('every npc has a sprite and either a real shop or dialogue lines', () => {
+  it('every npc has a sprite and either a real shop, dialogue lines, or romance', () => {
     for (const npc of Object.values(NPCS)) {
       expect(npc.displayName.length).toBeGreaterThan(0);
       expect(npc.textureKey.length).toBeGreaterThan(0);
       if (npc.shopId) {
         expect(SHOPS[npc.shopId]).toBeDefined();
       } else {
-        expect(npc.lines && npc.lines.length).toBeTruthy();
+        expect((npc.lines && npc.lines.length) || npc.romance).toBeTruthy();
       }
     }
   });

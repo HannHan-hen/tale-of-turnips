@@ -8,6 +8,7 @@ import { BootScene } from './game/scenes/BootScene';
 import { WorldScene } from './game/scenes/WorldScene';
 import { ChestScene } from './game/scenes/ChestScene';
 import { ShopScene } from './game/scenes/ShopScene';
+import { TalkScene } from './game/scenes/TalkScene';
 import { UIScene } from './game/scenes/UIScene';
 
 const farm = MAPS[MapId.Farm];
@@ -24,5 +25,5 @@ new Phaser.Game({
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   // UI is listed last so the HUD/toast render on top of the modal overlays.
-  scene: [BootScene, WorldScene, ChestScene, ShopScene, UIScene],
+  scene: [BootScene, WorldScene, ChestScene, ShopScene, TalkScene, UIScene],
 });

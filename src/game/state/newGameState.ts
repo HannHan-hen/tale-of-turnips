@@ -4,9 +4,18 @@
 
 import { Balance } from '../data/balance';
 import { MAPS, tileCenter } from '../data/maps';
+import { NPCS } from '../data/npcs';
 import { CropId, ItemId, MapId } from '../types/ids';
-import type { BushState, ChestState, ChickenState, GameState, MapState } from '../types/models';
+import type {
+  BushState,
+  ChestState,
+  ChickenState,
+  GameState,
+  MapState,
+  NpcAffectionState,
+} from '../types/models';
 import { add, createInventory } from '../systems/InventorySystem';
+import { createAffection } from '../systems/AffectionSystem';
 
 export function createNewGameState(): GameState {
   const farm = MAPS[MapId.Farm];
@@ -31,6 +40,11 @@ export function createNewGameState(): GameState {
     for (const bush of def.bushes) bushes[bush.id] = { id: bush.id, readyTick: 0 };
   }
 
+  const affection: Record<string, NpcAffectionState> = {};
+  for (const npc of Object.values(NPCS)) {
+    if (npc.romance) affection[npc.npcId] = createAffection(npc.npcId);
+  }
+
   return {
     player: {
       mapId: MapId.Farm,
@@ -50,6 +64,7 @@ export function createNewGameState(): GameState {
     time: { tick: 0, day: 1 },
     threat: { ruinThreat: 0 },
     armor: { collectedPieces: [] },
+    affection,
     stats: { cropsHarvested: 0, chickensPetted: 0, monstersDefeated: 0 },
   };
 }

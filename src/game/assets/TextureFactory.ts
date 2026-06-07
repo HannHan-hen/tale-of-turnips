@@ -238,6 +238,7 @@ function buildNpcs(scene: Phaser.Scene): void {
   buildVillager(scene, TextureKey.NpcSeedSeller, palette.apronGreen, palette.hair);
   buildVillager(scene, TextureKey.NpcBlacksmith, palette.apronRed, palette.outline);
   buildVillager(scene, TextureKey.NpcVillager, palette.wall, palette.steel);
+  buildVillager(scene, TextureKey.NpcJay, palette.jayShirt, palette.jayHair);
 }
 
 function buildVillager(scene: Phaser.Scene, key: string, cloth: number, hair: number): void {

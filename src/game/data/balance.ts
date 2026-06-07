@@ -32,4 +32,12 @@ export const Balance = {
   farmThreatThreshold: 4, // at/above this, monsters raid the farm
   farmRaidMax: 3, // most raiders that can appear at once
   cropEatRange: 14, // px at which a raider devours a crop
+
+  // Affection (the village boy). Talk once/day, gift once/day; story beats add a little too.
+  affectionTalkGain: 1,
+  affectionGiftLiked: 3,
+  affectionGiftLoved: 6,
+  affectionGiftRepeat: 1, // re-gifting an item type he's already received
+  affectionStorySet: 4, // completing the Starless Set
+  affectionMax: 30,
 } as const;

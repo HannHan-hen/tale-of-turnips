@@ -30,6 +30,8 @@ export const palette = {
   steelDark: 0x6b7d92,
   apronGreen: 0x6fa247,
   apronRed: 0xb04a4a,
+  jayShirt: 0x4aa0a8,
+  jayHair: 0x8a5a3b,
   carrot: 0xe8862e,
   carrotDark: 0xc96a1e,
   pumpkin: 0xe07b2e,

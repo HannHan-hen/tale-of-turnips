@@ -17,6 +17,7 @@ import { saveGame } from '../save/SaveSystem';
 import { cropAt, growthStage, isMature, plant, removeCrop } from '../systems/FarmingSystem';
 import { petChicken } from '../systems/ChickenSystem';
 import { applyDamage, rollLoot } from '../systems/CombatSystem';
+import { grantMilestone } from '../systems/AffectionSystem';
 import { collectPiece, computeLoadout, hasPiece, recalcMaxHp, type Loadout } from '../systems/EquipmentSystem';
 import { harvestBush, isBushReady } from '../systems/ForagingSystem';
 import { sellAll } from '../systems/EconomySystem';
@@ -33,7 +34,7 @@ import { add, has, remove } from '../systems/InventorySystem';
 import { movePlayer, type Bounds } from '../systems/PlayerController';
 import { transitionTo } from '../systems/MapTransitionSystem';
 import { advanceTick } from '../systems/TimeSystem';
-import { ArmorPieceId, EnemyId, InteractionKind, ItemId, MapId, SceneKey } from '../types/ids';
+import { ArmorPieceId, EnemyId, InteractionKind, ItemId, MapId, NpcId, SceneKey } from '../types/ids';
 import type { CropInstance, Facing, InteractionTarget } from '../types/models';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
@@ -414,7 +415,12 @@ export class WorldScene extends Phaser.Scene {
 
   private useNpc(npcId: keyof typeof NPCS): void {
     const npc = NPCS[npcId];
-    if (npc.shopId) {
+    if (npc.romance) {
+      this.game.events.emit(UiEvent.Prompt, null);
+      saveGame(this.store.state);
+      this.scene.pause();
+      this.scene.launch(SceneKey.Talk, { npcId });
+    } else if (npc.shopId) {
       this.game.events.emit(UiEvent.Prompt, null);
       saveGame(this.store.state);
       this.scene.pause();
@@ -676,6 +682,9 @@ export class WorldScene extends Phaser.Scene {
       this.time.delayedCall(1200, () =>
         this.toast(`The ${SET_NAME} is whole. The ruins' heart can now be reached…`),
       );
+      // Word of your deeds reaches the village boy.
+      const jay = this.store.state.affection[NpcId.Jay];
+      if (jay) grantMilestone(jay, 'set_complete', Balance.affectionStorySet);
     }
     this.game.events.emit(UiEvent.Hud);
   }
