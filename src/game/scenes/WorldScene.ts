@@ -18,13 +18,20 @@ import { petChicken } from '../systems/ChickenSystem';
 import { applyDamage, rollLoot } from '../systems/CombatSystem';
 import { harvestBush, isBushReady } from '../systems/ForagingSystem';
 import { sellAll } from '../systems/EconomySystem';
+import {
+  accrueDailyThreat,
+  isFarmUnderThreat,
+  raidSize,
+  reduceThreat,
+  threatBand,
+} from '../systems/ThreatSystem';
 import { findNearestTarget } from '../systems/InteractionSystem';
 import { InputSystem } from '../systems/InputSystem';
 import { add, has, remove } from '../systems/InventorySystem';
 import { movePlayer, type Bounds } from '../systems/PlayerController';
 import { transitionTo } from '../systems/MapTransitionSystem';
 import { advanceTick } from '../systems/TimeSystem';
-import { InteractionKind, ItemId, MapId, SceneKey } from '../types/ids';
+import { EnemyId, InteractionKind, ItemId, MapId, SceneKey } from '../types/ids';
 import type { CropInstance, Facing, InteractionTarget } from '../types/models';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
@@ -63,6 +70,7 @@ export class WorldScene extends Phaser.Scene {
   private cropSprites!: Map<CropInstance, Phaser.GameObjects.Image>;
   private bushSprites!: Map<string, Phaser.GameObjects.Image>;
   private combat?: CombatController;
+  private isRaid = false;
   private bounds!: Bounds;
   private targets: InteractionTarget[] = [];
 
@@ -83,6 +91,7 @@ export class WorldScene extends Phaser.Scene {
     this.cropSprites = new Map();
     this.bushSprites = new Map();
     this.combat = undefined;
+    this.isRaid = false;
     this.tickAccum = 0;
     this.saveAccum = 0;
     this.lastPrompt = null;
@@ -98,7 +107,7 @@ export class WorldScene extends Phaser.Scene {
 
     for (const crop of this.store.currentMap().crops) this.addCropSprite(crop);
 
-    // Combat is created only for maps that have enemies, keeping farm maps combat-free.
+    // Ruins-style combat: enemies chase the player.
     if (this.def.enemySpawns.length > 0) {
       this.combat = new CombatController(this, this.bounds);
       this.combat.spawn(this.def.enemySpawns);
@@ -108,6 +117,9 @@ export class WorldScene extends Phaser.Scene {
     this.playerSprite = this.add.image(p.x, p.y, TextureKey.Player).setOrigin(0.5, 0.9);
 
     this.controls = new InputSystem(this);
+
+    // Farm threat: warn on arrival and, if pressure is high, launch a raid on the crops.
+    if (this.def.mapId === MapId.Farm) this.handleFarmArrival();
 
     this.game.events.emit(UiEvent.Hud);
     this.game.events.emit(UiEvent.Prompt, null);
@@ -129,15 +141,20 @@ export class WorldScene extends Phaser.Scene {
     // Growth advances globally; crops keep maturing and bushes regrow even while indoors.
     this.tickAccum += deltaMs;
     let grew = false;
+    let newDay = false;
     while (this.tickAccum >= Balance.tickMs) {
       this.tickAccum -= Balance.tickMs;
-      advanceTick(this.store.state.time, Balance.dayLengthTicks);
+      if (advanceTick(this.store.state.time, Balance.dayLengthTicks)) {
+        accrueDailyThreat(this.store.state.threat, this.store.state.time.day);
+        newDay = true;
+      }
       grew = true;
     }
     if (grew) {
       this.refreshCropTextures();
       this.refreshBushTextures();
     }
+    if (newDay) this.onNewDay();
 
     // seed selection via number keys
     const hotkey = this.controls.numberKeyJustPressed();
@@ -450,9 +467,35 @@ export class WorldScene extends Phaser.Scene {
       this.swing(px, py);
     }
 
-    // enemy movement + contact damage
-    const contactDamage = this.combat!.update(dt, px, py);
+    // enemy movement + contact damage (raiders chase crops; ruins enemies chase the player)
+    let contactDamage: number;
+    if (this.isRaid) {
+      const crops = this.store.currentMap().crops;
+      const points = crops.map((c) => tileCenter({ x: c.tileX, y: c.tileY }));
+      const result = this.combat!.updateRaid(dt, points, px, py);
+      contactDamage = result.contactDamage;
+      this.devourCrops(result.eatenIndices, crops);
+    } else {
+      contactDamage = this.combat!.update(dt, px, py);
+    }
     if (contactDamage > 0 && now >= this.invulnUntil) this.takeDamage(contactDamage);
+  }
+
+  private devourCrops(eatenIndices: number[], crops: CropInstance[]): void {
+    const victims = [...new Set(eatenIndices)].map((i) => crops[i]).filter(Boolean);
+    if (victims.length === 0) return;
+    const map = this.store.currentMap();
+    for (const crop of victims) {
+      removeCrop(map, crop);
+      const spr = this.cropSprites.get(crop);
+      if (spr) {
+        spr.destroy();
+        this.cropSprites.delete(crop);
+      }
+      this.toast(`A nibbler ate your ${CROPS[crop.cropId].displayName}!`);
+    }
+    this.game.events.emit(UiEvent.Hud);
+    saveGame(this.store.state);
   }
 
   private swing(px: number, py: number): void {
@@ -467,6 +510,7 @@ export class WorldScene extends Phaser.Scene {
     const defeated = this.combat!.attackAt(ax, ay, Balance.attackRange, Balance.attackDamage);
     for (const def of defeated) {
       this.store.state.stats.monstersDefeated += 1;
+      reduceThreat(this.store.state.threat); // clearing monsters eases the pressure
       for (const drop of rollLoot(def)) {
         if (add(this.store.player.inventory, drop.itemId, drop.count)) {
           this.toast(`Defeated ${def.displayName}! +${drop.count} ${ITEMS[drop.itemId].displayName}`);
@@ -508,6 +552,48 @@ export class WorldScene extends Phaser.Scene {
     this.toast('You faint and wake up safe on the farm…');
     saveGame(this.store.state);
     this.scene.restart();
+  }
+
+  // --- farm threat ---
+
+  private handleFarmArrival(): void {
+    const threat = this.store.state.threat;
+    if (isFarmUnderThreat(threat)) {
+      this.startFarmRaid();
+    } else if (threatBand(threat) === 'rustling') {
+      this.toast('Something rustles near the ruins…');
+    } else if (this.store.state.time.day > Balance.threatGraceDays) {
+      this.toast('The farm is safe for now.');
+    }
+  }
+
+  private onNewDay(): void {
+    this.game.events.emit(UiEvent.Hud);
+    // If a fresh day pushes the farm over the edge while you're home, raiders arrive.
+    if (this.def.mapId === MapId.Farm && isFarmUnderThreat(this.store.state.threat) && !this.hasRaiders()) {
+      this.startFarmRaid();
+    }
+  }
+
+  private hasRaiders(): boolean {
+    return this.isRaid && !!this.combat && this.combat.remaining() > 0;
+  }
+
+  // Spawns a small wave of nibblers at the ruins-side edge, heading for the crops.
+  private startFarmRaid(): void {
+    if (!this.combat) this.combat = new CombatController(this, this.bounds);
+    this.isRaid = true;
+    const entryTiles = [
+      { x: this.def.widthTiles - 2, y: 4 },
+      { x: this.def.widthTiles - 2, y: 6 },
+      { x: this.def.widthTiles - 2, y: 8 },
+    ];
+    const count = raidSize(this.store.state.threat);
+    for (let i = 0; i < count; i++) {
+      const c = tileCenter(entryTiles[i % entryTiles.length]);
+      this.combat.spawnAt(EnemyId.CropNibbler, c.x, c.y);
+    }
+    this.toast('Tiny monsters are eyeing your crops!');
   }
 
   private petChickenAction(chickenId: string): void {

@@ -25,6 +25,7 @@ export const TextureKey = {
   Slash: 'slash',
   EnemyRuinMite: 'enemy_ruin_mite',
   EnemyShadePup: 'enemy_shade_pup',
+  EnemyCropNibbler: 'enemy_crop_nibbler',
   HeartFull: 'heart_full',
   HeartEmpty: 'heart_empty',
   IconTurnipSeed: 'icon_turnip_seed',

@@ -23,4 +23,13 @@ export const Balance = {
   invulnMs: 900, // i-frames after taking a hit
   enemyAggroRange: 96, // px at which an enemy starts chasing
   enemyContactRange: 18, // px at which an enemy deals contact damage
+
+  // Farm threat (light pressure; the first days are a peaceful grace period)
+  threatGraceDays: 7, // no threat builds on or before this day
+  threatPerDay: 1, // threat gained each day after the grace period
+  threatPerKill: 1, // threat removed per monster defeated
+  threatMax: 12, // cap
+  farmThreatThreshold: 4, // at/above this, monsters raid the farm
+  farmRaidMax: 3, // most raiders that can appear at once
+  cropEatRange: 14, // px at which a raider devours a crop
 } as const;

@@ -47,6 +47,8 @@ export const palette = {
   stoneFloorDark: 0x564e63,
   mite: 0x7fa05a,
   miteDark: 0x5e7c40,
+  nibbler: 0xc77fb0,
+  nibblerDark: 0xa15e8e,
   shade: 0x4a3f5e,
   shadeDark: 0x352c46,
   glow: 0xe2e26a,

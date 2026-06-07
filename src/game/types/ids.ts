@@ -35,6 +35,7 @@ export type MapId = (typeof MapId)[keyof typeof MapId];
 export const EnemyId = {
   RuinMite: 'ruin_mite',
   ShadePup: 'shade_pup',
+  CropNibbler: 'crop_nibbler',
 } as const;
 export type EnemyId = (typeof EnemyId)[keyof typeof EnemyId];
 

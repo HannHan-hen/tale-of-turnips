@@ -38,6 +38,8 @@ export function migrate(data: unknown): SaveData | null {
   state.player.selectedCropId ??= CropId.Turnip;
   state.player.maxHp ??= Balance.playerMaxHp;
   state.player.hp ??= state.player.maxHp;
+  state.threat ??= { ruinThreat: 0 };
+  state.threat.ruinThreat ??= 0;
 
   // Ensure every registered map, chest, chicken, and bush exists, so saves from before an
   // entry was added still load (the new ones simply start empty/fresh).

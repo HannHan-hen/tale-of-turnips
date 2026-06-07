@@ -48,6 +48,7 @@ export function createNewGameState(): GameState {
     chickens,
     bushes,
     time: { tick: 0, day: 1 },
+    threat: { ruinThreat: 0 },
     stats: { cropsHarvested: 0, chickensPetted: 0, monstersDefeated: 0 },
   };
 }

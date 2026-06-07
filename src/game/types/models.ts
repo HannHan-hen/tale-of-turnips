@@ -65,6 +65,12 @@ export interface TimeState {
   day: number;
 }
 
+// Pressure from the ruins. Rises daily (after a grace period), falls as monsters are
+// defeated; above a threshold, raiders appear on the farm.
+export interface ThreatState {
+  ruinThreat: number;
+}
+
 // Lightweight run stats, surfaced on the (future) ending screen.
 export interface Stats {
   cropsHarvested: number;
@@ -79,6 +85,7 @@ export interface GameState {
   chickens: Record<string, ChickenState>;
   bushes: Record<string, BushState>;
   time: TimeState;
+  threat: ThreatState;
   stats: Stats;
 }
 

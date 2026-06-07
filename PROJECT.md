@@ -231,7 +231,9 @@ thing implemented in code; everything below it lives here until its turn.**
 5. **Ruins + combat — done.** ruins map (reached via the village), player hearts with
    i-frames, a one-button swing, two data-driven enemies with chase AI and loot drops, and
    a gentle faint-and-retreat on defeat.
-6. **Threat:** `ruinThreat` rising daily, farm monster incursions, warnings, crop damage.
+6. **Threat — done.** `ruinThreat` rises daily after a 7-day grace period and falls as
+   monsters are defeated; above a threshold, nibblers raid the farm and eat crops unless
+   intercepted. Clear arrival warnings (safe / rustling / raid) and a HUD threat readout.
 7. **Legendary set:** five pieces found in ruins, per-piece effects, set completion gate.
 8. **Village boy:** daily talk, affection tiers, rare gifts, story-progress affection.
 9. **Boss + ending:** boss fight gated by the set; result screen with the full stat summary.

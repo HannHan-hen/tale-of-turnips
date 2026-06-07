@@ -44,4 +44,15 @@ export const ENEMIES: Record<EnemyId, EnemyDef> = {
       { itemId: ItemId.ShadowWisp, chance: 0.15, min: 1, max: 1 },
     ],
   },
+  // Wanders onto the farm during raids and makes for the crops. Weak and slow so the
+  // player can intercept; drops nothing — the reward is a saved harvest and lower threat.
+  [EnemyId.CropNibbler]: {
+    enemyId: EnemyId.CropNibbler,
+    displayName: 'Crop Nibbler',
+    maxHp: 2,
+    contactDamage: 1,
+    speed: 34,
+    textureKey: TextureKey.EnemyCropNibbler,
+    loot: [],
+  },
 };

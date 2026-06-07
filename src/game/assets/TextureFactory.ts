@@ -339,6 +339,19 @@ function buildEnemies(scene: Phaser.Scene): void {
     rect(g, palette.glow, 19, 6, 2, 2); // glowing eye
     rect(g, palette.shadeDark, 2, 8, 4, 2); // tail
   });
+  // Crop Nibbler: a small round pink critter with buck teeth.
+  make(scene, TextureKey.EnemyCropNibbler, 18, 16, (g) => {
+    rect(g, palette.outline, 3, 4, 12, 11);
+    rect(g, palette.nibbler, 4, 5, 10, 9);
+    rect(g, palette.nibblerDark, 4, 11, 10, 3);
+    rect(g, palette.uiInk, 5, 7, 3, 3); // eyes
+    rect(g, palette.uiInk, 10, 7, 3, 3);
+    rect(g, palette.outline, 6, 8, 1, 1);
+    rect(g, palette.outline, 11, 8, 1, 1);
+    rect(g, palette.uiInk, 7, 12, 4, 2); // teeth
+    rect(g, palette.nibblerDark, 1, 6, 3, 3); // ears
+    rect(g, palette.nibblerDark, 14, 6, 3, 3);
+  });
 }
 
 function buildSlash(scene: Phaser.Scene): void {

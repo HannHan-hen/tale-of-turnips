@@ -19,6 +19,7 @@ export class UIScene extends Phaser.Scene {
   private dayText!: Phaser.GameObjects.Text;
   private goldText!: Phaser.GameObjects.Text;
   private heartImages: Phaser.GameObjects.Image[] = [];
+  private threatText!: Phaser.GameObjects.Text;
   private seedCountTexts: Phaser.GameObjects.Text[] = [];
   private selectHighlight!: Phaser.GameObjects.Rectangle;
   private slotXs: number[] = [];
@@ -46,6 +47,9 @@ export class UIScene extends Phaser.Scene {
     for (let i = 0; i < this.store.player.maxHp; i++) {
       this.heartImages.push(this.add.image(140 + i * 16, 14, TextureKey.HeartFull));
     }
+
+    // threat readout (only shows when pressure is building)
+    this.threatText = this.add.text(232, 7, '', { ...label, color: toCss(palette.heartRed) });
 
     // Seed selector on the right: one slot per crop (icon + count), selected one highlighted.
     const startX = w - CROP_ORDER.length * SLOT_W - 6;
@@ -106,6 +110,8 @@ export class UIScene extends Phaser.Scene {
     for (let i = 0; i < this.heartImages.length; i++) {
       this.heartImages[i].setTexture(i < this.store.player.hp ? TextureKey.HeartFull : TextureKey.HeartEmpty);
     }
+    const threat = this.store.state.threat.ruinThreat;
+    this.threatText.setText(threat > 0 ? `Threat ${threat}` : '');
     CROP_ORDER.forEach((cropId, i) => {
       this.seedCountTexts[i].setText(`${count(inv, CROPS[cropId].seedItem)}`);
     });
