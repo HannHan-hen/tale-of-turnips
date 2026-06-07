@@ -56,9 +56,7 @@ export class UIScene extends Phaser.Scene {
 
     // Seed selector on the right: one slot per crop (icon + count), selected one highlighted.
     const startX = w - CROP_ORDER.length * SLOT_W - 6;
-    this.selectHighlight = this.add
-      .rectangle(0, 14, SLOT_W - 4, 24, palette.uiHighlight, 1)
-      .setOrigin(0.5);
+    this.selectHighlight = this.add.rectangle(0, 14, SLOT_W - 4, 24, palette.uiHighlight, 1).setOrigin(0.5);
     this.seedCountTexts = [];
     this.slotXs = [];
     CROP_ORDER.forEach((cropId, i) => {
@@ -70,7 +68,11 @@ export class UIScene extends Phaser.Scene {
     });
 
     // Starless Set tracker, bottom-left (dim until each piece is found).
-    this.add.text(10, h - 32, SET_NAME, { fontFamily: 'monospace', fontSize: '10px', color: toCss(palette.starlessTrim) });
+    this.add.text(10, h - 32, SET_NAME, {
+      fontFamily: 'monospace',
+      fontSize: '10px',
+      color: toCss(palette.starlessTrim),
+    });
     this.setIcons = ARMOR_ORDER.map((pieceId, i) =>
       this.add.image(18 + i * 18, h - 14, ARMOR_PIECES[pieceId].iconKey).setScale(0.8),
     );

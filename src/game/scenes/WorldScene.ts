@@ -220,7 +220,10 @@ export class WorldScene extends Phaser.Scene {
       }
     }
     for (const plot of def.plots) {
-      this.add.image(plot.x * TILE, plot.y * TILE, TextureKey.SoilTile).setOrigin(0, 0).setDepth(-9);
+      this.add
+        .image(plot.x * TILE, plot.y * TILE, TextureKey.SoilTile)
+        .setOrigin(0, 0)
+        .setDepth(-9);
     }
   }
 
@@ -239,11 +242,17 @@ export class WorldScene extends Phaser.Scene {
       // A set-gated door shows sealed until the legendary set is whole.
       const key =
         exit.requiresSet && !this.loadout.opensBoss ? TextureKey.SealedDoor : EXIT_TEXTURE[exit.art];
-      this.add.image(c.x, c.y, key).setOrigin(0.5, 0.9).setDepth(c.y - 2);
+      this.add
+        .image(c.x, c.y, key)
+        .setOrigin(0.5, 0.9)
+        .setDepth(c.y - 2);
     }
     for (const prop of def.props) {
       const c = tileCenter(prop.tile);
-      this.add.image(c.x, c.y, PROP_TEXTURE[prop.art]).setOrigin(0.5, 0.85).setDepth(c.y - 3);
+      this.add
+        .image(c.x, c.y, PROP_TEXTURE[prop.art])
+        .setOrigin(0.5, 0.85)
+        .setDepth(c.y - 3);
     }
     for (const npc of def.npcs) {
       const c = tileCenter(npc.tile);
@@ -267,7 +276,14 @@ export class WorldScene extends Phaser.Scene {
     for (const hen of def.chickens) {
       const c = tileCenter(hen.tile);
       const spr = this.add.image(c.x, c.y, TextureKey.Chicken).setOrigin(0.5, 0.9).setDepth(c.y);
-      this.tweens.add({ targets: spr, y: c.y - 3, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+      this.tweens.add({
+        targets: spr,
+        y: c.y - 3,
+        duration: 600,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.inOut',
+      });
     }
     for (const bush of def.bushes) {
       const c = tileCenter(bush.tile);
@@ -349,7 +365,13 @@ export class WorldScene extends Phaser.Scene {
     });
     def.caches.forEach((cache) => {
       const c = tileCenter(cache.tile);
-      targets.push({ kind: InteractionKind.Cache, x: c.x, y: c.y, cacheId: cache.id, pieceId: cache.pieceId });
+      targets.push({
+        kind: InteractionKind.Cache,
+        x: c.x,
+        y: c.y,
+        cacheId: cache.id,
+        pieceId: cache.pieceId,
+      });
     });
     return targets;
   }
@@ -384,14 +406,14 @@ export class WorldScene extends Phaser.Scene {
           ? 'Gather berries  [E]'
           : 'Bush is bare';
       case InteractionKind.Cache:
-        return hasPiece(this.store.state.armor, target.pieceId)
-          ? 'Empty cache'
-          : `Open cache  [E]`;
+        return hasPiece(this.store.state.armor, target.pieceId) ? 'Empty cache' : `Open cache  [E]`;
       case InteractionKind.Plot: {
         const crop = this.cropAtPlot(target.plotIndex);
         if (!crop) {
           const def = CROPS[this.store.player.selectedCropId];
-          return has(this.store.player.inventory, def.seedItem) ? `Plant ${def.displayName}  [E]` : 'No seeds';
+          return has(this.store.player.inventory, def.seedItem)
+            ? `Plant ${def.displayName}  [E]`
+            : 'No seeds';
         }
         return isMature(crop, this.store.state.time.tick) ? 'Harvest  [E]' : 'Growing…';
       }

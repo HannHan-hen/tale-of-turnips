@@ -82,9 +82,7 @@ export class ChestScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    this.cursor = this.add
-      .rectangle(0, 0, COL_WIDTH, 22, palette.uiHighlight, 1)
-      .setOrigin(0, 0.5);
+    this.cursor = this.add.rectangle(0, 0, COL_WIDTH, 22, palette.uiHighlight, 1).setOrigin(0, 0.5);
 
     const kb = this.input.keyboard!;
     this.keys = {

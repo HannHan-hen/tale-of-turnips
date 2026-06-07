@@ -50,7 +50,12 @@ export function isGiftable(romance: RomanceConfig, itemId: ItemId): boolean {
 export type GiftReaction = 'loved' | 'liked' | 'repeat';
 
 // Applies a gift (caller has already verified canGift + isGiftable and removed the item).
-export function giveGift(aff: NpcAffectionState, romance: RomanceConfig, itemId: ItemId, day: number): GiftReaction {
+export function giveGift(
+  aff: NpcAffectionState,
+  romance: RomanceConfig,
+  itemId: ItemId,
+  day: number,
+): GiftReaction {
   aff.lastGiftedDay = day;
   const seen = aff.giftedItemIds.includes(itemId);
   if (!seen) aff.giftedItemIds.push(itemId);

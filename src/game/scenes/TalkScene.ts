@@ -33,7 +33,10 @@ export class TalkScene extends Phaser.Scene {
   private cursor!: Phaser.GameObjects.Rectangle;
   private rowObjs: Phaser.GameObjects.GameObject[] = [];
 
-  private keys!: Record<'up' | 'down' | 'w' | 's' | 'confirm' | 'enter' | 'esc' | 'q', Phaser.Input.Keyboard.Key>;
+  private keys!: Record<
+    'up' | 'down' | 'w' | 's' | 'confirm' | 'enter' | 'esc' | 'q',
+    Phaser.Input.Keyboard.Key
+  >;
 
   constructor() {
     super(SceneKey.Talk);
@@ -58,10 +61,18 @@ export class TalkScene extends Phaser.Scene {
     const npc = NPCS[this.npcId as keyof typeof NPCS];
     this.add.image(w / 2 - 168, h / 2 - 40, npc.textureKey).setScale(3);
     this.add
-      .text(w / 2 - 140, h / 2 - 110, npc.displayName, { fontFamily: 'monospace', fontSize: '16px', color: toCss(palette.uiInk) })
+      .text(w / 2 - 140, h / 2 - 110, npc.displayName, {
+        fontFamily: 'monospace',
+        fontSize: '16px',
+        color: toCss(palette.uiInk),
+      })
       .setOrigin(0.5, 0);
     this.tierText = this.add
-      .text(w / 2 - 140, h / 2 - 88, '', { fontFamily: 'monospace', fontSize: '10px', color: toCss(palette.starlessTrim) })
+      .text(w / 2 - 140, h / 2 - 88, '', {
+        fontFamily: 'monospace',
+        fontSize: '10px',
+        color: toCss(palette.starlessTrim),
+      })
       .setOrigin(0.5, 0);
 
     this.lineText = this.add.text(w / 2 - 96, h / 2 - 96, '', {
@@ -72,7 +83,9 @@ export class TalkScene extends Phaser.Scene {
       lineSpacing: 3,
     });
 
-    this.cursor = this.add.rectangle(w / 2 - 100, ROWS_TOP, 290, 22, palette.uiHighlight, 1).setOrigin(0, 0.5);
+    this.cursor = this.add
+      .rectangle(w / 2 - 100, ROWS_TOP, 290, 22, palette.uiHighlight, 1)
+      .setOrigin(0, 0.5);
 
     this.add
       .text(w / 2, h - 30, '↑↓ select   [Space] choose   [Esc] back/leave', {
@@ -116,7 +129,9 @@ export class TalkScene extends Phaser.Scene {
 
   private currentRows(): string[] {
     if (this.mode === 'menu') return ['Talk', 'Give a gift', 'Leave'];
-    return this.giftItems.map((id) => `${ITEMS[id].displayName} (x${count(this.store.player.inventory, id)})`);
+    return this.giftItems.map(
+      (id) => `${ITEMS[id].displayName} (x${count(this.store.player.inventory, id)})`,
+    );
   }
 
   private render(): void {
@@ -128,7 +143,11 @@ export class TalkScene extends Phaser.Scene {
     const x = this.scale.width / 2 - 92;
     const style = { fontFamily: 'monospace', fontSize: '14px', color: toCss(palette.uiInk) };
     if (this.mode === 'gift' && rows.length === 0) {
-      this.rowObjs.push(this.add.text(x, ROWS_TOP, '(nothing to give — Esc to go back)', { ...style, color: toCss(palette.wall) }).setOrigin(0, 0.5));
+      this.rowObjs.push(
+        this.add
+          .text(x, ROWS_TOP, '(nothing to give — Esc to go back)', { ...style, color: toCss(palette.wall) })
+          .setOrigin(0, 0.5),
+      );
     }
     rows.forEach((label, i) => {
       this.rowObjs.push(this.add.text(x, ROWS_TOP + i * LINE_H, label, style).setOrigin(0, 0.5));

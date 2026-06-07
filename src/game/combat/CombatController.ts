@@ -144,7 +144,13 @@ export class CombatController {
 
   private poof(x: number, y: number): void {
     const puff = this.scene.add.circle(x, y - 8, 8, 0xfdf6e3, 0.85).setDepth(y + 1);
-    this.scene.tweens.add({ targets: puff, alpha: 0, scale: 1.8, duration: 220, onComplete: () => puff.destroy() });
+    this.scene.tweens.add({
+      targets: puff,
+      alpha: 0,
+      scale: 1.8,
+      duration: 220,
+      onComplete: () => puff.destroy(),
+    });
   }
 }
 

@@ -1,3 +1,5 @@
 dist
 node_modules
 package-lock.json
+# Markdown is prose — don't let the formatter reflow the design docs.
+*.md

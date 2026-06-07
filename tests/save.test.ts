@@ -1,12 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createNewGameState } from '../src/game/state/newGameState';
-import {
-  clearSave,
-  loadGame,
-  migrate,
-  saveGame,
-  SAVE_VERSION,
-} from '../src/game/save/SaveSystem';
+import { clearSave, loadGame, migrate, saveGame, SAVE_VERSION } from '../src/game/save/SaveSystem';
 
 // Minimal in-memory localStorage so the save system can be exercised in Node.
 function memoryStorage(): Storage {

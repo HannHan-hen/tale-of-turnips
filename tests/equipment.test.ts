@@ -2,12 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ARMOR_ORDER, ARMOR_PIECES } from '../src/game/data/armor';
 import { Balance } from '../src/game/data/balance';
 import { createNewGameState } from '../src/game/state/newGameState';
-import {
-  collectPiece,
-  computeLoadout,
-  hasPiece,
-  recalcMaxHp,
-} from '../src/game/systems/EquipmentSystem';
+import { collectPiece, computeLoadout, hasPiece, recalcMaxHp } from '../src/game/systems/EquipmentSystem';
 import { add } from '../src/game/systems/InventorySystem';
 import { ArmorPieceId, ItemId } from '../src/game/types/ids';
 
