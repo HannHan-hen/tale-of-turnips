@@ -43,6 +43,8 @@ export function buildTextures(scene: Phaser.Scene): void {
   buildStall(scene);
   buildAnvil(scene);
   buildNpcs(scene);
+  buildChicken(scene);
+  buildBushes(scene);
   buildIcons(scene);
   buildCropStages(scene);
 }
@@ -249,6 +251,42 @@ function buildVillager(scene: Phaser.Scene, key: string, cloth: number, hair: nu
   });
 }
 
+function buildChicken(scene: Phaser.Scene): void {
+  const w = 20;
+  const h = 22;
+  make(scene, TextureKey.Chicken, w, h, (g) => {
+    rect(g, palette.beak, 8, 19, 4, 3); // feet
+    rect(g, palette.outline, 4, 6, 12, 13); // body outline
+    rect(g, palette.chickenBody, 5, 7, 10, 11);
+    rect(g, palette.outline, 5, 2, 8, 7); // head
+    rect(g, palette.chickenBody, 6, 3, 6, 6);
+    rect(g, palette.chickenComb, 7, 0, 4, 3); // comb
+    rect(g, palette.beak, 12, 5, 3, 2); // beak
+    rect(g, palette.outline, 8, 4, 2, 2); // eye
+    rect(g, palette.beak, 4, 12, 2, 4); // wing hint
+  });
+}
+
+function buildBushes(scene: Phaser.Scene): void {
+  const w = 30;
+  const h = 26;
+  const leaves = (g: Phaser.GameObjects.Graphics) => {
+    rect(g, palette.leafDark, 3, 8, 24, 16);
+    rect(g, palette.leaf, 5, 6, 20, 14);
+    rect(g, palette.leafDark, 9, 4, 12, 6);
+    rect(g, palette.berryLeaf, 6, 16, 18, 4);
+  };
+  make(scene, TextureKey.BushFull, w, h, (g) => {
+    leaves(g);
+    // ripe berries
+    rect(g, palette.berry, 8, 12, 3, 3);
+    rect(g, palette.berry, 16, 10, 3, 3);
+    rect(g, palette.berry, 13, 16, 3, 3);
+    rect(g, palette.berry, 21, 15, 3, 3);
+  });
+  make(scene, TextureKey.BushEmpty, w, h, leaves);
+}
+
 function buildIcons(scene: Phaser.Scene): void {
   const s = 20;
   // seed: a small pip
@@ -280,41 +318,108 @@ function buildIcons(scene: Phaser.Scene): void {
     rect(g, palette.clothDark, 9, 5, 2, 11);
     rect(g, palette.skin, 8, 3, 4, 2); // collar gap
   });
+  // seed packets: a shared pip shape tinted per crop
+  buildSeedIcon(scene, TextureKey.IconCarrotSeed, palette.carrot);
+  buildSeedIcon(scene, TextureKey.IconPumpkinSeed, palette.pumpkin);
+  // carrot: orange root with green top
+  make(scene, TextureKey.IconCarrot, s, s, (g) => {
+    rect(g, palette.carrot, 8, 6, 4, 10);
+    rect(g, palette.carrot, 9, 16, 2, 2);
+    rect(g, palette.carrotDark, 11, 7, 1, 8);
+    rect(g, palette.leaf, 7, 2, 2, 4);
+    rect(g, palette.leaf, 11, 2, 2, 4);
+    rect(g, palette.leafDark, 9, 1, 2, 5);
+  });
+  // pumpkin: round ribbed gourd
+  make(scene, TextureKey.IconPumpkin, s, s, (g) => {
+    rect(g, palette.pumpkin, 4, 7, 12, 9);
+    rect(g, palette.pumpkin, 5, 6, 10, 11);
+    rect(g, palette.pumpkinRib, 9, 6, 2, 11);
+    rect(g, palette.pumpkinDark, 6, 7, 1, 9);
+    rect(g, palette.pumpkinDark, 13, 7, 1, 9);
+    rect(g, palette.leafDark, 9, 3, 2, 4); // stem
+  });
+  // egg
+  make(scene, TextureKey.IconEgg, s, s, (g) => {
+    rect(g, palette.outline, 7, 4, 6, 12);
+    rect(g, palette.egg, 7, 6, 6, 9);
+    rect(g, palette.egg, 8, 4, 4, 2);
+    rect(g, palette.egg, 8, 15, 4, 1);
+    rect(g, palette.uiInk, 8, 7, 2, 2); // shine
+  });
+  // berry cluster
+  make(scene, TextureKey.IconBerry, s, s, (g) => {
+    rect(g, palette.berry, 6, 9, 4, 4);
+    rect(g, palette.berry, 11, 8, 4, 4);
+    rect(g, palette.berry, 9, 13, 4, 4);
+    rect(g, palette.berryLeaf, 8, 4, 2, 4);
+    rect(g, palette.berryLeaf, 11, 4, 2, 3);
+  });
 }
 
-// Crop growth stages, drawn within a tile-sized canvas so the bulb sits on the soil.
+function buildSeedIcon(scene: Phaser.Scene, key: string, tint: number): void {
+  const s = 20;
+  make(scene, key, s, s, (g) => {
+    rect(g, palette.woodDark, 6, 4, 8, 12); // packet
+    rect(g, palette.wood, 7, 5, 6, 10);
+    rect(g, tint, 9, 9, 3, 3); // seed pip
+    rect(g, palette.leaf, 9, 6, 2, 2);
+  });
+}
+
+// Crop growth stages, drawn within a tile-sized canvas so the plant sits on the soil.
+// Early stages (mound/sprout/leafy) are shared; each crop has its own mature look.
 function buildCropStages(scene: Phaser.Scene): void {
-  const cropId = CropId.Turnip;
-  const stages = CROPS[cropId].growthStages;
   const w = TILE;
   const h = TILE;
   const cx = Math.floor(w / 2);
 
-  for (let stage = 0; stage < stages; stage++) {
-    make(scene, cropTextureKey(cropId, stage), w, h, (g) => {
-      if (stage === 0) {
-        // freshly planted mound
-        rect(g, palette.soilDark, cx - 4, h - 8, 8, 4);
-        rect(g, palette.leaf, cx - 1, h - 11, 2, 3);
-      } else if (stage === 1) {
-        // sprout
-        rect(g, palette.leaf, cx - 1, h - 14, 2, 6);
-        rect(g, palette.leaf, cx - 4, h - 12, 3, 2);
-        rect(g, palette.leaf, cx + 1, h - 12, 3, 2);
-      } else if (stage === 2) {
-        // leafy, not ready
-        rect(g, palette.leafDark, cx - 5, h - 16, 10, 6);
-        rect(g, palette.leaf, cx - 4, h - 17, 8, 5);
-        rect(g, palette.leaf, cx - 1, h - 20, 2, 4);
-      } else {
-        // mature turnip
-        rect(g, palette.bulb, cx - 5, h - 12, 10, 9);
-        rect(g, palette.bulb, cx - 4, h - 4, 8, 2);
-        rect(g, palette.bulbTop, cx - 5, h - 14, 10, 3);
-        rect(g, palette.leaf, cx - 4, h - 22, 2, 8);
-        rect(g, palette.leaf, cx + 2, h - 22, 2, 8);
-        rect(g, palette.leafDark, cx - 1, h - 20, 2, 7);
-      }
-    });
+  const mature: Record<CropId, (g: Phaser.GameObjects.Graphics) => void> = {
+    [CropId.Turnip]: (g) => {
+      rect(g, palette.bulb, cx - 5, h - 12, 10, 9);
+      rect(g, palette.bulb, cx - 4, h - 4, 8, 2);
+      rect(g, palette.bulbTop, cx - 5, h - 14, 10, 3);
+      rect(g, palette.leaf, cx - 4, h - 22, 2, 8);
+      rect(g, palette.leaf, cx + 2, h - 22, 2, 8);
+      rect(g, palette.leafDark, cx - 1, h - 20, 2, 7);
+    },
+    [CropId.Carrot]: (g) => {
+      rect(g, palette.carrot, cx - 4, h - 12, 8, 9);
+      rect(g, palette.carrot, cx - 2, h - 4, 4, 3);
+      rect(g, palette.carrotDark, cx + 1, h - 11, 2, 8);
+      rect(g, palette.leaf, cx - 4, h - 22, 2, 9);
+      rect(g, palette.leaf, cx + 2, h - 22, 2, 9);
+      rect(g, palette.leafDark, cx - 1, h - 24, 2, 11);
+    },
+    [CropId.Pumpkin]: (g) => {
+      rect(g, palette.pumpkin, cx - 7, h - 13, 14, 11);
+      rect(g, palette.pumpkin, cx - 6, h - 15, 12, 13);
+      rect(g, palette.pumpkinRib, cx - 1, h - 15, 2, 13);
+      rect(g, palette.pumpkinDark, cx - 5, h - 13, 1, 11);
+      rect(g, palette.pumpkinDark, cx + 4, h - 13, 1, 11);
+      rect(g, palette.leafDark, cx - 1, h - 18, 2, 4); // stem
+    },
+  };
+
+  for (const cropId of Object.keys(CROPS) as CropId[]) {
+    const stages = CROPS[cropId].growthStages;
+    for (let stage = 0; stage < stages; stage++) {
+      make(scene, cropTextureKey(cropId, stage), w, h, (g) => {
+        if (stage >= stages - 1) {
+          mature[cropId](g);
+        } else if (stage === 0) {
+          rect(g, palette.soilDark, cx - 4, h - 8, 8, 4); // mound
+          rect(g, palette.leaf, cx - 1, h - 11, 2, 3);
+        } else if (stage === 1) {
+          rect(g, palette.leaf, cx - 1, h - 14, 2, 6); // sprout
+          rect(g, palette.leaf, cx - 4, h - 12, 3, 2);
+          rect(g, palette.leaf, cx + 1, h - 12, 3, 2);
+        } else {
+          rect(g, palette.leafDark, cx - 5, h - 16, 10, 6); // leafy
+          rect(g, palette.leaf, cx - 4, h - 17, 8, 5);
+          rect(g, palette.leaf, cx - 1, h - 20, 2, 4);
+        }
+      });
+    }
   }
 }

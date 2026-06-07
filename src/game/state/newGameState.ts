@@ -1,11 +1,11 @@
 // Factory for a fresh game. Single place that defines starting conditions.
-// Map and chest state are derived from the map registry so adding maps/chests there
-// is enough — no edits needed here.
+// Map, chest, chicken, and bush state are derived from the map registry so adding entries
+// there is enough — no edits needed here.
 
 import { Balance } from '../data/balance';
 import { MAPS, tileCenter } from '../data/maps';
-import { ItemId, MapId } from '../types/ids';
-import type { ChestState, GameState, MapState } from '../types/models';
+import { CropId, ItemId, MapId } from '../types/ids';
+import type { BushState, ChestState, ChickenState, GameState, MapState } from '../types/models';
 import { add, createInventory } from '../systems/InventorySystem';
 
 export function createNewGameState(): GameState {
@@ -17,6 +17,8 @@ export function createNewGameState(): GameState {
 
   const maps: Record<string, MapState> = {};
   const chests: Record<string, ChestState> = {};
+  const chickens: Record<string, ChickenState> = {};
+  const bushes: Record<string, BushState> = {};
   for (const def of Object.values(MAPS)) {
     maps[def.mapId] = { mapId: def.mapId, crops: [] };
     for (const placement of def.chests) {
@@ -25,6 +27,8 @@ export function createNewGameState(): GameState {
         inventory: createInventory(Balance.chestCapacity),
       };
     }
+    for (const hen of def.chickens) chickens[hen.id] = { id: hen.id, lastPettedDay: 0 };
+    for (const bush of def.bushes) bushes[bush.id] = { id: bush.id, readyTick: 0 };
   }
 
   return {
@@ -35,10 +39,13 @@ export function createNewGameState(): GameState {
       facing: 'down',
       gold: Balance.startingGold,
       inventory,
+      selectedCropId: CropId.Turnip,
     },
     maps,
     chests,
+    chickens,
+    bushes,
     time: { tick: 0, day: 1 },
-    stats: { cropsHarvested: 0 },
+    stats: { cropsHarvested: 0, chickensPetted: 0 },
   };
 }

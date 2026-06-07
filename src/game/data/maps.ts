@@ -40,6 +40,16 @@ export interface PropPlacement {
   tile: TilePos;
 }
 
+export interface ChickenPlacement {
+  id: string;
+  tile: TilePos;
+}
+
+export interface BushPlacement {
+  id: string;
+  tile: TilePos;
+}
+
 export interface MapDef {
   mapId: MapId;
   widthTiles: number;
@@ -52,6 +62,8 @@ export interface MapDef {
   chests: ChestPlacement[];
   npcs: NpcPlacement[];
   props: PropPlacement[];
+  chickens: ChickenPlacement[];
+  bushes: BushPlacement[];
   exits: ExitDef[];
 }
 
@@ -73,11 +85,21 @@ export const MAPS: Record<MapId, MapDef> = {
     floor: 'grass',
     wallThickness: 0,
     spawnTile: { x: 8, y: 6 },
-    plots: plotGrid(3, 4, 3, 3),
+    plots: plotGrid(3, 4, 4, 3),
     shippingBox: { x: 13, y: 2 },
     chests: [],
     npcs: [],
     props: [],
+    chickens: [
+      { id: 'hen_1', tile: { x: 2, y: 9 } },
+      { id: 'hen_2', tile: { x: 4, y: 9 } },
+      { id: 'hen_3', tile: { x: 6, y: 9 } },
+    ],
+    bushes: [
+      { id: 'bush_1', tile: { x: 10, y: 4 } },
+      { id: 'bush_2', tile: { x: 12, y: 5 } },
+      { id: 'bush_3', tile: { x: 10, y: 7 } },
+    ],
     exits: [
       { tile: { x: 3, y: 3 }, toMap: MapId.House, toSpawn: { x: 5, y: 7 }, label: 'Enter house', art: 'cottage' },
       { tile: { x: 14, y: 9 }, toMap: MapId.Village, toSpawn: { x: 7, y: 8 }, label: 'To village', art: 'signpost' },
@@ -94,6 +116,8 @@ export const MAPS: Record<MapId, MapDef> = {
     chests: [{ chestId: ChestId.House, tile: { x: 3, y: 2 } }],
     npcs: [],
     props: [],
+    chickens: [],
+    bushes: [],
     exits: [
       { tile: { x: 5, y: 7 }, toMap: MapId.Farm, toSpawn: { x: 3, y: 3 }, label: 'Leave', art: 'door' },
     ],
@@ -116,6 +140,8 @@ export const MAPS: Record<MapId, MapDef> = {
       { art: 'stall', tile: { x: 4, y: 4 } },
       { art: 'anvil', tile: { x: 11, y: 5 } },
     ],
+    chickens: [],
+    bushes: [],
     exits: [
       { tile: { x: 7, y: 9 }, toMap: MapId.Farm, toSpawn: { x: 13, y: 9 }, label: 'To farm', art: 'signpost' },
     ],

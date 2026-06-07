@@ -3,6 +3,18 @@
 
 import type { CropId, InteractionKind, ItemId, MapId } from './ids';
 
+// A petable chicken. Position comes from map data; this tracks the daily pet.
+export interface ChickenState {
+  id: string;
+  lastPettedDay: number;
+}
+
+// A foragable bush. Ready to harvest when the current tick >= readyTick.
+export interface BushState {
+  id: string;
+  readyTick: number;
+}
+
 export interface ItemStack {
   itemId: ItemId;
   count: number;
@@ -32,6 +44,7 @@ export interface PlayerState {
   facing: Facing;
   gold: number;
   inventory: Inventory;
+  selectedCropId: CropId; // which seed planting uses
 }
 
 export interface MapState {
@@ -53,12 +66,15 @@ export interface TimeState {
 // Lightweight run stats, surfaced on the (future) ending screen.
 export interface Stats {
   cropsHarvested: number;
+  chickensPetted: number;
 }
 
 export interface GameState {
   player: PlayerState;
   maps: Record<string, MapState>;
   chests: Record<string, ChestState>;
+  chickens: Record<string, ChickenState>;
+  bushes: Record<string, BushState>;
   time: TimeState;
   stats: Stats;
 }
@@ -78,4 +94,6 @@ export interface InteractionTarget {
   chestId?: string; // set when kind === Chest
   exitIndex?: number; // set when kind === Door
   npcId?: string; // set when kind === Npc
+  chickenId?: string; // set when kind === Chicken
+  bushId?: string; // set when kind === Bush
 }

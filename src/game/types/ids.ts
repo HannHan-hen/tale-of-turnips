@@ -4,6 +4,12 @@
 export const ItemId = {
   TurnipSeed: 'turnip_seed',
   Turnip: 'turnip',
+  CarrotSeed: 'carrot_seed',
+  Carrot: 'carrot',
+  PumpkinSeed: 'pumpkin_seed',
+  Pumpkin: 'pumpkin',
+  Egg: 'egg',
+  Berry: 'berry',
   WornSword: 'worn_sword',
   PaddedVest: 'padded_vest',
 } as const;
@@ -11,6 +17,8 @@ export type ItemId = (typeof ItemId)[keyof typeof ItemId];
 
 export const CropId = {
   Turnip: 'turnip',
+  Carrot: 'carrot',
+  Pumpkin: 'pumpkin',
 } as const;
 export type CropId = (typeof CropId)[keyof typeof CropId];
 
@@ -55,5 +63,7 @@ export const InteractionKind = {
   Chest: 'chest',
   Door: 'door',
   Npc: 'npc',
+  Chicken: 'chicken',
+  Bush: 'bush',
 } as const;
 export type InteractionKind = (typeof InteractionKind)[keyof typeof InteractionKind];

@@ -26,6 +26,46 @@ export const ITEMS: Record<ItemId, ItemDef> = {
     maxStack: 99,
     iconKey: TextureKey.IconTurnip,
   },
+  [ItemId.CarrotSeed]: {
+    itemId: ItemId.CarrotSeed,
+    displayName: 'Carrot Seed',
+    maxStack: 99,
+    iconKey: TextureKey.IconCarrotSeed,
+  },
+  [ItemId.Carrot]: {
+    itemId: ItemId.Carrot,
+    displayName: 'Carrot',
+    sellPrice: 18,
+    maxStack: 99,
+    iconKey: TextureKey.IconCarrot,
+  },
+  [ItemId.PumpkinSeed]: {
+    itemId: ItemId.PumpkinSeed,
+    displayName: 'Pumpkin Seed',
+    maxStack: 99,
+    iconKey: TextureKey.IconPumpkinSeed,
+  },
+  [ItemId.Pumpkin]: {
+    itemId: ItemId.Pumpkin,
+    displayName: 'Pumpkin',
+    sellPrice: 34,
+    maxStack: 99,
+    iconKey: TextureKey.IconPumpkin,
+  },
+  [ItemId.Egg]: {
+    itemId: ItemId.Egg,
+    displayName: 'Egg',
+    sellPrice: 9,
+    maxStack: 99,
+    iconKey: TextureKey.IconEgg,
+  },
+  [ItemId.Berry]: {
+    itemId: ItemId.Berry,
+    displayName: 'Berry',
+    sellPrice: 6,
+    maxStack: 99,
+    iconKey: TextureKey.IconBerry,
+  },
   // Basic gear bought from the blacksmith. Inert for now; gains combat effects when the
   // combat/equipment slices land. Not sellable so a careless shipping-box sweep keeps it.
   [ItemId.WornSword]: {

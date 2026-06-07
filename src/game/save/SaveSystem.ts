@@ -5,7 +5,7 @@ import { Balance } from '../data/balance';
 import { MAPS } from '../data/maps';
 import { createInventory } from '../systems/InventorySystem';
 import { createNewGameState } from '../state/newGameState';
-import { MapId } from '../types/ids';
+import { CropId, MapId } from '../types/ids';
 import type { GameState, SaveData } from '../types/models';
 
 export const SAVE_KEY = 'story-of-turnips/save';
@@ -27,17 +27,21 @@ export function migrate(data: unknown): SaveData | null {
   if (!state.player || !state.time) return null;
 
   // Fill fields that may be missing in older saves rather than discarding the save.
-  state.stats ??= { cropsHarvested: 0 };
+  state.stats ??= { cropsHarvested: 0, chickensPetted: 0 };
+  state.stats.chickensPetted ??= 0;
   if (!state.player.inventory) {
     state.player.inventory = { slots: [], capacity: Balance.inventoryCapacity };
   }
   state.player.inventory.capacity ??= Balance.inventoryCapacity;
   state.player.inventory.slots ??= [];
+  state.player.selectedCropId ??= CropId.Turnip;
 
-  // Ensure every registered map and chest exists, so saves from before a map/chest was
-  // added still load (the new ones simply start empty).
+  // Ensure every registered map, chest, chicken, and bush exists, so saves from before an
+  // entry was added still load (the new ones simply start empty/fresh).
   state.maps ??= {};
   state.chests ??= {};
+  state.chickens ??= {};
+  state.bushes ??= {};
   for (const def of Object.values(MAPS)) {
     state.maps[def.mapId] ??= { mapId: def.mapId, crops: [] };
     for (const placement of def.chests) {
@@ -46,6 +50,8 @@ export function migrate(data: unknown): SaveData | null {
         inventory: createInventory(Balance.chestCapacity),
       };
     }
+    for (const hen of def.chickens) state.chickens[hen.id] ??= { id: hen.id, lastPettedDay: 0 };
+    for (const bush of def.bushes) state.bushes[bush.id] ??= { id: bush.id, readyTick: 0 };
   }
 
   // Recover gracefully if the player was saved on a map that no longer exists.

@@ -226,7 +226,8 @@ thing implemented in code; everything below it lives here until its turn.**
    exits), and a chest reusing the shared inventory model via a keyboard chest screen.
 3. **Village + shops — done.** village map, signpost link from the farm, NPCs (seed seller,
    blacksmith, hint villager), and data-driven shop purchasing via a keyboard shop screen.
-4. **Animals & more crops:** chickens (pet/eggs), bushes (foraging + regrow), crops 2 & 3.
+4. **Animals & more crops — done.** chickens (pet once/day → egg), bushes (forage + regrow),
+   carrot & pumpkin crops, a number-key seed selector, and a day counter.
 5. **Ruins + combat:** ruins map, hearts/HP, one attack, enemy data/behavior/drops.
 6. **Threat:** `ruinThreat` rising daily, farm monster incursions, warnings, crop damage.
 7. **Legendary set:** five pieces found in ruins, per-piece effects, set completion gate.

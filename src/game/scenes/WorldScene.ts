@@ -6,12 +6,14 @@
 import Phaser from 'phaser';
 import { cropTextureKey, TextureKey } from '../data/assetKeys';
 import { Balance } from '../data/balance';
-import { CROPS } from '../data/crops';
+import { CROP_ORDER, CROPS } from '../data/crops';
 import { MAPS, TILE, tileCenter, type MapDef } from '../data/maps';
 import { NPCS } from '../data/npcs';
 import { GameStateStore } from '../state/GameStateStore';
 import { saveGame } from '../save/SaveSystem';
 import { cropAt, growthStage, isMature, plant, removeCrop } from '../systems/FarmingSystem';
+import { petChicken } from '../systems/ChickenSystem';
+import { harvestBush, isBushReady } from '../systems/ForagingSystem';
 import { sellAll } from '../systems/EconomySystem';
 import { findNearestTarget } from '../systems/InteractionSystem';
 import { InputSystem } from '../systems/InputSystem';
@@ -42,6 +44,7 @@ export class WorldScene extends Phaser.Scene {
   private controls!: InputSystem;
   private playerSprite!: Phaser.GameObjects.Image;
   private cropSprites!: Map<CropInstance, Phaser.GameObjects.Image>;
+  private bushSprites!: Map<string, Phaser.GameObjects.Image>;
   private bounds!: Bounds;
   private targets: InteractionTarget[] = [];
 
@@ -58,12 +61,14 @@ export class WorldScene extends Phaser.Scene {
     this.store = this.registry.get(STORE_KEY) as GameStateStore;
     this.def = MAPS[this.store.player.mapId];
     this.cropSprites = new Map();
+    this.bushSprites = new Map();
     this.tickAccum = 0;
     this.saveAccum = 0;
     this.lastPrompt = null;
 
     this.drawGround();
     this.drawObjects();
+    this.drawEntities();
     this.targets = this.buildTargets();
 
     for (const crop of this.store.currentMap().crops) this.addCropSprite(crop);
@@ -88,15 +93,26 @@ export class WorldScene extends Phaser.Scene {
     this.playerSprite.setPosition(player.x, player.y).setDepth(player.y);
     this.playerSprite.setFlipX(player.facing === 'left');
 
-    // Growth advances globally; crops keep maturing even while indoors.
+    // Growth advances globally; crops keep maturing and bushes regrow even while indoors.
     this.tickAccum += deltaMs;
     let grew = false;
     while (this.tickAccum >= Balance.tickMs) {
       this.tickAccum -= Balance.tickMs;
-      advanceTick(this.store.state.time);
+      advanceTick(this.store.state.time, Balance.dayLengthTicks);
       grew = true;
     }
-    if (grew) this.refreshCropTextures();
+    if (grew) {
+      this.refreshCropTextures();
+      this.refreshBushTextures();
+    }
+
+    // seed selection via number keys
+    const hotkey = this.controls.numberKeyJustPressed();
+    if (hotkey !== undefined && hotkey < CROP_ORDER.length) {
+      this.store.player.selectedCropId = CROP_ORDER[hotkey];
+      this.lastPrompt = null;
+      this.game.events.emit(UiEvent.Hud);
+    }
 
     const target = findNearestTarget(player.x, player.y, this.targets, Balance.interactRadius);
     this.updatePrompt(target);
@@ -154,6 +170,34 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
+  // Chickens (with a gentle idle bob) and bushes (texture by readiness).
+  private drawEntities(): void {
+    const def = this.def;
+    const tick = this.store.state.time.tick;
+    for (const hen of def.chickens) {
+      const c = tileCenter(hen.tile);
+      const spr = this.add.image(c.x, c.y, TextureKey.Chicken).setOrigin(0.5, 0.9).setDepth(c.y);
+      this.tweens.add({ targets: spr, y: c.y - 3, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+    }
+    for (const bush of def.bushes) {
+      const c = tileCenter(bush.tile);
+      const ready = isBushReady(this.store.state.bushes[bush.id], tick);
+      const spr = this.add
+        .image(c.x, c.y, ready ? TextureKey.BushFull : TextureKey.BushEmpty)
+        .setOrigin(0.5, 0.85)
+        .setDepth(c.y - 1);
+      this.bushSprites.set(bush.id, spr);
+    }
+  }
+
+  private refreshBushTextures(): void {
+    const tick = this.store.state.time.tick;
+    for (const [id, spr] of this.bushSprites) {
+      const ready = isBushReady(this.store.state.bushes[id], tick);
+      spr.setTexture(ready ? TextureKey.BushFull : TextureKey.BushEmpty);
+    }
+  }
+
   private addCropSprite(crop: CropInstance): void {
     const c = tileCenter({ x: crop.tileX, y: crop.tileY });
     const stage = growthStage(crop, this.store.state.time.tick);
@@ -205,6 +249,14 @@ export class WorldScene extends Phaser.Scene {
       const c = tileCenter(npc.tile);
       targets.push({ kind: InteractionKind.Npc, x: c.x, y: c.y, npcId: npc.npcId });
     });
+    def.chickens.forEach((hen) => {
+      const c = tileCenter(hen.tile);
+      targets.push({ kind: InteractionKind.Chicken, x: c.x, y: c.y, chickenId: hen.id });
+    });
+    def.bushes.forEach((bush) => {
+      const c = tileCenter(bush.tile);
+      targets.push({ kind: InteractionKind.Bush, x: c.x, y: c.y, bushId: bush.id });
+    });
     return targets;
   }
 
@@ -228,10 +280,17 @@ export class WorldScene extends Phaser.Scene {
         const npc = NPCS[target.npcId as keyof typeof NPCS];
         return `${npc.shopId ? 'Shop' : 'Talk'}: ${npc.displayName}  [E]`;
       }
+      case InteractionKind.Chicken:
+        return 'Pet chicken  [E]';
+      case InteractionKind.Bush:
+        return isBushReady(this.store.state.bushes[target.bushId!], this.store.state.time.tick)
+          ? 'Gather berries  [E]'
+          : 'Bush is bare';
       case InteractionKind.Plot: {
         const crop = this.cropAtTarget(target);
         if (!crop) {
-          return has(this.store.player.inventory, ItemId.TurnipSeed) ? 'Plant turnip  [E]' : 'No seeds';
+          const def = CROPS[this.store.player.selectedCropId];
+          return has(this.store.player.inventory, def.seedItem) ? `Plant ${def.displayName}  [E]` : 'No seeds';
         }
         return isMature(crop, this.store.state.time.tick) ? 'Harvest  [E]' : 'Growing…';
       }
@@ -256,6 +315,12 @@ export class WorldScene extends Phaser.Scene {
         return; // shop scene takes over, or a dialogue toast shows
       case InteractionKind.Plot:
         this.usePlot(target);
+        break;
+      case InteractionKind.Chicken:
+        this.petChickenAction(target.chickenId!);
+        break;
+      case InteractionKind.Bush:
+        this.harvestBushAction(target.bushId!);
         break;
     }
     this.lastPrompt = null; // force a prompt refresh after the action
@@ -306,13 +371,14 @@ export class WorldScene extends Phaser.Scene {
     const plot = this.def.plots[target.plotIndex!];
 
     if (!crop) {
-      if (remove(inv, ItemId.TurnipSeed, 1)) {
-        const planted = plant(map, CROPS.turnip.cropId, this.def.mapId, plot.x, plot.y, this.store.state.time.tick);
+      const cropDef = CROPS[this.store.player.selectedCropId];
+      if (remove(inv, cropDef.seedItem, 1)) {
+        const planted = plant(map, cropDef.cropId, this.def.mapId, plot.x, plot.y, this.store.state.time.tick);
         if (planted) this.addCropSprite(planted);
-        this.toast('Planted turnip.');
+        this.toast(`Planted ${cropDef.displayName}.`);
         this.game.events.emit(UiEvent.Hud);
       } else {
-        this.toast('No seeds left.');
+        this.toast(`No ${cropDef.displayName} seeds.`);
       }
       return;
     }
@@ -332,6 +398,38 @@ export class WorldScene extends Phaser.Scene {
       }
       this.store.state.stats.cropsHarvested += def.harvestYield;
       this.toast(`Harvested ${def.displayName}.`);
+      this.game.events.emit(UiEvent.Hud);
+    } else {
+      this.toast('Inventory full.');
+    }
+  }
+
+  private petChickenAction(chickenId: string): void {
+    const chicken = this.store.state.chickens[chickenId];
+    if (!petChicken(chicken, this.store.state.time.day)) {
+      this.toast('The chicken is content.');
+      return;
+    }
+    this.store.state.stats.chickensPetted += 1;
+    if (add(this.store.player.inventory, ItemId.Egg, 1)) {
+      this.toast('Petted chicken! It left an egg.');
+    } else {
+      this.toast('Petted chicken!');
+    }
+    this.game.events.emit(UiEvent.Hud);
+  }
+
+  private harvestBushAction(bushId: string): void {
+    const bush = this.store.state.bushes[bushId];
+    const tick = this.store.state.time.tick;
+    if (!isBushReady(bush, tick)) {
+      this.toast('Nothing to gather yet.');
+      return;
+    }
+    if (add(this.store.player.inventory, ItemId.Berry, Balance.berryYield)) {
+      harvestBush(bush, tick, Balance.bushRegrowTicks);
+      this.refreshBushTextures();
+      this.toast('Gathered berries.');
       this.game.events.emit(UiEvent.Hud);
     } else {
       this.toast('Inventory full.');

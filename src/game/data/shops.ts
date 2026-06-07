@@ -21,7 +21,11 @@ export const SHOPS: Record<ShopId, ShopDef> = {
   [ShopId.Seeds]: {
     shopId: ShopId.Seeds,
     title: 'Seeds & Sprouts',
-    items: [{ itemId: ItemId.TurnipSeed, price: 8 }],
+    items: [
+      { itemId: ItemId.TurnipSeed, price: 8 },
+      { itemId: ItemId.CarrotSeed, price: 12 },
+      { itemId: ItemId.PumpkinSeed, price: 22 },
+    ],
   },
   [ShopId.Blacksmith]: {
     shopId: ShopId.Blacksmith,

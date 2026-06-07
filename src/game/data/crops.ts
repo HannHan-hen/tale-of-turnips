@@ -23,4 +23,25 @@ export const CROPS: Record<CropId, CropDef> = {
     harvestYield: 2,
     displayName: 'Turnip',
   },
+  [CropId.Carrot]: {
+    cropId: CropId.Carrot,
+    seedItem: ItemId.CarrotSeed,
+    harvestItem: ItemId.Carrot,
+    growthStages: 4,
+    ticksPerStage: 4,
+    harvestYield: 2,
+    displayName: 'Carrot',
+  },
+  [CropId.Pumpkin]: {
+    cropId: CropId.Pumpkin,
+    seedItem: ItemId.PumpkinSeed,
+    harvestItem: ItemId.Pumpkin,
+    growthStages: 4,
+    ticksPerStage: 6,
+    harvestYield: 1,
+    displayName: 'Pumpkin',
+  },
 };
+
+// Display/selection order for the seed selector. New crops appear here.
+export const CROP_ORDER: CropId[] = [CropId.Turnip, CropId.Carrot, CropId.Pumpkin];

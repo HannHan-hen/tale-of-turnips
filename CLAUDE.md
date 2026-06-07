@@ -73,9 +73,9 @@ tests/                    # Vitest pure-logic tests
 These files are safe to edit without touching game logic:
 
 - `src/game/data/items.ts` — item names, sell prices, stack behaviour.
-- `src/game/data/crops.ts` — crop seed/harvest items, growth duration & stages.
-- `src/game/data/maps.ts` — map layouts, spawn points, plots, chests, shipping box, NPC and
-  prop placements, and exits (doors/cottage/signpost) that link maps.
+- `src/game/data/crops.ts` — crop seed/harvest items, growth duration & stages, seed order.
+- `src/game/data/maps.ts` — map layouts, spawn points, plots, chests, shipping box, chicken,
+  bush, NPC and prop placements, and exits (doors/cottage/signpost) that link maps.
 - `src/game/data/shops.ts` — shop titles, goods, prices, optional unlock conditions.
 - `src/game/data/npcs.ts` — NPC names, sprites, shop links, and dialogue/hint lines.
 - `src/game/data/balance.ts` — tick length, starting gold, threat rates, tuning constants.

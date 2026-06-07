@@ -1,20 +1,25 @@
-// HUD overlay. Renders gold, inventory counts, the interaction prompt, and transient
-// toast feedback. Reads game state on demand; never mutates it. Driven by UiEvent messages.
+// HUD overlay. Renders day, gold, the seed selector (with counts), the interaction prompt,
+// and transient toast feedback. Reads game state on demand; never mutates it.
 
 import Phaser from 'phaser';
-import { TextureKey } from '../data/assetKeys';
 import { palette, toCss } from '../data/palette';
+import { CROP_ORDER, CROPS } from '../data/crops';
+import { ITEMS } from '../data/items';
 import { GameStateStore } from '../state/GameStateStore';
 import { count } from '../systems/InventorySystem';
-import { ItemId, SceneKey } from '../types/ids';
+import { SceneKey } from '../types/ids';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
 
+const SLOT_W = 58;
+
 export class UIScene extends Phaser.Scene {
   private store!: GameStateStore;
+  private dayText!: Phaser.GameObjects.Text;
   private goldText!: Phaser.GameObjects.Text;
-  private seedText!: Phaser.GameObjects.Text;
-  private turnipText!: Phaser.GameObjects.Text;
+  private seedCountTexts: Phaser.GameObjects.Text[] = [];
+  private selectHighlight!: Phaser.GameObjects.Rectangle;
+  private slotXs: number[] = [];
   private promptText!: Phaser.GameObjects.Text;
   private toastText!: Phaser.GameObjects.Text;
   private toastTween?: Phaser.Tweens.Tween;
@@ -28,19 +33,27 @@ export class UIScene extends Phaser.Scene {
     const w = this.scale.width;
     const h = this.scale.height;
 
-    // top panel
     this.add.rectangle(0, 0, w, 28, palette.uiPanel, 0.85).setOrigin(0, 0);
 
     const label = { fontFamily: 'monospace', fontSize: '13px' };
-    this.goldText = this.add.text(10, 7, '', { ...label, color: toCss(palette.gold) });
+    this.dayText = this.add.text(10, 7, '', { ...label, color: toCss(palette.uiInk) });
+    this.goldText = this.add.text(86, 7, '', { ...label, color: toCss(palette.gold) });
 
-    this.add.image(w - 132, 14, TextureKey.IconTurnipSeed).setScale(0.9);
-    this.seedText = this.add.text(w - 118, 7, '', { ...label, color: toCss(palette.uiInk) });
+    // Seed selector on the right: one slot per crop (icon + count), selected one highlighted.
+    const startX = w - CROP_ORDER.length * SLOT_W - 6;
+    this.selectHighlight = this.add
+      .rectangle(0, 14, SLOT_W - 4, 24, palette.uiHighlight, 1)
+      .setOrigin(0.5);
+    this.seedCountTexts = [];
+    this.slotXs = [];
+    CROP_ORDER.forEach((cropId, i) => {
+      const x = startX + i * SLOT_W;
+      this.slotXs.push(x);
+      this.add.image(x, 14, ITEMS[CROPS[cropId].seedItem].iconKey).setScale(0.85);
+      const t = this.add.text(x + 12, 7, '', { ...label, color: toCss(palette.uiInk) });
+      this.seedCountTexts.push(t);
+    });
 
-    this.add.image(w - 70, 14, TextureKey.IconTurnip).setScale(0.9);
-    this.turnipText = this.add.text(w - 56, 7, '', { ...label, color: toCss(palette.uiInk) });
-
-    // interaction prompt, bottom center
     this.promptText = this.add
       .text(w / 2, h - 16, '', {
         fontFamily: 'monospace',
@@ -51,7 +64,6 @@ export class UIScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // toast feedback, above the prompt
     this.toastText = this.add
       .text(w / 2, h - 44, '', {
         fontFamily: 'monospace',
@@ -81,9 +93,13 @@ export class UIScene extends Phaser.Scene {
 
   private refreshHud(): void {
     const inv = this.store.player.inventory;
-    this.goldText.setText(`Gold ${this.store.player.gold}`);
-    this.seedText.setText(`${count(inv, ItemId.TurnipSeed)}`);
-    this.turnipText.setText(`${count(inv, ItemId.Turnip)}`);
+    this.dayText.setText(`Day ${this.store.state.time.day}`);
+    this.goldText.setText(`${this.store.player.gold}g`);
+    CROP_ORDER.forEach((cropId, i) => {
+      this.seedCountTexts[i].setText(`${count(inv, CROPS[cropId].seedItem)}`);
+    });
+    const selected = CROP_ORDER.indexOf(this.store.player.selectedCropId);
+    if (selected >= 0) this.selectHighlight.setX(this.slotXs[selected]);
   }
 
   private showToast(message: string): void {
