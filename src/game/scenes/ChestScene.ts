@@ -7,6 +7,7 @@ import { ITEMS } from '../data/items';
 import { palette, toCss } from '../data/palette';
 import { GameStateStore } from '../state/GameStateStore';
 import { spaceFor, transfer } from '../systems/InventorySystem';
+import { saveGame } from '../save/SaveSystem';
 import { SceneKey } from '../types/ids';
 import type { ChestState, Inventory } from '../types/models';
 import { UiEvent } from '../ui/uiEvents';
@@ -178,6 +179,8 @@ export class ChestScene extends Phaser.Scene {
       return;
     }
     transfer(fromInv, toInv, stack.itemId, amount);
+    // Persist now: the world scene is paused, so its autosave won't run until we close.
+    saveGame(this.store.state);
     this.game.events.emit(UiEvent.Hud);
     this.render();
   }

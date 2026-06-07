@@ -8,6 +8,7 @@ import { availableItems, SHOPS, type ShopItem } from '../data/shops';
 import { GameStateStore } from '../state/GameStateStore';
 import { buy } from '../systems/EconomySystem';
 import { recalcMaxHp } from '../systems/EquipmentSystem';
+import { saveGame } from '../save/SaveSystem';
 import { SceneKey, ShopId } from '../types/ids';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
@@ -123,6 +124,8 @@ export class ShopScene extends Phaser.Scene {
     if (result === 'ok') {
       // carried gear can change max hearts (e.g. the Padded Vest) — reconcile right away
       recalcMaxHp(this.store.player, this.store.state.armor);
+      // Persist now: the world scene is paused, so its autosave won't run until we close.
+      saveGame(this.store.state);
       this.toast(`Bought ${ITEMS[item.itemId].displayName}.`);
       this.game.events.emit(UiEvent.Hud);
       this.refresh();

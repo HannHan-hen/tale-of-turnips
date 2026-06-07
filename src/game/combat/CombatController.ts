@@ -54,7 +54,9 @@ export class CombatController {
         e.sprite.setFlipX(dx < 0);
       }
 
-      if (dist < Balance.enemyContactRange) {
+      // Re-measure after moving so contact reflects where the enemy ends up this frame
+      // (matches the raid path — avoids a one-frame lag in contact damage).
+      if (Math.hypot(px - e.x, py - e.y) < Balance.enemyContactRange) {
         contactDamage = Math.max(contactDamage, e.def.contactDamage);
       }
     }

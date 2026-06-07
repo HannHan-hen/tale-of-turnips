@@ -2,6 +2,37 @@
 
 Date: 2026-06-07
 
+## Resolution pass (applied)
+
+A follow-up pass acted on the correctness and type-safety findings below. Build, typecheck,
+and the unit suite (now 57 tests) stay green.
+
+**Fixed:**
+
+- **Finding 2 — stale loadout/equipment.** `WorldScene` now recomputes the cached loadout and
+  max HP on the Phaser `RESUME` event, so gear bought in a shop or moved through a chest takes
+  effect the moment the world scene resumes — no map change or restart required.
+- **Finding 3 — shop/chest persistence.** `ShopScene` saves after a successful purchase and
+  `ChestScene` saves after a transfer, so changes made while the world scene is paused survive
+  an immediate tab close.
+- **Finding 4 — `stats.cropsHarvested` migration.** `migrate` now backfills
+  `stats.cropsHarvested ??= 0`, covering partial `stats` objects from older saves. Added a
+  regression test.
+- **Finding 6 — `InteractionTarget` discriminated union.** Replaced the single optional-field
+  interface with a union keyed by `kind`, removing every non-null assertion in `WorldScene`
+  (`plotIndex!`, `exitIndex!`, `bushId!`, `pieceId!`, …). Missing fields are now compile errors.
+- **Finding 7 — enemy contact damage.** Normal enemy contact is re-measured after the enemy
+  moves, matching the raid path and removing the one-frame lag.
+
+**Deferred (intentionally, not done in this pass):**
+
+- **Finding 1 — `WorldScene` god scene.** A real extraction is a larger refactor; the
+  correctness fixes above were prioritized first per the suggested order. Still open.
+- **Findings 5, 8, 9, 10, 11** — collision model, more scene-level tests, bundle size, lint
+  tooling, and the dependency audit remain open backlog items.
+
+---
+
 ## Executive summary
 
 This is a healthy small-game prototype: it builds, passes its current unit tests, uses strict TypeScript settings, keeps most tunable content in data registries, and stores game state as plain serializable data. The codebase is workable and not in crisis.

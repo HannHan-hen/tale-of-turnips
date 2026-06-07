@@ -63,4 +63,22 @@ describe('SaveSystem', () => {
     expect(result.state.stats).toBeDefined();
     expect(result.state.player.inventory.slots).toEqual([]);
   });
+
+  it('backfills cropsHarvested when an older partial stats object is missing it', () => {
+    const base = createNewGameState();
+    const partial = {
+      version: 0,
+      // A save from before cropsHarvested existed: stats present but partial.
+      state: {
+        player: base.player,
+        maps: base.maps,
+        time: base.time,
+        stats: { chickensPetted: 2, monstersDefeated: 1 },
+      },
+    };
+    const result = migrate(partial)!;
+    expect(result.state.stats.cropsHarvested).toBe(0);
+    expect(result.state.stats.chickensPetted).toBe(2);
+    expect(result.state.stats.monstersDefeated).toBe(1);
+  });
 });

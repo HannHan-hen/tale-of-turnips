@@ -137,7 +137,18 @@ export class WorldScene extends Phaser.Scene {
     this.game.events.emit(UiEvent.Hud);
     this.game.events.emit(UiEvent.Prompt, null);
 
+    // Shop/chest scenes pause (not restart) this scene, so create() won't re-run when they
+    // close. Carried gear may have changed there, so refresh derived effects on resume —
+    // otherwise speed, crop yield, combat damage, and max hearts would read stale values.
+    const onResume = (): void => {
+      recalcMaxHp(this.store.player, this.store.state.armor);
+      this.loadout = computeLoadout(this.store.state.armor, this.store.player.inventory);
+      this.game.events.emit(UiEvent.Hud);
+    };
+    this.events.on(Phaser.Scenes.Events.RESUME, onResume);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.events.off(Phaser.Scenes.Events.RESUME, onResume);
       this.combat?.destroy();
       saveGame(this.store.state);
     });
@@ -355,26 +366,26 @@ export class WorldScene extends Phaser.Scene {
       case InteractionKind.Chest:
         return 'Open chest  [E]';
       case InteractionKind.Door: {
-        const exit = this.def.exits[target.exitIndex!];
+        const exit = this.def.exits[target.exitIndex];
         if (exit.requiresSet && !this.loadout.opensBoss) return `Sealed — needs the ${SET_NAME}`;
         return `${exit.label}  [E]`;
       }
       case InteractionKind.Npc: {
-        const npc = NPCS[target.npcId as keyof typeof NPCS];
+        const npc = NPCS[target.npcId];
         return `${npc.shopId ? 'Shop' : 'Talk'}: ${npc.displayName}  [E]`;
       }
       case InteractionKind.Chicken:
         return 'Pet chicken  [E]';
       case InteractionKind.Bush:
-        return isBushReady(this.store.state.bushes[target.bushId!], this.store.state.time.tick)
+        return isBushReady(this.store.state.bushes[target.bushId], this.store.state.time.tick)
           ? 'Gather berries  [E]'
           : 'Bush is bare';
       case InteractionKind.Cache:
-        return hasPiece(this.store.state.armor, target.pieceId!)
+        return hasPiece(this.store.state.armor, target.pieceId)
           ? 'Empty cache'
           : `Open cache  [E]`;
       case InteractionKind.Plot: {
-        const crop = this.cropAtTarget(target);
+        const crop = this.cropAtPlot(target.plotIndex);
         if (!crop) {
           const def = CROPS[this.store.player.selectedCropId];
           return has(this.store.player.inventory, def.seedItem) ? `Plant ${def.displayName}  [E]` : 'No seeds';
@@ -392,25 +403,25 @@ export class WorldScene extends Phaser.Scene {
         this.sellAtBox();
         break;
       case InteractionKind.Chest:
-        this.openChest(target.chestId!);
+        this.openChest(target.chestId);
         return; // chest scene takes over; don't save mid-pause here
       case InteractionKind.Door:
-        this.useExit(target.exitIndex!);
+        this.useExit(target.exitIndex);
         return; // scene restarts
       case InteractionKind.Npc:
-        this.useNpc(target.npcId as keyof typeof NPCS);
+        this.useNpc(target.npcId);
         return; // shop scene takes over, or a dialogue toast shows
       case InteractionKind.Plot:
-        this.usePlot(target);
+        this.usePlot(target.plotIndex);
         break;
       case InteractionKind.Chicken:
-        this.petChickenAction(target.chickenId!);
+        this.petChickenAction(target.chickenId);
         break;
       case InteractionKind.Bush:
-        this.harvestBushAction(target.bushId!);
+        this.harvestBushAction(target.bushId);
         break;
       case InteractionKind.Cache:
-        this.openCache(target.cacheId!, target.pieceId!);
+        this.openCache(target.cacheId, target.pieceId);
         break;
     }
     this.lastPrompt = null; // force a prompt refresh after the action
@@ -463,11 +474,11 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  private usePlot(target: InteractionTarget): void {
+  private usePlot(plotIndex: number): void {
     const map = this.store.currentMap();
     const inv = this.store.player.inventory;
-    const crop = this.cropAtTarget(target);
-    const plot = this.def.plots[target.plotIndex!];
+    const crop = this.cropAtPlot(plotIndex);
+    const plot = this.def.plots[plotIndex];
 
     if (!crop) {
       const cropDef = CROPS[this.store.player.selectedCropId];
@@ -720,8 +731,8 @@ export class WorldScene extends Phaser.Scene {
     this.game.events.emit(UiEvent.Hud);
   }
 
-  private cropAtTarget(target: InteractionTarget): CropInstance | undefined {
-    const plot = this.def.plots[target.plotIndex!];
+  private cropAtPlot(plotIndex: number): CropInstance | undefined {
+    const plot = this.def.plots[plotIndex];
     return cropAt(this.store.currentMap(), plot.x, plot.y);
   }
 
