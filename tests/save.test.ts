@@ -1,12 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createNewGameState } from '../src/game/state/newGameState';
-import {
-  clearSave,
-  loadGame,
-  migrate,
-  saveGame,
-  SAVE_VERSION,
-} from '../src/game/save/SaveSystem';
+import { clearSave, loadGame, migrate, saveGame, SAVE_VERSION } from '../src/game/save/SaveSystem';
 
 // Minimal in-memory localStorage so the save system can be exercised in Node.
 function memoryStorage(): Storage {
@@ -62,5 +56,23 @@ describe('SaveSystem', () => {
     expect(result.version).toBe(SAVE_VERSION);
     expect(result.state.stats).toBeDefined();
     expect(result.state.player.inventory.slots).toEqual([]);
+  });
+
+  it('backfills cropsHarvested when an older partial stats object is missing it', () => {
+    const base = createNewGameState();
+    const partial = {
+      version: 0,
+      // A save from before cropsHarvested existed: stats present but partial.
+      state: {
+        player: base.player,
+        maps: base.maps,
+        time: base.time,
+        stats: { chickensPetted: 2, monstersDefeated: 1 },
+      },
+    };
+    const result = migrate(partial)!;
+    expect(result.state.stats.cropsHarvested).toBe(0);
+    expect(result.state.stats.chickensPetted).toBe(2);
+    expect(result.state.stats.monstersDefeated).toBe(1);
   });
 });

@@ -30,6 +30,7 @@ export function migrate(data: unknown): SaveData | null {
 
   // Fill fields that may be missing in older saves rather than discarding the save.
   state.stats ??= { cropsHarvested: 0, chickensPetted: 0, monstersDefeated: 0 };
+  state.stats.cropsHarvested ??= 0;
   state.stats.chickensPetted ??= 0;
   state.stats.monstersDefeated ??= 0;
   if (!state.player.inventory) {

@@ -63,7 +63,11 @@ export class EndScene extends Phaser.Scene {
     const right = w / 2 + 196;
     let y = 104;
     for (const [label, value] of rows) {
-      this.add.text(left, y, label, { fontFamily: 'monospace', fontSize: '13px', color: toCss(palette.uiInk) });
+      this.add.text(left, y, label, {
+        fontFamily: 'monospace',
+        fontSize: '13px',
+        color: toCss(palette.uiInk),
+      });
       this.add
         .text(right, y, value, { fontFamily: 'monospace', fontSize: '13px', color: toCss(palette.gold) })
         .setOrigin(1, 0);

@@ -5,7 +5,7 @@
 
 import Phaser from 'phaser';
 import { cropTextureKey, TextureKey } from '../data/assetKeys';
-import { ARMOR_PIECES, SET_NAME } from '../data/armor';
+import { SET_NAME } from '../data/armor';
 import { Balance } from '../data/balance';
 import { ENEMIES } from '../data/enemies';
 import { CROP_ORDER, CROPS } from '../data/crops';
@@ -15,26 +15,23 @@ import { NPCS } from '../data/npcs';
 import { CombatController } from '../combat/CombatController';
 import { GameStateStore } from '../state/GameStateStore';
 import { saveGame } from '../save/SaveSystem';
-import { cropAt, growthStage, isMature, plant, removeCrop } from '../systems/FarmingSystem';
+import { cropAt, growthStage, isMature, removeCrop } from '../systems/FarmingSystem';
 import { petChicken } from '../systems/ChickenSystem';
 import { applyDamage, rollLoot } from '../systems/CombatSystem';
 import { grantMilestone } from '../systems/AffectionSystem';
-import { collectPiece, computeLoadout, hasPiece, recalcMaxHp, type Loadout } from '../systems/EquipmentSystem';
+import { computeLoadout, hasPiece, recalcMaxHp, type Loadout } from '../systems/EquipmentSystem';
 import { harvestBush, isBushReady } from '../systems/ForagingSystem';
 import { sellAll } from '../systems/EconomySystem';
-import {
-  accrueDailyThreat,
-  isFarmUnderThreat,
-  raidSize,
-  reduceThreat,
-  threatBand,
-} from '../systems/ThreatSystem';
+import { isFarmUnderThreat, raidSize, reduceThreat, threatBand } from '../systems/ThreatSystem';
 import { findNearestTarget } from '../systems/InteractionSystem';
 import { InputSystem } from '../systems/InputSystem';
-import { add, has, remove } from '../systems/InventorySystem';
+import { add, has } from '../systems/InventorySystem';
 import { movePlayer, type Bounds } from '../systems/PlayerController';
 import { transitionTo } from '../systems/MapTransitionSystem';
-import { advanceTick } from '../systems/TimeSystem';
+import { advanceWorldClock } from '../systems/WorldClockSystem';
+import { usePlot as resolvePlotInteraction } from '../systems/CropInteractionSystem';
+import { openCache as resolveCacheInteraction } from '../systems/CacheInteractionSystem';
+import { buildSolidGrid, isSolidAt, type SolidGrid } from '../systems/CollisionSystem';
 import { ArmorPieceId, EnemyId, InteractionKind, ItemId, MapId, NpcId, SceneKey } from '../types/ids';
 import type { CropInstance, Facing, InteractionTarget } from '../types/models';
 import { UiEvent } from '../ui/uiEvents';
@@ -79,6 +76,7 @@ export class WorldScene extends Phaser.Scene {
   private combat?: CombatController;
   private isRaid = false;
   private bounds!: Bounds;
+  private solids!: SolidGrid;
   private targets: InteractionTarget[] = [];
 
   private tickAccum = 0;
@@ -109,6 +107,7 @@ export class WorldScene extends Phaser.Scene {
     this.attackReadyAt = 0;
 
     this.bounds = this.computeBounds();
+    this.solids = buildSolidGrid(this.def);
 
     this.drawGround();
     this.drawObjects();
@@ -137,7 +136,18 @@ export class WorldScene extends Phaser.Scene {
     this.game.events.emit(UiEvent.Hud);
     this.game.events.emit(UiEvent.Prompt, null);
 
+    // Shop/chest scenes pause (not restart) this scene, so create() won't re-run when they
+    // close. Carried gear may have changed there, so refresh derived effects on resume —
+    // otherwise speed, crop yield, combat damage, and max hearts would read stale values.
+    const onResume = (): void => {
+      recalcMaxHp(this.store.player, this.store.state.armor);
+      this.loadout = computeLoadout(this.store.state.armor, this.store.player.inventory);
+      this.game.events.emit(UiEvent.Hud);
+    };
+    this.events.on(Phaser.Scenes.Events.RESUME, onResume);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.events.off(Phaser.Scenes.Events.RESUME, onResume);
       this.combat?.destroy();
       saveGame(this.store.state);
     });
@@ -147,27 +157,31 @@ export class WorldScene extends Phaser.Scene {
     const dt = deltaMs / 1000;
     const player = this.store.player;
 
-    movePlayer(player, this.controls.getMovement(), Balance.playerSpeed + this.loadout.bonusSpeed, dt, this.bounds);
+    movePlayer(
+      player,
+      this.controls.getMovement(),
+      Balance.playerSpeed + this.loadout.bonusSpeed,
+      dt,
+      this.bounds,
+      (x, y) => isSolidAt(this.solids, x, y),
+    );
     this.playerSprite.setPosition(player.x, player.y).setDepth(player.y);
     this.playerSprite.setFlipX(player.facing === 'left');
 
     // Growth advances globally; crops keep maturing and bushes regrow even while indoors.
-    this.tickAccum += deltaMs;
-    let grew = false;
-    let newDay = false;
-    while (this.tickAccum >= Balance.tickMs) {
-      this.tickAccum -= Balance.tickMs;
-      if (advanceTick(this.store.state.time, Balance.dayLengthTicks)) {
-        accrueDailyThreat(this.store.state.threat, this.store.state.time.day);
-        newDay = true;
-      }
-      grew = true;
-    }
-    if (grew) {
+    const clock = advanceWorldClock(
+      this.store.state,
+      this.tickAccum,
+      deltaMs,
+      Balance.tickMs,
+      Balance.dayLengthTicks,
+    );
+    this.tickAccum = clock.tickAccum;
+    if (clock.grew) {
       this.refreshCropTextures();
       this.refreshBushTextures();
     }
-    if (newDay) this.onNewDay();
+    if (clock.newDay) this.onNewDay();
 
     // seed selection via number keys
     const hotkey = this.controls.numberKeyJustPressed();
@@ -206,7 +220,10 @@ export class WorldScene extends Phaser.Scene {
       }
     }
     for (const plot of def.plots) {
-      this.add.image(plot.x * TILE, plot.y * TILE, TextureKey.SoilTile).setOrigin(0, 0).setDepth(-9);
+      this.add
+        .image(plot.x * TILE, plot.y * TILE, TextureKey.SoilTile)
+        .setOrigin(0, 0)
+        .setDepth(-9);
     }
   }
 
@@ -225,11 +242,17 @@ export class WorldScene extends Phaser.Scene {
       // A set-gated door shows sealed until the legendary set is whole.
       const key =
         exit.requiresSet && !this.loadout.opensBoss ? TextureKey.SealedDoor : EXIT_TEXTURE[exit.art];
-      this.add.image(c.x, c.y, key).setOrigin(0.5, 0.9).setDepth(c.y - 2);
+      this.add
+        .image(c.x, c.y, key)
+        .setOrigin(0.5, 0.9)
+        .setDepth(c.y - 2);
     }
     for (const prop of def.props) {
       const c = tileCenter(prop.tile);
-      this.add.image(c.x, c.y, PROP_TEXTURE[prop.art]).setOrigin(0.5, 0.85).setDepth(c.y - 3);
+      this.add
+        .image(c.x, c.y, PROP_TEXTURE[prop.art])
+        .setOrigin(0.5, 0.85)
+        .setDepth(c.y - 3);
     }
     for (const npc of def.npcs) {
       const c = tileCenter(npc.tile);
@@ -253,7 +276,14 @@ export class WorldScene extends Phaser.Scene {
     for (const hen of def.chickens) {
       const c = tileCenter(hen.tile);
       const spr = this.add.image(c.x, c.y, TextureKey.Chicken).setOrigin(0.5, 0.9).setDepth(c.y);
-      this.tweens.add({ targets: spr, y: c.y - 3, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+      this.tweens.add({
+        targets: spr,
+        y: c.y - 3,
+        duration: 600,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.inOut',
+      });
     }
     for (const bush of def.bushes) {
       const c = tileCenter(bush.tile);
@@ -335,7 +365,13 @@ export class WorldScene extends Phaser.Scene {
     });
     def.caches.forEach((cache) => {
       const c = tileCenter(cache.tile);
-      targets.push({ kind: InteractionKind.Cache, x: c.x, y: c.y, cacheId: cache.id, pieceId: cache.pieceId });
+      targets.push({
+        kind: InteractionKind.Cache,
+        x: c.x,
+        y: c.y,
+        cacheId: cache.id,
+        pieceId: cache.pieceId,
+      });
     });
     return targets;
   }
@@ -355,29 +391,29 @@ export class WorldScene extends Phaser.Scene {
       case InteractionKind.Chest:
         return 'Open chest  [E]';
       case InteractionKind.Door: {
-        const exit = this.def.exits[target.exitIndex!];
+        const exit = this.def.exits[target.exitIndex];
         if (exit.requiresSet && !this.loadout.opensBoss) return `Sealed — needs the ${SET_NAME}`;
         return `${exit.label}  [E]`;
       }
       case InteractionKind.Npc: {
-        const npc = NPCS[target.npcId as keyof typeof NPCS];
+        const npc = NPCS[target.npcId];
         return `${npc.shopId ? 'Shop' : 'Talk'}: ${npc.displayName}  [E]`;
       }
       case InteractionKind.Chicken:
         return 'Pet chicken  [E]';
       case InteractionKind.Bush:
-        return isBushReady(this.store.state.bushes[target.bushId!], this.store.state.time.tick)
+        return isBushReady(this.store.state.bushes[target.bushId], this.store.state.time.tick)
           ? 'Gather berries  [E]'
           : 'Bush is bare';
       case InteractionKind.Cache:
-        return hasPiece(this.store.state.armor, target.pieceId!)
-          ? 'Empty cache'
-          : `Open cache  [E]`;
+        return hasPiece(this.store.state.armor, target.pieceId) ? 'Empty cache' : `Open cache  [E]`;
       case InteractionKind.Plot: {
-        const crop = this.cropAtTarget(target);
+        const crop = this.cropAtPlot(target.plotIndex);
         if (!crop) {
           const def = CROPS[this.store.player.selectedCropId];
-          return has(this.store.player.inventory, def.seedItem) ? `Plant ${def.displayName}  [E]` : 'No seeds';
+          return has(this.store.player.inventory, def.seedItem)
+            ? `Plant ${def.displayName}  [E]`
+            : 'No seeds';
         }
         return isMature(crop, this.store.state.time.tick) ? 'Harvest  [E]' : 'Growing…';
       }
@@ -392,25 +428,25 @@ export class WorldScene extends Phaser.Scene {
         this.sellAtBox();
         break;
       case InteractionKind.Chest:
-        this.openChest(target.chestId!);
+        this.openChest(target.chestId);
         return; // chest scene takes over; don't save mid-pause here
       case InteractionKind.Door:
-        this.useExit(target.exitIndex!);
+        this.useExit(target.exitIndex);
         return; // scene restarts
       case InteractionKind.Npc:
-        this.useNpc(target.npcId as keyof typeof NPCS);
+        this.useNpc(target.npcId);
         return; // shop scene takes over, or a dialogue toast shows
       case InteractionKind.Plot:
-        this.usePlot(target);
+        this.usePlot(target.plotIndex);
         break;
       case InteractionKind.Chicken:
-        this.petChickenAction(target.chickenId!);
+        this.petChickenAction(target.chickenId);
         break;
       case InteractionKind.Bush:
-        this.harvestBushAction(target.bushId!);
+        this.harvestBushAction(target.bushId);
         break;
       case InteractionKind.Cache:
-        this.openCache(target.cacheId!, target.pieceId!);
+        this.openCache(target.cacheId, target.pieceId);
         break;
     }
     this.lastPrompt = null; // force a prompt refresh after the action
@@ -463,44 +499,42 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  private usePlot(target: InteractionTarget): void {
-    const map = this.store.currentMap();
-    const inv = this.store.player.inventory;
-    const crop = this.cropAtTarget(target);
-    const plot = this.def.plots[target.plotIndex!];
-
-    if (!crop) {
-      const cropDef = CROPS[this.store.player.selectedCropId];
-      if (remove(inv, cropDef.seedItem, 1)) {
-        const planted = plant(map, cropDef.cropId, this.def.mapId, plot.x, plot.y, this.store.state.time.tick);
-        if (planted) this.addCropSprite(planted);
-        this.toast(`Planted ${cropDef.displayName}.`);
+  private usePlot(plotIndex: number): void {
+    const result = resolvePlotInteraction(
+      this.store.state,
+      this.def,
+      plotIndex,
+      this.store.state.time.tick,
+      this.loadout.bonusYield,
+    );
+    switch (result.kind) {
+      case 'planted':
+        this.addCropSprite(result.crop);
+        this.toast(`Planted ${result.cropDef.displayName}.`);
         this.game.events.emit(UiEvent.Hud);
-      } else {
-        this.toast(`No ${cropDef.displayName} seeds.`);
-      }
-      return;
+        break;
+      case 'harvested':
+        this.removeCropSprite(result.crop);
+        this.toast(`Harvested ${result.cropDef.displayName}.`);
+        this.game.events.emit(UiEvent.Hud);
+        break;
+      case 'no_seeds':
+        this.toast(`No ${result.cropDef.displayName} seeds.`);
+        break;
+      case 'growing':
+        this.toast('Still growing…');
+        break;
+      case 'inventory_full':
+        this.toast('Inventory full.');
+        break;
     }
+  }
 
-    if (!isMature(crop, this.store.state.time.tick)) {
-      this.toast('Still growing…');
-      return;
-    }
-
-    const def = CROPS[crop.cropId];
-    const yield_ = def.harvestYield + this.loadout.bonusYield;
-    if (add(inv, def.harvestItem, yield_)) {
-      removeCrop(map, crop);
-      const spr = this.cropSprites.get(crop);
-      if (spr) {
-        spr.destroy();
-        this.cropSprites.delete(crop);
-      }
-      this.store.state.stats.cropsHarvested += yield_;
-      this.toast(`Harvested ${def.displayName}.`);
-      this.game.events.emit(UiEvent.Hud);
-    } else {
-      this.toast('Inventory full.');
+  private removeCropSprite(crop: CropInstance): void {
+    const spr = this.cropSprites.get(crop);
+    if (spr) {
+      spr.destroy();
+      this.cropSprites.delete(crop);
     }
   }
 
@@ -535,11 +569,7 @@ export class WorldScene extends Phaser.Scene {
     const map = this.store.currentMap();
     for (const crop of victims) {
       removeCrop(map, crop);
-      const spr = this.cropSprites.get(crop);
-      if (spr) {
-        spr.destroy();
-        this.cropSprites.delete(crop);
-      }
+      this.removeCropSprite(crop);
       this.toast(`A nibbler ate your ${CROPS[crop.cropId].displayName}!`);
     }
     this.game.events.emit(UiEvent.Hud);
@@ -694,34 +724,25 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private openCache(cacheId: string, pieceId: ArmorPieceId): void {
-    const armor = this.store.state.armor;
-    if (!collectPiece(armor, pieceId)) {
+    const result = resolveCacheInteraction(this.store.state, pieceId);
+    if (result.kind === 'empty') {
       this.toast('The cache is empty.');
       return;
     }
-    // recompute effects and reward the find with a full heal
-    this.loadout = computeLoadout(armor, this.store.player.inventory);
-    recalcMaxHp(this.store.player, armor);
-    this.store.player.hp = this.store.player.maxHp;
+    this.loadout = result.loadout;
+    this.cacheSprites.get(cacheId)?.setTexture(TextureKey.CacheOpen);
 
-    const spr = this.cacheSprites.get(cacheId);
-    spr?.setTexture(TextureKey.CacheOpen);
-
-    const piece = ARMOR_PIECES[pieceId];
-    this.toast(`Found the ${piece.displayName}! (${piece.blurb})`);
-    if (this.loadout.setComplete) {
+    this.toast(`Found the ${result.piece.displayName}! (${result.piece.blurb})`);
+    if (result.setComplete) {
       this.time.delayedCall(1200, () =>
         this.toast(`The ${SET_NAME} is whole. The ruins' heart can now be reached…`),
       );
-      // Word of your deeds reaches the village boy.
-      const jay = this.store.state.affection[NpcId.Jay];
-      if (jay) grantMilestone(jay, 'set_complete', Balance.affectionStorySet);
     }
     this.game.events.emit(UiEvent.Hud);
   }
 
-  private cropAtTarget(target: InteractionTarget): CropInstance | undefined {
-    const plot = this.def.plots[target.plotIndex!];
+  private cropAtPlot(plotIndex: number): CropInstance | undefined {
+    const plot = this.def.plots[plotIndex];
     return cropAt(this.store.currentMap(), plot.x, plot.y);
   }
 

@@ -1,7 +1,8 @@
 // Plain-data game state structures. These are independent of Phaser — no sprites here.
 // Phaser scenes read/render these and call systems that mutate them.
 
-import type { ArmorPieceId, CropId, InteractionKind, ItemId, MapId } from './ids';
+import type { ArmorPieceId, CropId, ItemId, MapId, NpcId } from './ids';
+import { InteractionKind } from './ids';
 
 // A petable chicken. Position comes from map data; this tracks the daily pet.
 export interface ChickenState {
@@ -114,16 +115,18 @@ export interface SaveData {
 }
 
 // Resolved by the interaction system: the thing the player is standing next to.
-export interface InteractionTarget {
-  kind: InteractionKind;
+// A discriminated union keyed by `kind`, so each variant carries exactly the fields it
+// needs — the type checker (not a runtime crash) catches a missing or wrong field.
+interface TargetBase {
   x: number; // pixel center, for proximity tests
   y: number;
-  plotIndex?: number; // set when kind === Plot
-  chestId?: string; // set when kind === Chest
-  exitIndex?: number; // set when kind === Door
-  npcId?: string; // set when kind === Npc
-  chickenId?: string; // set when kind === Chicken
-  bushId?: string; // set when kind === Bush
-  cacheId?: string; // set when kind === Cache
-  pieceId?: ArmorPieceId; // set when kind === Cache
 }
+export type InteractionTarget =
+  | (TargetBase & { kind: typeof InteractionKind.Plot; plotIndex: number })
+  | (TargetBase & { kind: typeof InteractionKind.ShippingBox })
+  | (TargetBase & { kind: typeof InteractionKind.Chest; chestId: string })
+  | (TargetBase & { kind: typeof InteractionKind.Door; exitIndex: number })
+  | (TargetBase & { kind: typeof InteractionKind.Npc; npcId: NpcId })
+  | (TargetBase & { kind: typeof InteractionKind.Chicken; chickenId: string })
+  | (TargetBase & { kind: typeof InteractionKind.Bush; bushId: string })
+  | (TargetBase & { kind: typeof InteractionKind.Cache; cacheId: string; pieceId: ArmorPieceId });

@@ -24,7 +24,14 @@ function make(
   g.destroy();
 }
 
-function rect(g: Phaser.GameObjects.Graphics, color: number, x: number, y: number, w: number, h: number): void {
+function rect(
+  g: Phaser.GameObjects.Graphics,
+  color: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): void {
   g.fillStyle(color, 1);
   g.fillRect(x, y, w, h);
 }

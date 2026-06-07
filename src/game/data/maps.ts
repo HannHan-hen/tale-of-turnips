@@ -118,8 +118,20 @@ export const MAPS: Record<MapId, MapDef> = {
     enemySpawns: [],
     caches: [],
     exits: [
-      { tile: { x: 3, y: 3 }, toMap: MapId.House, toSpawn: { x: 5, y: 7 }, label: 'Enter house', art: 'cottage' },
-      { tile: { x: 14, y: 9 }, toMap: MapId.Village, toSpawn: { x: 7, y: 8 }, label: 'To village', art: 'signpost' },
+      {
+        tile: { x: 3, y: 3 },
+        toMap: MapId.House,
+        toSpawn: { x: 5, y: 7 },
+        label: 'Enter house',
+        art: 'cottage',
+      },
+      {
+        tile: { x: 14, y: 9 },
+        toMap: MapId.Village,
+        toSpawn: { x: 7, y: 8 },
+        label: 'To village',
+        art: 'signpost',
+      },
     ],
   },
   [MapId.House]: {
@@ -165,8 +177,20 @@ export const MAPS: Record<MapId, MapDef> = {
     enemySpawns: [],
     caches: [],
     exits: [
-      { tile: { x: 7, y: 9 }, toMap: MapId.Farm, toSpawn: { x: 13, y: 9 }, label: 'To farm', art: 'signpost' },
-      { tile: { x: 13, y: 1 }, toMap: MapId.Ruins, toSpawn: { x: 6, y: 10 }, label: 'To ruins', art: 'signpost' },
+      {
+        tile: { x: 7, y: 9 },
+        toMap: MapId.Farm,
+        toSpawn: { x: 13, y: 9 },
+        label: 'To farm',
+        art: 'signpost',
+      },
+      {
+        tile: { x: 13, y: 1 },
+        toMap: MapId.Ruins,
+        toSpawn: { x: 6, y: 10 },
+        label: 'To ruins',
+        art: 'signpost',
+      },
     ],
   },
   [MapId.Ruins]: {
@@ -199,7 +223,13 @@ export const MAPS: Record<MapId, MapDef> = {
       { id: 'cache_blade', pieceId: ArmorPieceId.Blade, tile: { x: 6, y: 5 } },
     ],
     exits: [
-      { tile: { x: 6, y: 10 }, toMap: MapId.Village, toSpawn: { x: 13, y: 1 }, label: 'Leave ruins', art: 'signpost' },
+      {
+        tile: { x: 6, y: 10 },
+        toMap: MapId.Village,
+        toSpawn: { x: 13, y: 1 },
+        label: 'Leave ruins',
+        art: 'signpost',
+      },
       {
         tile: { x: 6, y: 1 },
         toMap: MapId.BossArena,

@@ -84,7 +84,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
       giftLikedLine: '"For me? Th-thank you. I\'ll keep it safe." He cradles it carefully.',
       giftLovedLine: '"This is… I\'ve never seen anything like it. I— I\'ll treasure this. Truly."',
       giftRepeatLine: '"Another one? You\'re too kind." He smiles, a little shy.',
-      noGiftLine: 'You have nothing he\'d treasure right now.',
+      noGiftLine: "You have nothing he'd treasure right now.",
       alreadyGiftedLine: 'Jay glances at the gift you already gave today. "You spoil me…"',
     },
   },

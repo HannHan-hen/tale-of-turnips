@@ -2,6 +2,53 @@
 
 Date: 2026-06-07
 
+## Resolution pass (applied)
+
+Every finding below has now been addressed. Build, typecheck, lint, Prettier, and the unit
+suite (grown from 56 to **79 tests**) are all green.
+
+**Correctness & type safety:**
+
+- **Finding 2 — stale loadout/equipment.** `WorldScene` recomputes the cached loadout and max
+  HP on the Phaser `RESUME` event, so gear bought in a shop or moved through a chest takes
+  effect the moment the world scene resumes — no map change or restart required.
+- **Finding 3 — shop/chest persistence.** `ShopScene` saves after a successful purchase and
+  `ChestScene` saves after a transfer, so changes made while the world scene is paused survive
+  an immediate tab close.
+- **Finding 4 — `stats.cropsHarvested` migration.** `migrate` backfills
+  `stats.cropsHarvested ??= 0`, covering partial `stats` objects from older saves (regression
+  test added).
+- **Finding 6 — `InteractionTarget` discriminated union.** Replaced the single optional-field
+  interface with a union keyed by `kind`, removing every non-null assertion in `WorldScene`.
+  Missing fields are now compile errors.
+- **Finding 7 — enemy contact damage.** Normal enemy contact is re-measured after the enemy
+  moves, matching the raid path and removing the one-frame lag.
+
+**Architecture, polish & tooling:**
+
+- **Finding 1 — `WorldScene` god scene.** Extracted pure systems: `WorldClockSystem`
+  (tick/day/threat advance), `CropInteractionSystem` (plant/harvest rules), and
+  `CacheInteractionSystem` (piece collection, loadout/heal/affection). The scene now renders
+  their outcomes instead of owning the rules. (Combat/raid lifecycle stays in
+  `CombatController`, which was already a separate object.)
+- **Finding 5 — collision.** `CollisionSystem` derives solid tiles from map data (chests,
+  NPCs, props, caches, bushes, shipping box); `movePlayer` resolves per-axis so the player
+  slides along edges instead of passing through objects. Plots, exits, the spawn, and chickens
+  stay walkable.
+- **Finding 8 — test coverage.** Added suites for the new systems and collision, and expanded
+  registry validation (placement bounds, valid exit/NPC/shop/enemy references, globally unique
+  ids, spawn/exit tiles never solid).
+- **Finding 9 — bundle size.** Phaser is split into its own cacheable chunk (~1.48 MB) and the
+  app code is now a ~64 kB chunk; `chunkSizeWarningLimit` is set to a value we consciously
+  accept since Phaser is the engine's irreducible floor.
+- **Finding 10 — lint/format.** Added ESLint (flat config, TypeScript-aware) and Prettier with
+  `lint`, `format`, and `format:check` scripts.
+- **Finding 11 — dependency audit.** `npm audit --omit=dev` now reports **0 vulnerabilities**.
+  The dev-only toolchain advisories (esbuild/vite dev server) require a breaking `vite@8` bump
+  and do not affect the shipped static build; left for a deliberate major-version upgrade.
+
+---
+
 ## Executive summary
 
 This is a healthy small-game prototype: it builds, passes its current unit tests, uses strict TypeScript settings, keeps most tunable content in data registries, and stores game state as plain serializable data. The codebase is workable and not in crisis.

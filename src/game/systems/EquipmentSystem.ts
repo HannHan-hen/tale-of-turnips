@@ -27,7 +27,13 @@ export function computeLoadout(armor: ArmorState, inventory?: Inventory): Loadou
     opensBoss: false,
     setComplete: armor.collectedPieces.length >= ARMOR_ORDER.length,
   };
-  const apply = (e: { bonusDamage?: number; bonusHearts?: number; bonusSpeed?: number; bonusYield?: number; opensBoss?: boolean }) => {
+  const apply = (e: {
+    bonusDamage?: number;
+    bonusHearts?: number;
+    bonusSpeed?: number;
+    bonusYield?: number;
+    opensBoss?: boolean;
+  }) => {
     loadout.bonusDamage += e.bonusDamage ?? 0;
     loadout.bonusHearts += e.bonusHearts ?? 0;
     loadout.bonusSpeed += e.bonusSpeed ?? 0;
