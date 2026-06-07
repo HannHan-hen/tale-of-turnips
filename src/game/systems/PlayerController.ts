@@ -10,15 +10,20 @@ export interface Bounds {
   maxY: number;
 }
 
+// `isSolid` (optional) blocks movement into solid tiles. Resolved per-axis so the player
+// slides along a wall or object instead of sticking when moving diagonally into it.
 export function movePlayer(
   player: PlayerState,
   move: { x: number; y: number },
   speed: number,
   dt: number,
   bounds: Bounds,
+  isSolid?: (x: number, y: number) => boolean,
 ): void {
-  player.x = clamp(player.x + move.x * speed * dt, bounds.minX, bounds.maxX);
-  player.y = clamp(player.y + move.y * speed * dt, bounds.minY, bounds.maxY);
+  const nextX = clamp(player.x + move.x * speed * dt, bounds.minX, bounds.maxX);
+  if (!isSolid || !isSolid(nextX, player.y)) player.x = nextX;
+  const nextY = clamp(player.y + move.y * speed * dt, bounds.minY, bounds.maxY);
+  if (!isSolid || !isSolid(player.x, nextY)) player.y = nextY;
   const facing = facingFromMove(move);
   if (facing) player.facing = facing;
 }

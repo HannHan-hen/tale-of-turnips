@@ -8,6 +8,16 @@ export default defineConfig({
   build: {
     target: 'es2020',
     outDir: 'dist',
+    // Phaser is ~1.5 MB minified (≈360 kB gzip) and is the irreducible floor for this engine.
+    // Split it into its own chunk so it caches independently of our (small) game code, and
+    // raise the warning limit to a value we consciously accept rather than chase a smaller
+    // bundle that this stack can't deliver.
+    chunkSizeWarningLimit: 1600,
+    rollupOptions: {
+      output: {
+        manualChunks: { phaser: ['phaser'] },
+      },
+    },
   },
   test: {
     globals: true,
