@@ -29,6 +29,9 @@ export const palette = {
   denim: 0x4f6fa8,
   denimDark: 0x3a5384,
   denimLight: 0x6f8ec8, // lit denim (overall highlights)
+  beige: 0xd4ba8e, // farmer's cute overalls (base / shadow / light)
+  beigeDark: 0xa88f61,
+  beigeLight: 0xead7ab,
   farmerShirt: 0xf6ede0,
   farmerShirtDark: 0xd9cdba,
   overallButton: 0xe8c46a,

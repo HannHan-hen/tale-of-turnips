@@ -1,18 +1,19 @@
 import { palette } from '../../data/palette';
 import type { PixelSprite } from './spriteGrid';
 
-// The farmer — same identity as before (blonde tuft hair, cream shirt, blue denim
-// overalls), redrawn as deliberate pixel art: a rounded silhouette, big shiny eyes,
-// rosy cheeks, and soft 3-tone shading. 24x32 to match the original texture size.
+// The farmer — a pretty blonde girl in cute beige overalls. Long hair frames the face and
+// falls past the shoulders; big lashed eyes, rosy cheeks, a soft smile. 24x32 to match the
+// original texture size. Drawn as deliberate pixel art with a rounded silhouette and soft
+// 3-tone shading on the hair, overalls, and skin.
 //
 // Legend:
 //   .  transparent (a 1px outline is auto-added around the shape)
 //   s/k/S  skin: base / shadow / light
 //   h/g/H  hair: base / shadow / light
-//   w/e    eye white / iris
+//   w/e    eye white / iris+lash
 //   r      cheek blush
 //   c/v    shirt: base / shadow
-//   d/b/D  denim: base / shadow / light
+//   d/b/D  beige overalls: base / shadow / light
 //   y      overall button (gold)
 //   t/u    boot: base / sole
 //   O      internal detail line (mouth)
@@ -32,9 +33,9 @@ export const FARMER: PixelSprite = {
     r: palette.cheek,
     c: palette.farmerShirt,
     v: palette.farmerShirtDark,
-    d: palette.denim,
-    b: palette.denimDark,
-    D: palette.denimLight,
+    d: palette.beige,
+    b: palette.beigeDark,
+    D: palette.beigeLight,
     y: palette.overallButton,
     t: palette.shoe,
     u: palette.shoeDark,
@@ -42,24 +43,24 @@ export const FARMER: PixelSprite = {
   },
   rows: [
     '........................', // 0
-    '.........hHHHHh.........', // 1  hair dome
-    '........hHHHhhhh........', // 2
-    '.......hHHhhhhhhh.......', // 3  hair + sheen
-    '.......hhhhhhhhhh.......', // 4  cap
-    '.......hhsssssshh.......', // 5  bowl-cut fringe + sidelocks
-    '.......swwwsswwws.......', // 6  eye whites
-    '.......swewsswews.......', // 7  pupils
-    '.......srssssssrs.......', // 8  rosy cheeks
-    '........ssOssOss........', // 9  smile (jaw narrows)
-    '.........ssOOss.........', // 10 smile base + chin
-    '..........kssk..........', // 11 neck
-    '......cccccssccccc......', // 12 collar + shoulders
-    '......ccddccccddcc......', // 13 overall straps
-    '.....cccddddddddccc.....', // 14 chest + bib top
-    '.....cccyDdddddyccc.....', // 15 buttons + bib sheen
-    '.....ssddddddddddss.....', // 16 hands + bib
-    '.....kkddddddddddkk.....', // 17 hands shade
-    '......dddbbbbbbddd......', // 18 bib pocket
+    '........hhHHHHhh........', // 1  hair crown
+    '......hHHHhhhhhhhh......', // 2
+    '.....hHHhhhhhhhhhhh.....', // 3
+    '....hhhhhhhhhhhhhhhh....', // 4  full hair
+    '....hhhhhhhhhhhhhhhh....', // 5  bangs
+    '....HhgswwwsswwwsghH....', // 6  side hair + big eyes
+    '....HhgswewsswewsghH....', // 7  pupils
+    '....HhgsrssssssrsghH....', // 8  rosy cheeks
+    '....HhgsssOssOsssghH....', // 9  smile
+    '....HhgssssOOssssghH....', // 10 smile base + chin
+    '....HhgcccsssscccghH....', // 11 collar + hair on shoulders
+    '....HhgcddccccddcghH....', // 12 overall straps
+    '....HhgcddddddddcghH....', // 13 bib top
+    '.....hgcyDddddDycgh.....', // 14 buttons + bib (hair tapers)
+    '.....hgsddddddddsgh.....', // 15 hands + bib
+    '.....hgkddddddddkgh.....', // 16 hands shade
+    '.....hgddbbbbbbddgh.....', // 17 bib pocket
+    '......gddddddddddg......', // 18 hair tips + lower bib
     '......Dddddddddddb......', // 19 waist
     '......bbbbbbbbbbbb......', // 20 waistband
     '.......dddd..dddd.......', // 21 legs
