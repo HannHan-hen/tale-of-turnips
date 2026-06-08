@@ -122,9 +122,39 @@ function reviewSheet(sprite) {
   return sheet;
 }
 
-for (const [name, sprite] of Object.entries(SPRITES)) {
+// --- compose a contact sheet of every sprite at a normalized display size ---
+function contactSheet(entries, cols = 4) {
+  const pad = 18,
+    gap = 14,
+    target = 150; // aim each sprite ~150px tall regardless of native size
+  const panels = entries.map(([name, sprite]) => {
+    const scale = Math.max(4, Math.round(target / sprite.height));
+    // alternate grass/soil backgrounds so light and dark sprites both read
+    return { name, panel: spritePanel(sprite, scale, palette.grass) };
+  });
+  const cellW = Math.max(...panels.map((p) => p.panel.w));
+  const cellH = Math.max(...panels.map((p) => p.panel.h));
+  const rows = Math.ceil(panels.length / cols);
+  const W = pad * 2 + cols * cellW + (cols - 1) * gap;
+  const H = pad * 2 + rows * cellH + (rows - 1) * gap;
+  const sheet = canvas(W, H, palette.uiPanel);
+  panels.forEach((p, i) => {
+    const cx = pad + (i % cols) * (cellW + gap);
+    const cy = pad + Math.floor(i / cols) * (cellH + gap);
+    // bottom-center each sprite in its cell so the cast lines up on a shared floor
+    blit(sheet, p.panel, cx + ((cellW - p.panel.w) >> 1), cy + (cellH - p.panel.h));
+  });
+  return sheet;
+}
+
+const entries = Object.entries(SPRITES);
+for (const [name, sprite] of entries) {
   const png = encodePng(reviewSheet(sprite));
   const file = path.join(outDir, `${name}.png`);
   fs.writeFileSync(file, png);
   console.log('wrote', path.relative(root, file), `(${png.length} bytes)`);
 }
+const contact = encodePng(contactSheet(entries));
+const contactFile = path.join(outDir, '_contact.png');
+fs.writeFileSync(contactFile, contact);
+console.log('wrote', path.relative(root, contactFile), `(${contact.length} bytes)`);

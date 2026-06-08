@@ -1,6 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { resolvePixels, type PixelSprite } from '../src/game/assets/sprites/spriteGrid';
 import { FARMER } from '../src/game/assets/sprites/farmer';
+import { JAY, SEED_SELLER, BLACKSMITH, VILLAGER } from '../src/game/assets/sprites/characters';
+import { CHICKEN } from '../src/game/assets/sprites/chicken';
+
+// Every hand-authored sprite, for the shared validity checks below.
+const AUTHORED_SPRITES: Record<string, PixelSprite> = {
+  FARMER,
+  JAY,
+  SEED_SELLER,
+  BLACKSMITH,
+  VILLAGER,
+  CHICKEN,
+};
 
 const legend = { a: 0x112233 };
 
@@ -42,19 +54,27 @@ describe('resolvePixels', () => {
   });
 });
 
-describe('FARMER sprite', () => {
-  it('has a valid, paintable grid (every row matches width, all chars in legend)', () => {
-    // resolvePixels validates dimensions and legend coverage; this guards against typos
-    // such as a miscounted row when authoring pixel grids.
-    expect(() => resolvePixels(FARMER)).not.toThrow();
-  });
+describe('authored sprites', () => {
+  for (const [name, sprite] of Object.entries(AUTHORED_SPRITES)) {
+    describe(name, () => {
+      it('has a valid, paintable grid (every row matches width, all chars in legend)', () => {
+        // resolvePixels validates dimensions and legend coverage; this guards against typos
+        // such as a miscounted row when authoring pixel grids.
+        expect(() => resolvePixels(sprite)).not.toThrow();
+      });
 
-  it('produces pixels within its declared bounds', () => {
-    for (const p of resolvePixels(FARMER)) {
-      expect(p.x).toBeGreaterThanOrEqual(0);
-      expect(p.y).toBeGreaterThanOrEqual(0);
-      expect(p.x).toBeLessThan(FARMER.width);
-      expect(p.y).toBeLessThan(FARMER.height);
-    }
-  });
+      it('declares height equal to its row count', () => {
+        expect(sprite.rows).toHaveLength(sprite.height);
+      });
+
+      it('produces pixels within its declared bounds', () => {
+        for (const p of resolvePixels(sprite)) {
+          expect(p.x).toBeGreaterThanOrEqual(0);
+          expect(p.y).toBeGreaterThanOrEqual(0);
+          expect(p.x).toBeLessThan(sprite.width);
+          expect(p.y).toBeLessThan(sprite.height);
+        }
+      });
+    });
+  }
 });
