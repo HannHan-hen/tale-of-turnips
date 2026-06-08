@@ -89,7 +89,9 @@ export const palette = {
   berryLeaf: 0x4f8a45,
   egg: 0xf5ecd6,
   chickenBody: 0xfbf6ec,
-  chickenShade: 0xe4dac2, // soft shading on the white chicken
+  chickenShade: 0xe4dac2, // soft warm shading on the white chicken
+  chickenWing: 0xdbe6f0, // cool moonlit blue-white for the folded wing + belly
+  chickenCheek: 0xf2a0a8, // rosy cheek blush, the heart of the cuteness
   chickenComb: 0xd9594f,
   beak: 0xe8a23a,
   stone: 0x8a8090,

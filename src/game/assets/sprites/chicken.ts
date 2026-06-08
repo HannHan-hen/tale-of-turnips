@@ -1,44 +1,50 @@
 import { palette } from '../../data/palette';
 import type { PixelSprite } from './spriteGrid';
 
-// A plump, round little hen: white body, red comb, big beady eyes, a tiny orange beak,
-// folded wings, and stubby orange feet. 20x22 to match the original texture size.
+// A plump, round little chick in the cozy moonlit style: an egg-shaped white body, big
+// beady oval eyes with a sparkle, rosy cheeks, a tiny orange beak, a messy orange-red comb
+// tuft, a soft folded wing with cool blue-white shading, and stubby red feet. 22x22.
 //
-// Legend: . transparent  b body  B soft shade  m comb  e eye  o beak  f feet
+// Legend: . transparent  b body  B cool wing/belly shade  m comb red  n comb gold
+//         e eye  h eye sparkle  o beak  c cheek  x wing crease  f feet
 export const CHICKEN: PixelSprite = {
-  width: 20,
+  width: 22,
   height: 22,
   outline: palette.outline,
   legend: {
     b: palette.chickenBody,
-    B: palette.chickenShade,
+    B: palette.chickenWing,
     m: palette.chickenComb,
+    n: palette.beak,
     e: palette.outline,
+    h: palette.eyeWhite,
     o: palette.beak,
-    f: palette.beak,
+    c: palette.chickenCheek,
+    x: palette.outline,
+    f: palette.chickenComb,
   },
   rows: [
-    '.......m.m.m........', // 0  comb points
-    '.......mmmmm........', // 1  comb base
-    '......bbbbbbbb......', // 2  head
-    '.....bbbbbbbbbb.....', // 3
-    '.....bbebbbbebb.....', // 4  eyes
-    '.....bbebbbbebb.....', // 5
-    '....bbbbboobbbbb....', // 6  beak
-    '....bbbbbbbbbbbb....', // 7  body
-    '...bbbbbbbbbbbbbb...', // 8
-    '...bbBbbbbbbbbBbb...', // 9  folded wings
-    '...bbBbbbbbbbbBbb...', // 10
-    '...bbbBbbbbbbBbbb...', // 11
-    '....bbbbbbbbbbbb....', // 12
-    '....bbbbbbbbbbbb....', // 13
-    '.....bbbbbbbbbb.....', // 14
-    '.....bBBBBBBBBb.....', // 15 belly shade
-    '......bbbbbbbb......', // 16
-    '........f..f........', // 17 legs
-    '........f..f........', // 18
-    '.......fff.fff......', // 19 toes
-    '....................', // 20
-    '....................', // 21
+    '........nmnmn.........', // 0  messy comb tips
+    '........nmmmn.........', // 1  comb base
+    '........bbbbbb........', // 2  head top
+    '.......bbbbbbbb.......', // 3
+    '......bbbbbbbbbb......', // 4
+    '.....bbbbbbbbbbbb.....', // 5
+    '....bbbbbbbbbbbbbb....', // 6
+    '....bbbhebbbbhebbb....', // 7  eyes (with sparkle)
+    '....bbbeebbbbeebbb....', // 8
+    '...bbbbeebbbbeebbbb...', // 9
+    '...bbbceeboobeecbbb...', // 10 cheeks + beak
+    '...bbbccbboobbccbbb...', // 11
+    '...bbbbbbbbbbxBBBBB...', // 12 folded wing on the side
+    '...bbbbbbbbbxBBBBBB...', // 13
+    '....bbbbbbbbxBBBBB....', // 14
+    '....bbbbbbbbbxBBBb....', // 15 wing tapers to a tail
+    '.....bbbbbbbBBBBb.....', // 16
+    '......bbBBBBBBbb......', // 17 soft under-shadow
+    '.......bBBBBBBb.......', // 18
+    '........bBBBBb........', // 19
+    '.........f..f.........', // 20 legs
+    '........ff..ff........', // 21 feet
   ],
 };
