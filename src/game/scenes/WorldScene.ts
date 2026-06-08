@@ -49,6 +49,7 @@ const PROP_TEXTURE = {
   stall: TextureKey.Stall,
   anvil: TextureKey.Anvil,
   rubble: TextureKey.Rubble,
+  tree: TextureKey.Tree,
 } as const;
 
 const FLOOR_TEXTURE = {

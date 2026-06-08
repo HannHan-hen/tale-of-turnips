@@ -39,9 +39,9 @@ describe('CollisionSystem', () => {
   });
 
   it('includes bush tiles in the solid grid', () => {
-    const farm = MAPS[MapId.Farm];
-    const solids = buildSolidGrid(farm);
-    const bush = tileCenter(farm.bushes[0].tile);
+    const forest = MAPS[MapId.Forest];
+    const solids = buildSolidGrid(forest);
+    const bush = tileCenter(forest.bushes[0].tile);
     expect(isSolidAt(solids, bush.x, bush.y)).toBe(true);
   });
 });

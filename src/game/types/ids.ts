@@ -29,6 +29,7 @@ export const MapId = {
   House: 'house',
   Village: 'village',
   Ruins: 'ruins',
+  Forest: 'forest',
   BossArena: 'boss_arena',
 } as const;
 export type MapId = (typeof MapId)[keyof typeof MapId];

@@ -24,6 +24,7 @@ import { JAY, SEED_SELLER, BLACKSMITH, VILLAGER } from './sprites/characters';
 import { CHICKEN } from './sprites/chicken';
 import { CROP_MOUND, CROP_SPROUT, CROP_LEAFY, TURNIP, CARROT, PUMPKIN } from './sprites/crops';
 import { BUSH_FULL, BUSH_EMPTY } from './sprites/bushes';
+import { TREE } from './sprites/trees';
 import { RUIN_MITE, SHADE_PUP, CROP_NIBBLER, RUIN_HEART } from './sprites/enemies';
 import {
   SHIPPING_BOX,
@@ -141,6 +142,7 @@ export function buildTextures(scene: Phaser.Scene): void {
   buildBushes(scene);
   buildStoneFloorTile(scene);
   buildRubble(scene);
+  buildTree(scene);
   buildEnemies(scene);
   buildRuinHeart(scene);
   buildSealedDoor(scene);
@@ -298,6 +300,10 @@ function buildStoneFloorTile(scene: Phaser.Scene): void {
 
 function buildRubble(scene: Phaser.Scene): void {
   paintSprite(scene, TextureKey.Rubble, RUBBLE);
+}
+
+function buildTree(scene: Phaser.Scene): void {
+  paintSprite(scene, TextureKey.Tree, TREE);
 }
 
 function buildEnemies(scene: Phaser.Scene): void {
