@@ -122,7 +122,7 @@ export const MAPS: Record<MapId, MapDef> = {
       {
         tile: { x: 14, y: 6 },
         toMap: MapId.Village,
-        toSpawn: { x: 13, y: 5 },
+        toSpawn: { x: 1, y: 5 },
         label: 'To village',
         art: 'signpost',
       },
@@ -263,13 +263,14 @@ export const MAPS: Record<MapId, MapDef> = {
     ],
     chickens: [],
     // Two clusters of three berry bushes, tucked among the trees on opposite sides of the map.
+    // Each bush has at least one empty tile around it so the clusters feel roomier.
     bushes: [
       { id: 'forest_bush_1', tile: { x: 3, y: 4 } },
-      { id: 'forest_bush_2', tile: { x: 4, y: 4 } },
-      { id: 'forest_bush_3', tile: { x: 3, y: 5 } },
-      { id: 'forest_bush_4', tile: { x: 10, y: 6 } },
+      { id: 'forest_bush_2', tile: { x: 5, y: 4 } },
+      { id: 'forest_bush_3', tile: { x: 3, y: 6 } },
+      { id: 'forest_bush_4', tile: { x: 9, y: 6 } },
       { id: 'forest_bush_5', tile: { x: 11, y: 6 } },
-      { id: 'forest_bush_6', tile: { x: 10, y: 7 } },
+      { id: 'forest_bush_6', tile: { x: 9, y: 8 } },
     ],
     enemySpawns: [],
     caches: [],

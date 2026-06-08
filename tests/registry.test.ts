@@ -103,6 +103,26 @@ describe('every map is well-formed', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it('keeps forest berry bushes separated by at least one empty tile', () => {
+    const forest = MAPS[MapId.Forest];
+    for (let i = 0; i < forest.bushes.length; i++) {
+      for (let j = i + 1; j < forest.bushes.length; j++) {
+        const a = forest.bushes[i].tile;
+        const b = forest.bushes[j].tile;
+        expect(
+          Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)),
+          `${forest.bushes[i].id} and ${forest.bushes[j].id} are too close`,
+        ).toBeGreaterThan(1);
+      }
+    }
+  });
+
+  it('sends the farm-to-village transition to the village left edge', () => {
+    const farmToVillage = MAPS[MapId.Farm].exits.find((exit) => exit.toMap === MapId.Village);
+    expect(farmToVillage).toBeDefined();
+    expect(farmToVillage!.toSpawn.x).toBe(1);
+  });
+
   it('never spawns the player or an exit tile on a solid object', () => {
     for (const def of ALL_MAPS) {
       const solids = buildSolidGrid(def);
