@@ -10,7 +10,8 @@ import { createNewGameState } from '../state/newGameState';
 import { CropId, MapId } from '../types/ids';
 import type { GameState, SaveData } from '../types/models';
 
-export const SAVE_KEY = 'story-of-turnips/save';
+export const SAVE_KEY = 'tale-of-turnips/save';
+const LEGACY_SAVE_KEY = 'story-of-turnips/save';
 export const SAVE_VERSION = 1;
 
 function storage(): Storage | undefined {
@@ -85,7 +86,7 @@ export function loadGame(): GameState {
   const store = storage();
   if (!store) return createNewGameState();
   try {
-    const raw = store.getItem(SAVE_KEY);
+    const raw = store.getItem(SAVE_KEY) ?? store.getItem(LEGACY_SAVE_KEY);
     if (!raw) return createNewGameState();
     const migrated = migrate(JSON.parse(raw));
     return migrated ? migrated.state : createNewGameState();
@@ -106,13 +107,17 @@ export function saveGame(state: GameState): void {
 }
 
 export function clearSave(): void {
-  storage()?.removeItem(SAVE_KEY);
+  const store = storage();
+  store?.removeItem(SAVE_KEY);
+  store?.removeItem(LEGACY_SAVE_KEY);
 }
 
-const HIGHSCORE_KEY = 'story-of-turnips/highscore';
+const HIGHSCORE_KEY = 'tale-of-turnips/highscore';
+const LEGACY_HIGHSCORE_KEY = 'story-of-turnips/highscore';
 
 export function loadHighScore(): number {
-  const raw = storage()?.getItem(HIGHSCORE_KEY);
+  const store = storage();
+  const raw = store?.getItem(HIGHSCORE_KEY) ?? store?.getItem(LEGACY_HIGHSCORE_KEY);
   const n = raw ? Number(raw) : 0;
   return Number.isFinite(n) ? n : 0;
 }

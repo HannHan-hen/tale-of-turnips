@@ -1,4 +1,4 @@
-# CLAUDE.md — Story of Turnips
+# CLAUDE.md — Tale of Turnips
 
 Operating manual for anyone (human or Claude) working in this repo. Read this before
 writing code. The full design lives in [`PROJECT.md`](./PROJECT.md); this file is the

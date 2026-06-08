@@ -1,4 +1,4 @@
-# Codebase Quality Audit — Story of Turnips
+# Codebase Quality Audit — Tale of Turnips
 
 Date: 2026-06-07
 
