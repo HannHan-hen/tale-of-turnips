@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createNewGameState } from '../src/game/state/newGameState';
-import { clearSave, loadGame, migrate, saveGame, SAVE_VERSION } from '../src/game/save/SaveSystem';
+import { clearSave, loadGame, migrate, saveGame, SAVE_KEY, SAVE_VERSION } from '../src/game/save/SaveSystem';
 
 // Minimal in-memory localStorage so the save system can be exercised in Node.
 function memoryStorage(): Storage {
@@ -29,6 +29,25 @@ describe('SaveSystem', () => {
 
     const loaded = loadGame();
     expect(loaded.player.gold).toBe(777);
+  });
+
+  it('loads saves written under the previous game name', () => {
+    const state = createNewGameState();
+    state.player.gold = 515;
+    localStorage.setItem('story-of-turnips/save', JSON.stringify({ version: SAVE_VERSION, state }));
+
+    const loaded = loadGame();
+    expect(loaded.player.gold).toBe(515);
+  });
+
+  it('clears saves from the current and previous game names', () => {
+    localStorage.setItem(SAVE_KEY, 'current');
+    localStorage.setItem('story-of-turnips/save', 'legacy');
+
+    clearSave();
+
+    expect(localStorage.getItem(SAVE_KEY)).toBeNull();
+    expect(localStorage.getItem('story-of-turnips/save')).toBeNull();
   });
 
   it('returns a fresh game when no save exists', () => {

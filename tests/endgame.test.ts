@@ -24,6 +24,12 @@ beforeEach(() => {
 });
 
 describe('high score', () => {
+  it('loads high scores written under the previous game name', () => {
+    localStorage.setItem('story-of-turnips/highscore', '240');
+
+    expect(loadHighScore()).toBe(240);
+  });
+
   it('keeps the best gold across runs', () => {
     expect(loadHighScore()).toBe(0);
     expect(recordHighScore(120)).toBe(120);

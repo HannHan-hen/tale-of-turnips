@@ -15,6 +15,7 @@ import { UIScene } from './game/scenes/UIScene';
 const farm = MAPS[MapId.Farm];
 
 new Phaser.Game({
+  title: 'Tale of Turnips',
   type: Phaser.AUTO,
   parent: 'game',
   width: farm.widthTiles * TILE,

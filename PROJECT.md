@@ -1,4 +1,4 @@
-# Story of Turnips — Project Plan
+# Tale of Turnips — Project Plan
 
 The complete design record. This is the source of truth for the backlog so nothing is lost
 between vertical slices. Rules and build order live in [`CLAUDE.md`](./CLAUDE.md).

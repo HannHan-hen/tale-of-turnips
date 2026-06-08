@@ -1,4 +1,4 @@
-# Story of Turnips
+# Tale of Turnips
 
 A cozy browser farming-adventure toy. Grow crops for gold, pet chickens and forage
 berries, brave the ruins for a dramatic legendary armor set, keep your farm safe from tiny
