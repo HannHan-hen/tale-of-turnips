@@ -9,7 +9,14 @@ import type { PixelSprite } from './spriteGrid';
 export const ICON_TURNIP = build(
   20,
   20,
-  { b: palette.bulb, B: palette.bulbDark, p: palette.bulbTop, l: palette.leaf, L: palette.leafDark, H: palette.leafLight },
+  {
+    b: palette.bulb,
+    B: palette.bulbDark,
+    p: palette.bulbTop,
+    l: palette.leaf,
+    L: palette.leafDark,
+    H: palette.leafLight,
+  },
   (r) => {
     r('l', 6, 3, 2, 4); // leaves
     r('l', 12, 3, 2, 4);
@@ -76,18 +83,13 @@ export const ICON_CARROT_SEED = makeSeed(palette.carrot);
 export const ICON_PUMPKIN_SEED = makeSeed(palette.pumpkin);
 
 // --- forage ---
-export const ICON_EGG = build(
-  20,
-  20,
-  { e: palette.egg, E: palette.chickenShade, w: palette.uiInk },
-  (r) => {
-    r('e', 7, 4, 6, 12); // body
-    r('e', 8, 3, 4, 1);
-    r('e', 8, 16, 4, 1);
-    r('E', 11, 7, 2, 8); // shadow
-    r('w', 8, 6, 2, 3); // shine
-  },
-);
+export const ICON_EGG = build(20, 20, { e: palette.egg, E: palette.chickenShade, w: palette.uiInk }, (r) => {
+  r('e', 7, 4, 6, 12); // body
+  r('e', 8, 3, 4, 1);
+  r('e', 8, 16, 4, 1);
+  r('E', 11, 7, 2, 8); // shadow
+  r('w', 8, 6, 2, 3); // shine
+});
 
 export const ICON_BERRY = build(
   20,
@@ -120,31 +122,21 @@ export const ICON_SWORD = build(
   },
 );
 
-export const ICON_ARMOR = build(
-  20,
-  20,
-  { c: palette.cloth, C: palette.clothDark, s: palette.skin },
-  (r) => {
-    r('s', 8, 3, 4, 2); // collar gap
-    r('c', 5, 5, 10, 11); // vest
-    r('C', 9, 5, 2, 11); // center seam
-    r('C', 5, 14, 10, 2); // hem
-    r('c', 3, 6, 2, 5); // shoulders
-    r('c', 15, 6, 2, 5);
-  },
-);
+export const ICON_ARMOR = build(20, 20, { c: palette.cloth, C: palette.clothDark, s: palette.skin }, (r) => {
+  r('s', 8, 3, 4, 2); // collar gap
+  r('c', 5, 5, 10, 11); // vest
+  r('C', 9, 5, 2, 11); // center seam
+  r('C', 5, 14, 10, 2); // hem
+  r('c', 3, 6, 2, 5); // shoulders
+  r('c', 15, 6, 2, 5);
+});
 
-export const ICON_RUIN_SHARD = build(
-  20,
-  20,
-  { s: palette.shard, w: palette.uiInk },
-  (r) => {
-    r('s', 8, 3, 4, 13); // main crystal
-    r('s', 5, 8, 3, 5); // left facet
-    r('s', 12, 6, 3, 7); // right facet
-    r('w', 9, 5, 1, 6); // shine
-  },
-);
+export const ICON_RUIN_SHARD = build(20, 20, { s: palette.shard, w: palette.uiInk }, (r) => {
+  r('s', 8, 3, 4, 13); // main crystal
+  r('s', 5, 8, 3, 5); // left facet
+  r('s', 12, 6, 3, 7); // right facet
+  r('w', 9, 5, 1, 6); // shine
+});
 
 export const ICON_SHADOW_WISP = build(
   20,

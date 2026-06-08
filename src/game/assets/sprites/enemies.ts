@@ -146,9 +146,7 @@ function makeRuinHeart(): string[] {
   const cMaxHalf = 7;
   for (let y = cTop; y <= cBottom; y++) {
     const hw =
-      y <= cWide
-        ? (cMaxHalf * (y - cTop)) / (cWide - cTop)
-        : (cMaxHalf * (cBottom - y)) / (cBottom - cWide);
+      y <= cWide ? (cMaxHalf * (y - cTop)) / (cWide - cTop) : (cMaxHalf * (cBottom - y)) / (cBottom - cWide);
     const x0 = Math.ceil(cx - hw);
     const x1 = Math.floor(cx + hw);
     for (let x = x0; x <= x1; x++) g[y][x] = x >= 19 && x <= 24 && y >= 19 && y <= 24 ? 'C' : 'c';

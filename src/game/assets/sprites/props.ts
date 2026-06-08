@@ -78,18 +78,23 @@ export const ANVIL = build(30, 26, { s: palette.steel, S: palette.steelDark, L: 
 });
 
 // A pile of ruin rubble: broken stone blocks.
-export const RUBBLE = build(30, 22, { s: palette.stone, S: palette.stoneDark, L: palette.stoneLight }, (r) => {
-  r('s', 3, 9, 24, 8); // main heap
-  r('S', 3, 15, 24, 2); // base shadow
-  r('s', 5, 5, 9, 6); // left block
-  r('L', 6, 5, 4, 1);
-  r('S', 5, 10, 9, 1);
-  r('s', 17, 7, 8, 5); // right block
-  r('L', 18, 7, 3, 1);
-  r('s', 11, 3, 7, 5); // top block
-  r('L', 12, 3, 3, 1);
-  r('S', 11, 7, 7, 1);
-});
+export const RUBBLE = build(
+  30,
+  22,
+  { s: palette.stone, S: palette.stoneDark, L: palette.stoneLight },
+  (r) => {
+    r('s', 3, 9, 24, 8); // main heap
+    r('S', 3, 15, 24, 2); // base shadow
+    r('s', 5, 5, 9, 6); // left block
+    r('L', 6, 5, 4, 1);
+    r('S', 5, 10, 9, 1);
+    r('s', 17, 7, 8, 5); // right block
+    r('L', 18, 7, 3, 1);
+    r('s', 11, 3, 7, 5); // top block
+    r('L', 12, 3, 3, 1);
+    r('S', 11, 7, 7, 1);
+  },
+);
 
 // The sealed ruin door: a stone slab with a glowing starlit seal.
 export const SEALED_DOOR = build(

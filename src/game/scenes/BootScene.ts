@@ -2,7 +2,7 @@
 // gameplay and UI scenes. Keeps one-time setup out of the gameplay scene.
 
 import Phaser from 'phaser';
-import { buildTextures } from '../assets/TextureFactory';
+import { buildTextures, buildPlayerAnimations } from '../assets/TextureFactory';
 import { GameStateStore } from '../state/GameStateStore';
 import { recalcMaxHp } from '../systems/EquipmentSystem';
 import { loadGame } from '../save/SaveSystem';
@@ -17,6 +17,7 @@ export class BootScene extends Phaser.Scene {
 
   create(): void {
     buildTextures(this);
+    buildPlayerAnimations(this);
 
     const store = new GameStateStore(loadGame());
     // Reconcile max hearts with collected armor (a saved set should restore its bonus).

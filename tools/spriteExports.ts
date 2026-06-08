@@ -3,7 +3,17 @@
 // here to include it in the review sheets. Not part of the app or the tsconfig build.
 export { resolvePixels } from '../src/game/assets/sprites/spriteGrid';
 export { palette } from '../src/game/data/palette';
-import { FARMER } from '../src/game/assets/sprites/farmer';
+import {
+  FARMER_DOWN,
+  FARMER_DOWN_WALK_A,
+  FARMER_DOWN_WALK_B,
+  FARMER_UP,
+  FARMER_UP_WALK_A,
+  FARMER_UP_WALK_B,
+  FARMER_SIDE,
+  FARMER_SIDE_WALK_A,
+  FARMER_SIDE_WALK_B,
+} from '../src/game/assets/sprites/farmer';
 import { JAY, SEED_SELLER, BLACKSMITH, VILLAGER } from '../src/game/assets/sprites/characters';
 import { CHICKEN } from '../src/game/assets/sprites/chicken';
 import {
@@ -53,7 +63,15 @@ import {
 } from '../src/game/assets/sprites/icons';
 
 export const SPRITES = {
-  farmer: FARMER,
+  farmerDown: FARMER_DOWN,
+  farmerDownWalkA: FARMER_DOWN_WALK_A,
+  farmerDownWalkB: FARMER_DOWN_WALK_B,
+  farmerUp: FARMER_UP,
+  farmerUpWalkA: FARMER_UP_WALK_A,
+  farmerUpWalkB: FARMER_UP_WALK_B,
+  farmerSide: FARMER_SIDE,
+  farmerSideWalkA: FARMER_SIDE_WALK_A,
+  farmerSideWalkB: FARMER_SIDE_WALK_B,
   jay: JAY,
   seedSeller: SEED_SELLER,
   blacksmith: BLACKSMITH,

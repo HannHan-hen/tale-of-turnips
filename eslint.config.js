@@ -4,12 +4,15 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
+import globals from 'globals';
 
 export default tseslint.config(
   { ignores: ['dist/**', 'node_modules/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   prettier,
+  // Offline dev tooling (preview renderer, sprite exports) runs in Node, not the browser.
+  { files: ['tools/**'], languageOptions: { globals: globals.node } },
   {
     rules: {
       // Discourage the non-null assertions the audit flagged; warn rather than block.

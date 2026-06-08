@@ -158,3 +158,30 @@ const contact = encodePng(contactSheet(entries));
 const contactFile = path.join(outDir, '_contact.png');
 fs.writeFileSync(contactFile, contact);
 console.log('wrote', path.relative(root, contactFile), `(${contact.length} bytes)`);
+
+// --- farmer walk-cycle strips: each row shows a direction's animation frames in order ---
+const walkRows = [
+  ['farmerDownWalkA', 'farmerDown', 'farmerDownWalkB', 'farmerDown'],
+  ['farmerUpWalkA', 'farmerUp', 'farmerUpWalkB', 'farmerUp'],
+  ['farmerSideWalkA', 'farmerSide', 'farmerSideWalkB', 'farmerSide'],
+];
+if (walkRows.every((row) => row.every((k) => SPRITES[k]))) {
+  const scale = 6;
+  const pad = 14;
+  const gap = 10;
+  const cellW = 24 * scale;
+  const cellH = 32 * scale;
+  const cols = 4;
+  const W = pad * 2 + cols * cellW + (cols - 1) * gap;
+  const H = pad * 2 + walkRows.length * cellH + (walkRows.length - 1) * gap;
+  const sheet = canvas(W, H, palette.uiPanel);
+  walkRows.forEach((row, ry) => {
+    row.forEach((key, cx) => {
+      const panel = spritePanel(SPRITES[key], scale, palette.grass);
+      blit(sheet, panel, pad + cx * (cellW + gap), pad + ry * (cellH + gap));
+    });
+  });
+  const walkFile = path.join(outDir, '_walk.png');
+  fs.writeFileSync(walkFile, encodePng(sheet));
+  console.log('wrote', path.relative(root, walkFile), `(${fs.statSync(walkFile).size} bytes)`);
+}

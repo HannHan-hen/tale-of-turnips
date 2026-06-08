@@ -53,6 +53,32 @@ export const TextureKey = {
 } as const;
 export type TextureKey = (typeof TextureKey)[keyof typeof TextureKey];
 
+// The farmer is an animated sprite: a standing pose plus two walk frames for each of three
+// views (down/up/side; left reuses the side, flipped). One texture per frame; the down
+// stand reuses the base Player key.
+export const PlayerFrame = {
+  DownStand: TextureKey.Player,
+  DownWalkA: 'player_down_a',
+  DownWalkB: 'player_down_b',
+  UpStand: 'player_up',
+  UpWalkA: 'player_up_a',
+  UpWalkB: 'player_up_b',
+  SideStand: 'player_side',
+  SideWalkA: 'player_side_a',
+  SideWalkB: 'player_side_b',
+} as const;
+
+// Player animation keys (registered once at boot).
+export const PlayerAnim = {
+  IdleDown: 'farmer_idle_down',
+  WalkDown: 'farmer_walk_down',
+  IdleUp: 'farmer_idle_up',
+  WalkUp: 'farmer_walk_up',
+  IdleSide: 'farmer_idle_side',
+  WalkSide: 'farmer_walk_side',
+} as const;
+export type PlayerAnim = (typeof PlayerAnim)[keyof typeof PlayerAnim];
+
 // Crop textures are generated per growth stage: crop_<cropId>_<stage>.
 export function cropTextureKey(cropId: string, stage: number): string {
   return `crop_${cropId}_${stage}`;

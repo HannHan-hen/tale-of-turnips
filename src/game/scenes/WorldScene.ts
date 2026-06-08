@@ -4,7 +4,7 @@
 // systems and data — not here. Switching maps is a scene restart after a state transition.
 
 import Phaser from 'phaser';
-import { cropTextureKey, TextureKey } from '../data/assetKeys';
+import { cropTextureKey, PlayerAnim, TextureKey } from '../data/assetKeys';
 import { SET_NAME } from '../data/armor';
 import { Balance } from '../data/balance';
 import { ENEMIES } from '../data/enemies';
@@ -68,7 +68,7 @@ export class WorldScene extends Phaser.Scene {
   private store!: GameStateStore;
   private def!: MapDef;
   private controls!: InputSystem;
-  private playerSprite!: Phaser.GameObjects.Image;
+  private playerSprite!: Phaser.GameObjects.Sprite;
   private cropSprites!: Map<CropInstance, Phaser.GameObjects.Image>;
   private bushSprites!: Map<string, Phaser.GameObjects.Image>;
   private cacheSprites!: Map<string, Phaser.GameObjects.Image>;
@@ -126,7 +126,8 @@ export class WorldScene extends Phaser.Scene {
     }
 
     const p = this.store.player;
-    this.playerSprite = this.add.image(p.x, p.y, TextureKey.Player).setOrigin(0.5, 0.9);
+    this.playerSprite = this.add.sprite(p.x, p.y, TextureKey.Player).setOrigin(0.5, 0.9);
+    this.playerSprite.play(PlayerAnim.IdleDown);
 
     this.controls = new InputSystem(this);
 
@@ -157,16 +158,12 @@ export class WorldScene extends Phaser.Scene {
     const dt = deltaMs / 1000;
     const player = this.store.player;
 
-    movePlayer(
-      player,
-      this.controls.getMovement(),
-      Balance.playerSpeed + this.loadout.bonusSpeed,
-      dt,
-      this.bounds,
-      (x, y) => isSolidAt(this.solids, x, y),
+    const move = this.controls.getMovement();
+    movePlayer(player, move, Balance.playerSpeed + this.loadout.bonusSpeed, dt, this.bounds, (x, y) =>
+      isSolidAt(this.solids, x, y),
     );
     this.playerSprite.setPosition(player.x, player.y).setDepth(player.y);
-    this.playerSprite.setFlipX(player.facing === 'left');
+    this.updatePlayerAnimation(move.x !== 0 || move.y !== 0);
 
     // Growth advances globally; crops keep maturing and bushes regrow even while indoors.
     const clock = advanceWorldClock(
@@ -202,6 +199,17 @@ export class WorldScene extends Phaser.Scene {
       this.saveAccum = 0;
       saveGame(this.store.state);
     }
+  }
+
+  // Play the walk or idle cycle for the current facing; left reuses the side art, flipped.
+  private updatePlayerAnimation(moving: boolean): void {
+    const facing = this.store.player.facing;
+    let anim: PlayerAnim;
+    if (facing === 'up') anim = moving ? PlayerAnim.WalkUp : PlayerAnim.IdleUp;
+    else if (facing === 'down') anim = moving ? PlayerAnim.WalkDown : PlayerAnim.IdleDown;
+    else anim = moving ? PlayerAnim.WalkSide : PlayerAnim.IdleSide;
+    this.playerSprite.setFlipX(facing === 'left');
+    this.playerSprite.play(anim, true);
   }
 
   // --- rendering ---

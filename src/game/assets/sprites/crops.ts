@@ -18,13 +18,7 @@ export const CROP_MOUND: PixelSprite = {
   width: 12,
   height: 5,
   legend: leafLegend,
-  rows: [
-    '.....ll.....',
-    '...oooooo...',
-    '..oooooooo..',
-    '.oooooooooo.',
-    '.oooooooooo.',
-  ],
+  rows: ['.....ll.....', '...oooooo...', '..oooooooo..', '.oooooooooo.', '.oooooooooo.'],
 };
 
 // Stage 1 — a two-leaf sprout.

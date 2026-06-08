@@ -3,13 +3,23 @@
 // without changing any gameplay code (which only ever references the keys).
 
 import Phaser from 'phaser';
-import { cropTextureKey, TextureKey } from '../data/assetKeys';
+import { cropTextureKey, PlayerAnim, PlayerFrame, TextureKey } from '../data/assetKeys';
 import { CROPS } from '../data/crops';
 import { palette } from '../data/palette';
 import { TILE } from '../data/maps';
 import { CropId } from '../types/ids';
 import { resolvePixels, type PixelSprite } from './sprites/spriteGrid';
-import { FARMER } from './sprites/farmer';
+import {
+  FARMER_DOWN,
+  FARMER_DOWN_WALK_A,
+  FARMER_DOWN_WALK_B,
+  FARMER_UP,
+  FARMER_UP_WALK_A,
+  FARMER_UP_WALK_B,
+  FARMER_SIDE,
+  FARMER_SIDE_WALK_A,
+  FARMER_SIDE_WALK_B,
+} from './sprites/farmer';
 import { JAY, SEED_SELLER, BLACKSMITH, VILLAGER } from './sprites/characters';
 import { CHICKEN } from './sprites/chicken';
 import { CROP_MOUND, CROP_SPROUT, CROP_LEAFY, TURNIP, CARROT, PUMPKIN } from './sprites/crops';
@@ -186,7 +196,48 @@ function buildWallTile(scene: Phaser.Scene): void {
 }
 
 function buildPlayer(scene: Phaser.Scene): void {
-  paintSprite(scene, TextureKey.Player, FARMER);
+  paintSprite(scene, PlayerFrame.DownStand, FARMER_DOWN);
+  paintSprite(scene, PlayerFrame.DownWalkA, FARMER_DOWN_WALK_A);
+  paintSprite(scene, PlayerFrame.DownWalkB, FARMER_DOWN_WALK_B);
+  paintSprite(scene, PlayerFrame.UpStand, FARMER_UP);
+  paintSprite(scene, PlayerFrame.UpWalkA, FARMER_UP_WALK_A);
+  paintSprite(scene, PlayerFrame.UpWalkB, FARMER_UP_WALK_B);
+  paintSprite(scene, PlayerFrame.SideStand, FARMER_SIDE);
+  paintSprite(scene, PlayerFrame.SideWalkA, FARMER_SIDE_WALK_A);
+  paintSprite(scene, PlayerFrame.SideWalkB, FARMER_SIDE_WALK_B);
+}
+
+// Register the farmer's walk/idle animations. Each frame is its own texture, so the cycles
+// reference texture keys directly. Idempotent — safe if called more than once.
+export function buildPlayerAnimations(scene: Phaser.Scene): void {
+  const anim = (key: string, frames: string[], frameRate: number): void => {
+    if (scene.anims.exists(key)) return;
+    scene.anims.create({
+      key,
+      frames: frames.map((f) => ({ key: f })),
+      frameRate,
+      repeat: -1,
+    });
+  };
+  // Walk cycles step A -> stand -> B -> stand so the contact pose reads between steps.
+  anim(PlayerAnim.IdleDown, [PlayerFrame.DownStand], 1);
+  anim(
+    PlayerAnim.WalkDown,
+    [PlayerFrame.DownWalkA, PlayerFrame.DownStand, PlayerFrame.DownWalkB, PlayerFrame.DownStand],
+    8,
+  );
+  anim(PlayerAnim.IdleUp, [PlayerFrame.UpStand], 1);
+  anim(
+    PlayerAnim.WalkUp,
+    [PlayerFrame.UpWalkA, PlayerFrame.UpStand, PlayerFrame.UpWalkB, PlayerFrame.UpStand],
+    8,
+  );
+  anim(PlayerAnim.IdleSide, [PlayerFrame.SideStand], 1);
+  anim(
+    PlayerAnim.WalkSide,
+    [PlayerFrame.SideWalkA, PlayerFrame.SideStand, PlayerFrame.SideWalkB, PlayerFrame.SideStand],
+    8,
+  );
 }
 
 function buildShippingBox(scene: Phaser.Scene): void {
@@ -316,8 +367,7 @@ function buildCropStages(scene: Phaser.Scene): void {
   for (const cropId of Object.keys(CROPS) as CropId[]) {
     const stages = CROPS[cropId].growthStages;
     for (let stage = 0; stage < stages; stage++) {
-      const sprite =
-        stage >= stages - 1 ? ripe[cropId] : early[Math.min(stage, early.length - 1)];
+      const sprite = stage >= stages - 1 ? ripe[cropId] : early[Math.min(stage, early.length - 1)];
       const ox = Math.floor((TILE - sprite.width) / 2);
       const oy = TILE - sprite.height - 2; // sit on the soil, a couple px from the bottom
       paintSpriteInto(scene, cropTextureKey(cropId, stage), sprite, TILE, TILE, ox, oy);

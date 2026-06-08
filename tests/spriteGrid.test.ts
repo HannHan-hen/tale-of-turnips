@@ -1,6 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { resolvePixels, type PixelSprite } from '../src/game/assets/sprites/spriteGrid';
-import { FARMER } from '../src/game/assets/sprites/farmer';
+import {
+  FARMER_DOWN,
+  FARMER_DOWN_WALK_A,
+  FARMER_DOWN_WALK_B,
+  FARMER_UP,
+  FARMER_UP_WALK_A,
+  FARMER_UP_WALK_B,
+  FARMER_SIDE,
+  FARMER_SIDE_WALK_A,
+  FARMER_SIDE_WALK_B,
+} from '../src/game/assets/sprites/farmer';
 import { JAY, SEED_SELLER, BLACKSMITH, VILLAGER } from '../src/game/assets/sprites/characters';
 import { CHICKEN } from '../src/game/assets/sprites/chicken';
 import {
@@ -51,7 +61,15 @@ import {
 
 // Every hand-authored sprite, for the shared validity checks below.
 const AUTHORED_SPRITES: Record<string, PixelSprite> = {
-  FARMER,
+  FARMER_DOWN,
+  FARMER_DOWN_WALK_A,
+  FARMER_DOWN_WALK_B,
+  FARMER_UP,
+  FARMER_UP_WALK_A,
+  FARMER_UP_WALK_B,
+  FARMER_SIDE,
+  FARMER_SIDE_WALK_A,
+  FARMER_SIDE_WALK_B,
   JAY,
   SEED_SELLER,
   BLACKSMITH,
