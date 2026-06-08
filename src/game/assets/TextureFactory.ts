@@ -12,6 +12,8 @@ import { resolvePixels, type PixelSprite } from './sprites/spriteGrid';
 import { FARMER } from './sprites/farmer';
 import { JAY, SEED_SELLER, BLACKSMITH, VILLAGER } from './sprites/characters';
 import { CHICKEN } from './sprites/chicken';
+import { CROP_MOUND, CROP_SPROUT, CROP_LEAFY, TURNIP, CARROT, PUMPKIN } from './sprites/crops';
+import { BUSH_FULL, BUSH_EMPTY } from './sprites/bushes';
 
 // Draw into a Graphics, bake it into a texture of size w x h, then discard the Graphics.
 function make(
@@ -51,6 +53,27 @@ function paintSprite(scene: Phaser.Scene, key: string, sprite: PixelSprite): voi
     g.fillRect(px.x, px.y, 1, 1);
   }
   g.generateTexture(key, sprite.width, sprite.height);
+  g.destroy();
+}
+
+// Paint a sprite at an offset inside a larger texture (e.g. a crop sitting on the soil at the
+// bottom of a tile-sized canvas).
+function paintSpriteInto(
+  scene: Phaser.Scene,
+  key: string,
+  sprite: PixelSprite,
+  texW: number,
+  texH: number,
+  ox: number,
+  oy: number,
+): void {
+  if (scene.textures.exists(key)) return;
+  const g = scene.add.graphics();
+  for (const px of resolvePixels(sprite)) {
+    g.fillStyle(px.color, 1);
+    g.fillRect(ox + px.x, oy + px.y, 1, 1);
+  }
+  g.generateTexture(key, texW, texH);
   g.destroy();
 }
 
@@ -252,23 +275,8 @@ function buildChicken(scene: Phaser.Scene): void {
 }
 
 function buildBushes(scene: Phaser.Scene): void {
-  const w = 30;
-  const h = 26;
-  const leaves = (g: Phaser.GameObjects.Graphics) => {
-    rect(g, palette.leafDark, 3, 8, 24, 16);
-    rect(g, palette.leaf, 5, 6, 20, 14);
-    rect(g, palette.leafDark, 9, 4, 12, 6);
-    rect(g, palette.berryLeaf, 6, 16, 18, 4);
-  };
-  make(scene, TextureKey.BushFull, w, h, (g) => {
-    leaves(g);
-    // ripe berries
-    rect(g, palette.berry, 8, 12, 3, 3);
-    rect(g, palette.berry, 16, 10, 3, 3);
-    rect(g, palette.berry, 13, 16, 3, 3);
-    rect(g, palette.berry, 21, 15, 3, 3);
-  });
-  make(scene, TextureKey.BushEmpty, w, h, leaves);
+  paintSprite(scene, TextureKey.BushFull, BUSH_FULL);
+  paintSprite(scene, TextureKey.BushEmpty, BUSH_EMPTY);
 }
 
 function buildStoneFloorTile(scene: Phaser.Scene): void {
@@ -549,59 +557,25 @@ function buildSeedIcon(scene: Phaser.Scene, key: string, tint: number): void {
   });
 }
 
-// Crop growth stages, drawn within a tile-sized canvas so the plant sits on the soil.
-// Early stages (mound/sprout/leafy) are shared; each crop has its own mature look.
+// Crop growth stages, each a pixel-grid sprite (sprites/crops) painted bottom-centered into a
+// tile-sized canvas so the plant sits on the soil. The early stages are shared; each crop has
+// its own ripe look for the final stage.
 function buildCropStages(scene: Phaser.Scene): void {
-  const w = TILE;
-  const h = TILE;
-  const cx = Math.floor(w / 2);
-
-  const mature: Record<CropId, (g: Phaser.GameObjects.Graphics) => void> = {
-    [CropId.Turnip]: (g) => {
-      rect(g, palette.bulb, cx - 5, h - 12, 10, 9);
-      rect(g, palette.bulb, cx - 4, h - 4, 8, 2);
-      rect(g, palette.bulbTop, cx - 5, h - 14, 10, 3);
-      rect(g, palette.leaf, cx - 4, h - 22, 2, 8);
-      rect(g, palette.leaf, cx + 2, h - 22, 2, 8);
-      rect(g, palette.leafDark, cx - 1, h - 20, 2, 7);
-    },
-    [CropId.Carrot]: (g) => {
-      rect(g, palette.carrot, cx - 4, h - 12, 8, 9);
-      rect(g, palette.carrot, cx - 2, h - 4, 4, 3);
-      rect(g, palette.carrotDark, cx + 1, h - 11, 2, 8);
-      rect(g, palette.leaf, cx - 4, h - 22, 2, 9);
-      rect(g, palette.leaf, cx + 2, h - 22, 2, 9);
-      rect(g, palette.leafDark, cx - 1, h - 24, 2, 11);
-    },
-    [CropId.Pumpkin]: (g) => {
-      rect(g, palette.pumpkin, cx - 7, h - 13, 14, 11);
-      rect(g, palette.pumpkin, cx - 6, h - 15, 12, 13);
-      rect(g, palette.pumpkinRib, cx - 1, h - 15, 2, 13);
-      rect(g, palette.pumpkinDark, cx - 5, h - 13, 1, 11);
-      rect(g, palette.pumpkinDark, cx + 4, h - 13, 1, 11);
-      rect(g, palette.leafDark, cx - 1, h - 18, 2, 4); // stem
-    },
+  const early = [CROP_MOUND, CROP_SPROUT, CROP_LEAFY];
+  const ripe: Record<CropId, PixelSprite> = {
+    [CropId.Turnip]: TURNIP,
+    [CropId.Carrot]: CARROT,
+    [CropId.Pumpkin]: PUMPKIN,
   };
 
   for (const cropId of Object.keys(CROPS) as CropId[]) {
     const stages = CROPS[cropId].growthStages;
     for (let stage = 0; stage < stages; stage++) {
-      make(scene, cropTextureKey(cropId, stage), w, h, (g) => {
-        if (stage >= stages - 1) {
-          mature[cropId](g);
-        } else if (stage === 0) {
-          rect(g, palette.soilDark, cx - 4, h - 8, 8, 4); // mound
-          rect(g, palette.leaf, cx - 1, h - 11, 2, 3);
-        } else if (stage === 1) {
-          rect(g, palette.leaf, cx - 1, h - 14, 2, 6); // sprout
-          rect(g, palette.leaf, cx - 4, h - 12, 3, 2);
-          rect(g, palette.leaf, cx + 1, h - 12, 3, 2);
-        } else {
-          rect(g, palette.leafDark, cx - 5, h - 16, 10, 6); // leafy
-          rect(g, palette.leaf, cx - 4, h - 17, 8, 5);
-          rect(g, palette.leaf, cx - 1, h - 20, 2, 4);
-        }
-      });
+      const sprite =
+        stage >= stages - 1 ? ripe[cropId] : early[Math.min(stage, early.length - 1)];
+      const ox = Math.floor((TILE - sprite.width) / 2);
+      const oy = TILE - sprite.height - 2; // sit on the soil, a couple px from the bottom
+      paintSpriteInto(scene, cropTextureKey(cropId, stage), sprite, TILE, TILE, ox, oy);
     }
   }
 }

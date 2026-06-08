@@ -12,7 +12,9 @@ export const palette = {
   woodDark: 0x8a6238,
   leaf: 0x66b257,
   leafDark: 0x47924a,
+  leafLight: 0x8fce5e, // sunlit leaf tips
   bulb: 0xf3efe2, // turnip body
+  bulbDark: 0xd9cdba, // turnip shading
   bulbTop: 0xb5567f, // turnip pink-purple crown
   skin: 0xf2c79b,
   skinDark: 0xd9a574, // shading on skin (jaw, under nose)

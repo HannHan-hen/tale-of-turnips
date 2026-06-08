@@ -3,6 +3,15 @@ import { resolvePixels, type PixelSprite } from '../src/game/assets/sprites/spri
 import { FARMER } from '../src/game/assets/sprites/farmer';
 import { JAY, SEED_SELLER, BLACKSMITH, VILLAGER } from '../src/game/assets/sprites/characters';
 import { CHICKEN } from '../src/game/assets/sprites/chicken';
+import {
+  CROP_MOUND,
+  CROP_SPROUT,
+  CROP_LEAFY,
+  TURNIP,
+  CARROT,
+  PUMPKIN,
+} from '../src/game/assets/sprites/crops';
+import { BUSH_FULL, BUSH_EMPTY } from '../src/game/assets/sprites/bushes';
 
 // Every hand-authored sprite, for the shared validity checks below.
 const AUTHORED_SPRITES: Record<string, PixelSprite> = {
@@ -12,6 +21,14 @@ const AUTHORED_SPRITES: Record<string, PixelSprite> = {
   BLACKSMITH,
   VILLAGER,
   CHICKEN,
+  CROP_MOUND,
+  CROP_SPROUT,
+  CROP_LEAFY,
+  TURNIP,
+  CARROT,
+  PUMPKIN,
+  BUSH_FULL,
+  BUSH_EMPTY,
 };
 
 const legend = { a: 0x112233 };
