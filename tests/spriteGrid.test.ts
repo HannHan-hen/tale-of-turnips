@@ -12,6 +12,7 @@ import {
   PUMPKIN,
 } from '../src/game/assets/sprites/crops';
 import { BUSH_FULL, BUSH_EMPTY } from '../src/game/assets/sprites/bushes';
+import { RUIN_MITE, SHADE_PUP, CROP_NIBBLER, RUIN_HEART } from '../src/game/assets/sprites/enemies';
 
 // Every hand-authored sprite, for the shared validity checks below.
 const AUTHORED_SPRITES: Record<string, PixelSprite> = {
@@ -29,6 +30,10 @@ const AUTHORED_SPRITES: Record<string, PixelSprite> = {
   PUMPKIN,
   BUSH_FULL,
   BUSH_EMPTY,
+  RUIN_MITE,
+  SHADE_PUP,
+  CROP_NIBBLER,
+  RUIN_HEART,
 };
 
 const legend = { a: 0x112233 };

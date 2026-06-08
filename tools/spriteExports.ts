@@ -15,6 +15,7 @@ import {
   PUMPKIN,
 } from '../src/game/assets/sprites/crops';
 import { BUSH_FULL, BUSH_EMPTY } from '../src/game/assets/sprites/bushes';
+import { RUIN_MITE, SHADE_PUP, CROP_NIBBLER, RUIN_HEART } from '../src/game/assets/sprites/enemies';
 
 export const SPRITES = {
   farmer: FARMER,
@@ -31,4 +32,8 @@ export const SPRITES = {
   pumpkin: PUMPKIN,
   bushFull: BUSH_FULL,
   bushEmpty: BUSH_EMPTY,
+  ruinMite: RUIN_MITE,
+  shadePup: SHADE_PUP,
+  cropNibbler: CROP_NIBBLER,
+  ruinHeart: RUIN_HEART,
 };
