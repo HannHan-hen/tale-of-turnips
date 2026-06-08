@@ -26,6 +26,28 @@ import {
   COTTAGE,
   STALL,
 } from '../src/game/assets/sprites/props';
+import {
+  ICON_TURNIP,
+  ICON_CARROT,
+  ICON_PUMPKIN,
+  ICON_TURNIP_SEED,
+  ICON_CARROT_SEED,
+  ICON_PUMPKIN_SEED,
+  ICON_EGG,
+  ICON_BERRY,
+  ICON_SWORD,
+  ICON_ARMOR,
+  ICON_RUIN_SHARD,
+  ICON_SHADOW_WISP,
+  ICON_STARLESS_HELM,
+  ICON_STARLESS_PLATE,
+  ICON_STARLESS_GAUNTLETS,
+  ICON_STARLESS_GREAVES,
+  ICON_STARLESS_BLADE,
+  HEART_FULL,
+  HEART_EMPTY,
+  SLASH,
+} from '../src/game/assets/sprites/icons';
 
 // Every hand-authored sprite, for the shared validity checks below.
 const AUTHORED_SPRITES: Record<string, PixelSprite> = {
@@ -58,6 +80,26 @@ const AUTHORED_SPRITES: Record<string, PixelSprite> = {
   CACHE_OPEN,
   COTTAGE,
   STALL,
+  ICON_TURNIP,
+  ICON_CARROT,
+  ICON_PUMPKIN,
+  ICON_TURNIP_SEED,
+  ICON_CARROT_SEED,
+  ICON_PUMPKIN_SEED,
+  ICON_EGG,
+  ICON_BERRY,
+  ICON_SWORD,
+  ICON_ARMOR,
+  ICON_RUIN_SHARD,
+  ICON_SHADOW_WISP,
+  ICON_STARLESS_HELM,
+  ICON_STARLESS_PLATE,
+  ICON_STARLESS_GAUNTLETS,
+  ICON_STARLESS_GREAVES,
+  ICON_STARLESS_BLADE,
+  HEART_FULL,
+  HEART_EMPTY,
+  SLASH,
 };
 
 const legend = { a: 0x112233 };

@@ -1,29 +1,9 @@
 import { palette } from '../../data/palette';
-import type { PixelSprite } from './spriteGrid';
+import { build } from './compose';
 
 // Structures and props. These are mostly rectangular, so each is composed from filled rects
-// into a character grid (guaranteeing valid rows) and then gets the shared 1px auto-outline,
-// so they read as deliberate pixel art alongside the cast and creatures.
-
-type Draw = (rect: (ch: string, x: number, y: number, w: number, h: number) => void) => void;
-
-function build(
-  width: number,
-  height: number,
-  legend: Record<string, number>,
-  draw: Draw,
-): PixelSprite {
-  const g: string[][] = Array.from({ length: height }, () => Array<string>(width).fill('.'));
-  const rect = (ch: string, x: number, y: number, w: number, h: number): void => {
-    for (let yy = y; yy < y + h; yy++) {
-      for (let xx = x; xx < x + w; xx++) {
-        if (yy >= 0 && yy < height && xx >= 0 && xx < width) g[yy][xx] = ch;
-      }
-    }
-  };
-  draw(rect);
-  return { width, height, outline: palette.outline, legend, rows: g.map((r) => r.join('')) };
-}
+// (see compose.build) into a character grid and then gets the shared 1px auto-outline, so they
+// read as deliberate pixel art alongside the cast and creatures.
 
 const woodLegend = { w: palette.wood, W: palette.woodDark, L: palette.woodLight, m: palette.metal };
 

@@ -28,6 +28,28 @@ import {
   COTTAGE,
   STALL,
 } from './sprites/props';
+import {
+  ICON_TURNIP,
+  ICON_CARROT,
+  ICON_PUMPKIN,
+  ICON_TURNIP_SEED,
+  ICON_CARROT_SEED,
+  ICON_PUMPKIN_SEED,
+  ICON_EGG,
+  ICON_BERRY,
+  ICON_SWORD,
+  ICON_ARMOR,
+  ICON_RUIN_SHARD,
+  ICON_SHADOW_WISP,
+  ICON_STARLESS_HELM,
+  ICON_STARLESS_PLATE,
+  ICON_STARLESS_GAUNTLETS,
+  ICON_STARLESS_GREAVES,
+  ICON_STARLESS_BLADE,
+  HEART_FULL,
+  HEART_EMPTY,
+  SLASH,
+} from './sprites/icons';
 
 // Draw into a Graphics, bake it into a texture of size w x h, then discard the Graphics.
 function make(
@@ -242,29 +264,12 @@ function buildSealedDoor(scene: Phaser.Scene): void {
 }
 
 function buildSlash(scene: Phaser.Scene): void {
-  const s = 30;
-  make(scene, TextureKey.Slash, s, s, (g) => {
-    rect(g, palette.slash, 20, 4, 4, 6);
-    rect(g, palette.slash, 17, 9, 4, 5);
-    rect(g, palette.slash, 13, 13, 4, 5);
-    rect(g, palette.slash, 9, 17, 4, 5);
-    rect(g, palette.slash, 6, 22, 4, 4);
-  });
+  paintSprite(scene, TextureKey.Slash, SLASH);
 }
 
 function buildHearts(scene: Phaser.Scene): void {
-  const s = 14;
-  const heart = (g: Phaser.GameObjects.Graphics, color: number) => {
-    rect(g, color, 2, 4, 4, 5);
-    rect(g, color, 8, 4, 4, 5);
-    rect(g, color, 2, 3, 4, 2);
-    rect(g, color, 8, 3, 4, 2);
-    rect(g, color, 3, 9, 8, 2);
-    rect(g, color, 4, 11, 6, 1);
-    rect(g, color, 6, 12, 2, 1);
-  };
-  make(scene, TextureKey.HeartFull, s, s, (g) => heart(g, palette.heartRed));
-  make(scene, TextureKey.HeartEmpty, s, s, (g) => heart(g, palette.heartEmpty));
+  paintSprite(scene, TextureKey.HeartFull, HEART_FULL);
+  paintSprite(scene, TextureKey.HeartEmpty, HEART_EMPTY);
 }
 
 function buildCaches(scene: Phaser.Scene): void {
@@ -272,137 +277,29 @@ function buildCaches(scene: Phaser.Scene): void {
   paintSprite(scene, TextureKey.CacheOpen, CACHE_OPEN);
 }
 
-// The five Starless pieces share a deep-blue palette with starlight accents.
+// The five legendary Starless pieces (sprites/icons).
 function buildArmorIcons(scene: Phaser.Scene): void {
-  const s = 20;
-  make(scene, TextureKey.IconStarlessHelm, s, s, (g) => {
-    rect(g, palette.starless, 5, 4, 10, 9);
-    rect(g, palette.starlessDark, 5, 11, 10, 4);
-    rect(g, palette.starlight, 8, 6, 4, 2);
-    rect(g, palette.starlessTrim, 9, 2, 2, 3); // crest
-  });
-  make(scene, TextureKey.IconStarlessPlate, s, s, (g) => {
-    rect(g, palette.starless, 4, 4, 12, 12);
-    rect(g, palette.starlessDark, 9, 4, 2, 12);
-    rect(g, palette.starlight, 7, 8, 2, 2);
-    rect(g, palette.starlight, 11, 8, 2, 2);
-    rect(g, palette.starlessTrim, 4, 4, 12, 1);
-  });
-  make(scene, TextureKey.IconStarlessGauntlets, s, s, (g) => {
-    rect(g, palette.starless, 5, 6, 5, 10);
-    rect(g, palette.starless, 11, 6, 4, 10);
-    rect(g, palette.starlessDark, 5, 12, 10, 2);
-    rect(g, palette.starlight, 6, 8, 2, 2);
-  });
-  make(scene, TextureKey.IconStarlessGreaves, s, s, (g) => {
-    rect(g, palette.starless, 5, 4, 4, 12);
-    rect(g, palette.starless, 11, 4, 4, 12);
-    rect(g, palette.starlessDark, 4, 14, 6, 3);
-    rect(g, palette.starlessDark, 10, 14, 6, 3);
-    rect(g, palette.starlight, 6, 7, 2, 2);
-  });
-  make(scene, TextureKey.IconStarlessBlade, s, s, (g) => {
-    rect(g, palette.starlight, 9, 2, 2, 11);
-    rect(g, palette.starless, 11, 3, 1, 10);
-    rect(g, palette.starlessTrim, 6, 13, 8, 2); // guard
-    rect(g, palette.starlessDark, 9, 15, 2, 4); // grip
-  });
+  paintSprite(scene, TextureKey.IconStarlessHelm, ICON_STARLESS_HELM);
+  paintSprite(scene, TextureKey.IconStarlessPlate, ICON_STARLESS_PLATE);
+  paintSprite(scene, TextureKey.IconStarlessGauntlets, ICON_STARLESS_GAUNTLETS);
+  paintSprite(scene, TextureKey.IconStarlessGreaves, ICON_STARLESS_GREAVES);
+  paintSprite(scene, TextureKey.IconStarlessBlade, ICON_STARLESS_BLADE);
 }
 
+// Inventory icons (sprites/icons).
 function buildIcons(scene: Phaser.Scene): void {
-  const s = 20;
-  // seed: a small pip
-  make(scene, TextureKey.IconTurnipSeed, s, s, (g) => {
-    rect(g, palette.leafDark, 7, 4, 6, 12);
-    rect(g, palette.leaf, 8, 5, 4, 9);
-    rect(g, palette.bulbTop, 9, 13, 2, 2);
-  });
-  // turnip: bulb with leafy crown
-  make(scene, TextureKey.IconTurnip, s, s, (g) => {
-    rect(g, palette.bulb, 5, 8, 10, 9);
-    rect(g, palette.bulb, 6, 16, 8, 2);
-    rect(g, palette.bulbTop, 5, 6, 10, 3);
-    rect(g, palette.leaf, 7, 1, 2, 6);
-    rect(g, palette.leaf, 11, 1, 2, 6);
-    rect(g, palette.leafDark, 9, 2, 2, 5);
-  });
-  // sword: a simple steel blade
-  make(scene, TextureKey.IconSword, s, s, (g) => {
-    rect(g, palette.steel, 9, 2, 2, 11);
-    rect(g, palette.steelDark, 11, 3, 1, 10);
-    rect(g, palette.metal, 6, 13, 8, 2); // guard
-    rect(g, palette.woodDark, 9, 15, 2, 4); // grip
-  });
-  // armor: a padded vest
-  make(scene, TextureKey.IconArmor, s, s, (g) => {
-    rect(g, palette.outline, 5, 4, 10, 13);
-    rect(g, palette.cloth, 6, 5, 8, 11);
-    rect(g, palette.clothDark, 9, 5, 2, 11);
-    rect(g, palette.skin, 8, 3, 4, 2); // collar gap
-  });
-  // seed packets: a shared pip shape tinted per crop
-  buildSeedIcon(scene, TextureKey.IconCarrotSeed, palette.carrot);
-  buildSeedIcon(scene, TextureKey.IconPumpkinSeed, palette.pumpkin);
-  // carrot: orange root with green top
-  make(scene, TextureKey.IconCarrot, s, s, (g) => {
-    rect(g, palette.carrot, 8, 6, 4, 10);
-    rect(g, palette.carrot, 9, 16, 2, 2);
-    rect(g, palette.carrotDark, 11, 7, 1, 8);
-    rect(g, palette.leaf, 7, 2, 2, 4);
-    rect(g, palette.leaf, 11, 2, 2, 4);
-    rect(g, palette.leafDark, 9, 1, 2, 5);
-  });
-  // pumpkin: round ribbed gourd
-  make(scene, TextureKey.IconPumpkin, s, s, (g) => {
-    rect(g, palette.pumpkin, 4, 7, 12, 9);
-    rect(g, palette.pumpkin, 5, 6, 10, 11);
-    rect(g, palette.pumpkinRib, 9, 6, 2, 11);
-    rect(g, palette.pumpkinDark, 6, 7, 1, 9);
-    rect(g, palette.pumpkinDark, 13, 7, 1, 9);
-    rect(g, palette.leafDark, 9, 3, 2, 4); // stem
-  });
-  // egg
-  make(scene, TextureKey.IconEgg, s, s, (g) => {
-    rect(g, palette.outline, 7, 4, 6, 12);
-    rect(g, palette.egg, 7, 6, 6, 9);
-    rect(g, palette.egg, 8, 4, 4, 2);
-    rect(g, palette.egg, 8, 15, 4, 1);
-    rect(g, palette.uiInk, 8, 7, 2, 2); // shine
-  });
-  // berry cluster
-  make(scene, TextureKey.IconBerry, s, s, (g) => {
-    rect(g, palette.berry, 6, 9, 4, 4);
-    rect(g, palette.berry, 11, 8, 4, 4);
-    rect(g, palette.berry, 9, 13, 4, 4);
-    rect(g, palette.berryLeaf, 8, 4, 2, 4);
-    rect(g, palette.berryLeaf, 11, 4, 2, 3);
-  });
-  // ruin shard: a cyan crystal
-  make(scene, TextureKey.IconRuinShard, s, s, (g) => {
-    rect(g, palette.outline, 8, 3, 4, 14);
-    rect(g, palette.shard, 9, 4, 2, 12);
-    rect(g, palette.uiInk, 9, 6, 1, 4);
-    rect(g, palette.shard, 6, 8, 2, 5);
-    rect(g, palette.shard, 12, 7, 2, 6);
-  });
-  // shadow wisp: a wispy purple flame
-  make(scene, TextureKey.IconShadowWisp, s, s, (g) => {
-    rect(g, palette.wisp, 8, 4, 4, 10);
-    rect(g, palette.wisp, 6, 7, 2, 6);
-    rect(g, palette.wisp, 12, 8, 2, 5);
-    rect(g, palette.glow, 9, 6, 2, 3);
-    rect(g, palette.shadeDark, 7, 14, 6, 3);
-  });
-}
-
-function buildSeedIcon(scene: Phaser.Scene, key: string, tint: number): void {
-  const s = 20;
-  make(scene, key, s, s, (g) => {
-    rect(g, palette.woodDark, 6, 4, 8, 12); // packet
-    rect(g, palette.wood, 7, 5, 6, 10);
-    rect(g, tint, 9, 9, 3, 3); // seed pip
-    rect(g, palette.leaf, 9, 6, 2, 2);
-  });
+  paintSprite(scene, TextureKey.IconTurnip, ICON_TURNIP);
+  paintSprite(scene, TextureKey.IconCarrot, ICON_CARROT);
+  paintSprite(scene, TextureKey.IconPumpkin, ICON_PUMPKIN);
+  paintSprite(scene, TextureKey.IconTurnipSeed, ICON_TURNIP_SEED);
+  paintSprite(scene, TextureKey.IconCarrotSeed, ICON_CARROT_SEED);
+  paintSprite(scene, TextureKey.IconPumpkinSeed, ICON_PUMPKIN_SEED);
+  paintSprite(scene, TextureKey.IconEgg, ICON_EGG);
+  paintSprite(scene, TextureKey.IconBerry, ICON_BERRY);
+  paintSprite(scene, TextureKey.IconSword, ICON_SWORD);
+  paintSprite(scene, TextureKey.IconArmor, ICON_ARMOR);
+  paintSprite(scene, TextureKey.IconRuinShard, ICON_RUIN_SHARD);
+  paintSprite(scene, TextureKey.IconShadowWisp, ICON_SHADOW_WISP);
 }
 
 // Crop growth stages, each a pixel-grid sprite (sprites/crops) painted bottom-centered into a
