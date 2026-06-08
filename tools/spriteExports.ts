@@ -16,6 +16,19 @@ import {
 } from '../src/game/assets/sprites/crops';
 import { BUSH_FULL, BUSH_EMPTY } from '../src/game/assets/sprites/bushes';
 import { RUIN_MITE, SHADE_PUP, CROP_NIBBLER, RUIN_HEART } from '../src/game/assets/sprites/enemies';
+import {
+  SHIPPING_BOX,
+  DOOR,
+  CHEST,
+  SIGNPOST,
+  ANVIL,
+  RUBBLE,
+  SEALED_DOOR,
+  CACHE_CLOSED,
+  CACHE_OPEN,
+  COTTAGE,
+  STALL,
+} from '../src/game/assets/sprites/props';
 
 export const SPRITES = {
   farmer: FARMER,
@@ -36,4 +49,15 @@ export const SPRITES = {
   shadePup: SHADE_PUP,
   cropNibbler: CROP_NIBBLER,
   ruinHeart: RUIN_HEART,
+  shippingBox: SHIPPING_BOX,
+  door: DOOR,
+  chest: CHEST,
+  signpost: SIGNPOST,
+  anvil: ANVIL,
+  rubble: RUBBLE,
+  sealedDoor: SEALED_DOOR,
+  cacheClosed: CACHE_CLOSED,
+  cacheOpen: CACHE_OPEN,
+  cottage: COTTAGE,
+  stall: STALL,
 };

@@ -13,6 +13,19 @@ import {
 } from '../src/game/assets/sprites/crops';
 import { BUSH_FULL, BUSH_EMPTY } from '../src/game/assets/sprites/bushes';
 import { RUIN_MITE, SHADE_PUP, CROP_NIBBLER, RUIN_HEART } from '../src/game/assets/sprites/enemies';
+import {
+  SHIPPING_BOX,
+  DOOR,
+  CHEST,
+  SIGNPOST,
+  ANVIL,
+  RUBBLE,
+  SEALED_DOOR,
+  CACHE_CLOSED,
+  CACHE_OPEN,
+  COTTAGE,
+  STALL,
+} from '../src/game/assets/sprites/props';
 
 // Every hand-authored sprite, for the shared validity checks below.
 const AUTHORED_SPRITES: Record<string, PixelSprite> = {
@@ -34,6 +47,17 @@ const AUTHORED_SPRITES: Record<string, PixelSprite> = {
   SHADE_PUP,
   CROP_NIBBLER,
   RUIN_HEART,
+  SHIPPING_BOX,
+  DOOR,
+  CHEST,
+  SIGNPOST,
+  ANVIL,
+  RUBBLE,
+  SEALED_DOOR,
+  CACHE_CLOSED,
+  CACHE_OPEN,
+  COTTAGE,
+  STALL,
 };
 
 const legend = { a: 0x112233 };

@@ -10,6 +10,7 @@ export const palette = {
   soilDark: 0x744a30,
   wood: 0xb98a52,
   woodDark: 0x8a6238,
+  woodLight: 0xd4a86a,
   leaf: 0x66b257,
   leafDark: 0x47924a,
   leafLight: 0x8fce5e, // sunlit leaf tips
@@ -70,6 +71,7 @@ export const palette = {
   wallDark: 0x5e486b,
   roof: 0xc4566a,
   roofDark: 0xa03f54,
+  roofLight: 0xd97a8a,
   window: 0xbfe3e0,
   metal: 0xe8d28a,
   steel: 0x9fb0c3,
@@ -92,6 +94,7 @@ export const palette = {
   beak: 0xe8a23a,
   stone: 0x8a8090,
   stoneDark: 0x615868,
+  stoneLight: 0xa8a0b0,
   stoneFloor: 0x6d6478,
   stoneFloorDark: 0x564e63,
   mite: 0x7fa05a,

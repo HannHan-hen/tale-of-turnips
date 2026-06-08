@@ -15,6 +15,19 @@ import { CHICKEN } from './sprites/chicken';
 import { CROP_MOUND, CROP_SPROUT, CROP_LEAFY, TURNIP, CARROT, PUMPKIN } from './sprites/crops';
 import { BUSH_FULL, BUSH_EMPTY } from './sprites/bushes';
 import { RUIN_MITE, SHADE_PUP, CROP_NIBBLER, RUIN_HEART } from './sprites/enemies';
+import {
+  SHIPPING_BOX,
+  DOOR,
+  CHEST,
+  SIGNPOST,
+  ANVIL,
+  RUBBLE,
+  SEALED_DOOR,
+  CACHE_CLOSED,
+  CACHE_OPEN,
+  COTTAGE,
+  STALL,
+} from './sprites/props';
 
 // Draw into a Graphics, bake it into a texture of size w x h, then discard the Graphics.
 function make(
@@ -155,112 +168,31 @@ function buildPlayer(scene: Phaser.Scene): void {
 }
 
 function buildShippingBox(scene: Phaser.Scene): void {
-  const w = 30;
-  const h = 26;
-  make(scene, TextureKey.ShippingBox, w, h, (g) => {
-    rect(g, palette.woodDark, 0, 4, w, h - 4);
-    rect(g, palette.wood, 2, 6, w - 4, h - 8);
-    // plank seams
-    rect(g, palette.woodDark, 2, 14, w - 4, 2);
-    rect(g, palette.woodDark, 14, 6, 2, h - 8);
-    // open lid lip
-    rect(g, palette.woodDark, 0, 0, w, 6);
-    rect(g, palette.outline, 4, 2, w - 8, 3);
-  });
+  paintSprite(scene, TextureKey.ShippingBox, SHIPPING_BOX);
 }
 
 function buildCottage(scene: Phaser.Scene): void {
-  // A cute cottage placed on the farm; its doorway sits at the bottom center.
-  const w = 60;
-  const h = 56;
-  make(scene, TextureKey.Cottage, w, h, (g) => {
-    // walls
-    rect(g, palette.outline, 6, 22, w - 12, h - 24);
-    rect(g, palette.floorWood, 8, 24, w - 16, h - 26);
-    // roof
-    rect(g, palette.roofDark, 2, 12, w - 4, 12);
-    rect(g, palette.roof, 4, 8, w - 8, 8);
-    rect(g, palette.roof, 10, 4, w - 20, 6);
-    // window
-    rect(g, palette.outline, 12, 28, 12, 12);
-    rect(g, palette.window, 14, 30, 8, 8);
-    rect(g, palette.outline, 17, 30, 2, 8);
-    // door
-    rect(g, palette.outline, w / 2 - 7, h - 18, 14, 18);
-    rect(g, palette.woodDark, w / 2 - 5, h - 16, 10, 16);
-    rect(g, palette.metal, w / 2 + 1, h - 9, 2, 2);
-  });
+  paintSprite(scene, TextureKey.Cottage, COTTAGE);
 }
 
 function buildDoor(scene: Phaser.Scene): void {
-  const w = 22;
-  const h = 28;
-  make(scene, TextureKey.Door, w, h, (g) => {
-    rect(g, palette.outline, 0, 0, w, h);
-    rect(g, palette.woodDark, 2, 2, w - 4, h - 2);
-    rect(g, palette.wood, 4, 4, w - 8, h - 6);
-    rect(g, palette.woodDark, w / 2 - 1, 4, 2, h - 6);
-    rect(g, palette.metal, w - 7, h / 2, 2, 3);
-  });
+  paintSprite(scene, TextureKey.Door, DOOR);
 }
 
 function buildChest(scene: Phaser.Scene): void {
-  const w = 28;
-  const h = 22;
-  make(scene, TextureKey.Chest, w, h, (g) => {
-    // body
-    rect(g, palette.outline, 1, 8, w - 2, h - 8);
-    rect(g, palette.wood, 2, 9, w - 4, h - 10);
-    // lid
-    rect(g, palette.outline, 0, 1, w, 8);
-    rect(g, palette.woodDark, 1, 2, w - 2, 6);
-    // metal bands + lock
-    rect(g, palette.metal, w / 2 - 1, 1, 2, h - 1);
-    rect(g, palette.metal, w / 2 - 3, 9, 6, 4);
-  });
+  paintSprite(scene, TextureKey.Chest, CHEST);
 }
 
 function buildSignpost(scene: Phaser.Scene): void {
-  const w = 24;
-  const h = 30;
-  make(scene, TextureKey.Signpost, w, h, (g) => {
-    rect(g, palette.outline, 10, 10, 4, 20); // post
-    rect(g, palette.woodDark, 11, 11, 2, 18);
-    rect(g, palette.outline, 2, 4, 20, 9); // sign board
-    rect(g, palette.wood, 4, 6, 16, 5);
-    rect(g, palette.woodDark, 6, 8, 10, 1);
-  });
+  paintSprite(scene, TextureKey.Signpost, SIGNPOST);
 }
 
 function buildStall(scene: Phaser.Scene): void {
-  // a little market stall with a striped awning
-  const w = 56;
-  const h = 44;
-  make(scene, TextureKey.Stall, w, h, (g) => {
-    rect(g, palette.outline, 4, 24, w - 8, h - 24); // counter
-    rect(g, palette.wood, 6, 26, w - 12, h - 28);
-    rect(g, palette.outline, 2, 22, w - 4, 4); // counter top
-    rect(g, palette.outline, 6, 4, 4, 22); // posts
-    rect(g, palette.outline, w - 10, 4, 4, 22);
-    // striped awning
-    for (let i = 0; i < w - 8; i += 12) {
-      rect(g, palette.cloth, 4 + i, 2, 6, 10);
-      rect(g, palette.uiInk, 10 + i, 2, 6, 10);
-    }
-    rect(g, palette.outline, 2, 0, w - 4, 3);
-  });
+  paintSprite(scene, TextureKey.Stall, STALL);
 }
 
 function buildAnvil(scene: Phaser.Scene): void {
-  const w = 30;
-  const h = 26;
-  make(scene, TextureKey.Anvil, w, h, (g) => {
-    rect(g, palette.stoneDark, 8, 18, 14, 8); // base
-    rect(g, palette.stone, 11, 10, 8, 8); // waist
-    rect(g, palette.outline, 4, 4, w - 8, 7); // top
-    rect(g, palette.steel, 6, 5, w - 12, 4);
-    rect(g, palette.steelDark, 2, 5, 5, 3); // horn
-  });
+  paintSprite(scene, TextureKey.Anvil, ANVIL);
 }
 
 // The villager cast, each a hand-authored pixel grid (sprites/characters).
@@ -292,15 +224,7 @@ function buildStoneFloorTile(scene: Phaser.Scene): void {
 }
 
 function buildRubble(scene: Phaser.Scene): void {
-  const w = 30;
-  const h = 22;
-  make(scene, TextureKey.Rubble, w, h, (g) => {
-    rect(g, palette.stoneDark, 3, 10, 24, 10);
-    rect(g, palette.stone, 5, 8, 9, 9);
-    rect(g, palette.stone, 16, 11, 8, 8);
-    rect(g, palette.stoneFloorDark, 12, 4, 6, 6);
-    rect(g, palette.stone, 13, 5, 4, 4);
-  });
+  paintSprite(scene, TextureKey.Rubble, RUBBLE);
 }
 
 function buildEnemies(scene: Phaser.Scene): void {
@@ -314,17 +238,7 @@ function buildRuinHeart(scene: Phaser.Scene): void {
 }
 
 function buildSealedDoor(scene: Phaser.Scene): void {
-  const w = 26;
-  const h = 32;
-  make(scene, TextureKey.SealedDoor, w, h, (g) => {
-    rect(g, palette.outline, 0, 0, w, h);
-    rect(g, palette.stoneDark, 2, 2, w - 4, h - 2);
-    rect(g, palette.stone, 4, 4, w - 8, h - 6);
-    // starlit seal across the middle
-    rect(g, palette.starlessTrim, 3, h / 2 - 2, w - 6, 4);
-    rect(g, palette.starlight, w / 2 - 2, 6, 4, h - 10);
-    rect(g, palette.starlight, w / 2 - 1, h / 2 - 1, 2, 2);
-  });
+  paintSprite(scene, TextureKey.SealedDoor, SEALED_DOOR);
 }
 
 function buildSlash(scene: Phaser.Scene): void {
@@ -354,25 +268,8 @@ function buildHearts(scene: Phaser.Scene): void {
 }
 
 function buildCaches(scene: Phaser.Scene): void {
-  const w = 28;
-  const h = 24;
-  // Closed: a dark starlit reliquary with a glowing seam.
-  make(scene, TextureKey.CacheClosed, w, h, (g) => {
-    rect(g, palette.outline, 2, 4, w - 4, h - 4);
-    rect(g, palette.starlessDark, 3, 5, w - 6, h - 6);
-    rect(g, palette.starless, 5, 7, w - 10, h - 11);
-    rect(g, palette.starlight, 4, 12, w - 8, 1); // glowing seam
-    rect(g, palette.cacheGold, w / 2 - 1, 6, 2, h - 9); // clasp
-    rect(g, palette.starlessTrim, 8, 9, 2, 2); // little stars
-    rect(g, palette.starlessTrim, 17, 10, 2, 2);
-  });
-  // Open: emptied, lid ajar.
-  make(scene, TextureKey.CacheOpen, w, h, (g) => {
-    rect(g, palette.outline, 2, 8, w - 4, h - 8);
-    rect(g, palette.starlessDark, 3, 9, w - 6, h - 10);
-    rect(g, palette.outline, 0, 2, w, 5); // tilted-open lid
-    rect(g, palette.starless, 2, 3, w - 4, 3);
-  });
+  paintSprite(scene, TextureKey.CacheClosed, CACHE_CLOSED);
+  paintSprite(scene, TextureKey.CacheOpen, CACHE_OPEN);
 }
 
 // The five Starless pieces share a deep-blue palette with starlight accents.
