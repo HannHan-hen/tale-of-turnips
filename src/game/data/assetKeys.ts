@@ -23,6 +23,7 @@ export const TextureKey = {
   BushEmpty: 'bush_empty',
   StoneFloor: 'tile_stone_floor',
   Rubble: 'rubble',
+  Tree: 'tree',
   Slash: 'slash',
   EnemyRuinMite: 'enemy_ruin_mite',
   EnemyShadePup: 'enemy_shade_pup',

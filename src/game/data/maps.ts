@@ -46,7 +46,7 @@ export interface CachePlacement {
 }
 
 // Purely decorative scenery (no interaction).
-export type PropArt = 'stall' | 'anvil' | 'rubble';
+export type PropArt = 'stall' | 'anvil' | 'rubble' | 'tree';
 
 export interface PropPlacement {
   art: PropArt;
@@ -100,36 +100,44 @@ export const MAPS: Record<MapId, MapDef> = {
     floor: 'grass',
     wallThickness: 0,
     spawnTile: { x: 8, y: 6 },
-    plots: plotGrid(3, 4, 4, 3),
+    // 3x3 grid of fields, one grass tile south of the house so the farmhouse and the fields
+    // don't crowd each other.
+    plots: plotGrid(3, 4, 3, 3),
     shippingBox: { x: 13, y: 2 },
     chests: [],
     npcs: [],
     props: [],
-    chickens: [
-      { id: 'hen_1', tile: { x: 2, y: 9 } },
-      { id: 'hen_2', tile: { x: 4, y: 9 } },
-      { id: 'hen_3', tile: { x: 6, y: 9 } },
-    ],
-    bushes: [
-      { id: 'bush_1', tile: { x: 10, y: 4 } },
-      { id: 'bush_2', tile: { x: 12, y: 5 } },
-      { id: 'bush_3', tile: { x: 10, y: 7 } },
-    ],
+    chickens: [{ id: 'hen_1', tile: { x: 6, y: 2 } }],
+    bushes: [],
     enemySpawns: [],
     caches: [],
     exits: [
       {
-        tile: { x: 3, y: 3 },
+        tile: { x: 3, y: 2 },
         toMap: MapId.House,
         toSpawn: { x: 5, y: 7 },
         label: 'Enter house',
         art: 'cottage',
       },
       {
-        tile: { x: 14, y: 9 },
+        tile: { x: 14, y: 6 },
         toMap: MapId.Village,
-        toSpawn: { x: 7, y: 8 },
+        toSpawn: { x: 13, y: 5 },
         label: 'To village',
+        art: 'signpost',
+      },
+      {
+        tile: { x: 8, y: 11 },
+        toMap: MapId.Forest,
+        toSpawn: { x: 7, y: 1 },
+        label: 'To forest',
+        art: 'signpost',
+      },
+      {
+        tile: { x: 1, y: 8 },
+        toMap: MapId.Ruins,
+        toSpawn: { x: 6, y: 10 },
+        label: 'To ruins',
         art: 'signpost',
       },
     ],
@@ -150,7 +158,7 @@ export const MAPS: Record<MapId, MapDef> = {
     enemySpawns: [],
     caches: [],
     exits: [
-      { tile: { x: 5, y: 7 }, toMap: MapId.Farm, toSpawn: { x: 3, y: 3 }, label: 'Leave', art: 'door' },
+      { tile: { x: 5, y: 7 }, toMap: MapId.Farm, toSpawn: { x: 3, y: 2 }, label: 'Leave', art: 'door' },
     ],
   },
   [MapId.Village]: {
@@ -166,7 +174,7 @@ export const MAPS: Record<MapId, MapDef> = {
       { npcId: NpcId.SeedSeller, tile: { x: 4, y: 5 } },
       { npcId: NpcId.Blacksmith, tile: { x: 10, y: 5 } },
       { npcId: NpcId.Hint, tile: { x: 7, y: 3 } },
-      { npcId: NpcId.Jay, tile: { x: 9, y: 8 } }, // by the gate to the farm
+      { npcId: NpcId.Jay, tile: { x: 2, y: 6 } }, // by the gate to the farm
     ],
     props: [
       { art: 'stall', tile: { x: 4, y: 4 } },
@@ -178,17 +186,10 @@ export const MAPS: Record<MapId, MapDef> = {
     caches: [],
     exits: [
       {
-        tile: { x: 7, y: 9 },
+        tile: { x: 1, y: 5 },
         toMap: MapId.Farm,
-        toSpawn: { x: 13, y: 9 },
+        toSpawn: { x: 13, y: 6 },
         label: 'To farm',
-        art: 'signpost',
-      },
-      {
-        tile: { x: 13, y: 1 },
-        toMap: MapId.Ruins,
-        toSpawn: { x: 6, y: 10 },
-        label: 'To ruins',
         art: 'signpost',
       },
     ],
@@ -225,8 +226,8 @@ export const MAPS: Record<MapId, MapDef> = {
     exits: [
       {
         tile: { x: 6, y: 10 },
-        toMap: MapId.Village,
-        toSpawn: { x: 13, y: 1 },
+        toMap: MapId.Farm,
+        toSpawn: { x: 1, y: 8 },
         label: 'Leave ruins',
         art: 'signpost',
       },
@@ -237,6 +238,48 @@ export const MAPS: Record<MapId, MapDef> = {
         label: 'Sealed door',
         art: 'sealed',
         requiresSet: true,
+      },
+    ],
+  },
+  [MapId.Forest]: {
+    mapId: MapId.Forest,
+    widthTiles: 14,
+    heightTiles: 12,
+    floor: 'grass',
+    wallThickness: 0,
+    spawnTile: { x: 7, y: 1 },
+    plots: [],
+    chests: [],
+    npcs: [],
+    props: [
+      { art: 'tree', tile: { x: 1, y: 2 } },
+      { art: 'tree', tile: { x: 3, y: 2 } },
+      { art: 'tree', tile: { x: 11, y: 2 } },
+      { art: 'tree', tile: { x: 12, y: 3 } },
+      { art: 'tree', tile: { x: 1, y: 7 } },
+      { art: 'tree', tile: { x: 2, y: 9 } },
+      { art: 'tree', tile: { x: 12, y: 7 } },
+      { art: 'tree', tile: { x: 11, y: 9 } },
+    ],
+    chickens: [],
+    // Two clusters of three berry bushes, tucked among the trees on opposite sides of the map.
+    bushes: [
+      { id: 'forest_bush_1', tile: { x: 3, y: 4 } },
+      { id: 'forest_bush_2', tile: { x: 4, y: 4 } },
+      { id: 'forest_bush_3', tile: { x: 3, y: 5 } },
+      { id: 'forest_bush_4', tile: { x: 10, y: 6 } },
+      { id: 'forest_bush_5', tile: { x: 11, y: 6 } },
+      { id: 'forest_bush_6', tile: { x: 10, y: 7 } },
+    ],
+    enemySpawns: [],
+    caches: [],
+    exits: [
+      {
+        tile: { x: 7, y: 1 },
+        toMap: MapId.Farm,
+        toSpawn: { x: 8, y: 11 },
+        label: 'To farm',
+        art: 'signpost',
       },
     ],
   },
