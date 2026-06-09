@@ -51,6 +51,7 @@ export function migrate(data: unknown): SaveData | null {
   for (const npc of Object.values(NPCS)) {
     if (npc.romance) state.affection[npc.npcId] ??= createAffection(npc.npcId);
   }
+  state.firstBossDefeated ??= false;
   state.bossDefeated ??= false;
 
   // Ensure every registered map, chest, chicken, and bush exists, so saves from before an

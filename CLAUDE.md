@@ -79,8 +79,10 @@ These files are safe to edit without touching game logic:
 - `src/game/data/shops.ts` — shop titles, goods, prices, optional unlock conditions.
 - `src/game/data/npcs.ts` — NPC names, sprites, shop links, and dialogue/hint lines.
 - `src/game/data/enemies.ts` — enemy stats, speed, sprites, and loot tables.
-- `src/game/data/armor.ts` — legendary set name, pieces, and per-piece effects.
-- `src/game/data/balance.ts` — tick length, starting gold, combat tuning, threat rates.
+- `src/game/data/armor.ts` — legendary set name, pieces, per-piece effects, and the hidden
+  relic finds (`RELIC_DROPS`: which chore turns up which piece, and at what chance).
+- `src/game/data/balance.ts` — tick length, starting gold, combat tuning, threat rates, and
+  the relic gate (`relicGoldThreshold`, `relicDropChance`).
 - (Later) `loot.ts`, dialogue tables.
 
 If you add a new tweakable, put it in `data/` and document it here.

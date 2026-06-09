@@ -264,6 +264,13 @@ thing implemented in code; everything below it lives here until its turn.**
   ease it per kill. The old set-gated sealed door and the standalone boss arena were removed;
   progression is now combat-gated, not set-gated.
 
+- **Hidden Starless relics.** The three pieces not held in dungeon chests surface as rare
+  finds during everyday chores: the helm while foraging a bush, the plate while harvesting a
+  turnip, the blade while petting a chicken (`RelicDropSystem`, mapping/chance in
+  `data/armor.ts`). They only begin dropping once the first ruin boss has fallen
+  (`GameState.firstBossDefeated`) and the player holds at least `relicGoldThreshold` gold, so
+  the full set stays a mid/late-game goal. Completing it re-enables the set-complete reward.
+
 ## 18. Risks & anti-overengineering guardrails
 
 - **Scope creep is the main risk.** Keep MVP minimal; resist building backlog systems early.

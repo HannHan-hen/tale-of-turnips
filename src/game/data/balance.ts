@@ -41,4 +41,10 @@ export const Balance = {
   affectionGiftRepeat: 1, // re-gifting an item type he's already received
   affectionStorySet: 4, // completing the Starless Set
   affectionMax: 30,
+
+  // Hidden Starless relics. The three pieces not guarded by a dungeon boss surface as rare
+  // finds during chores — but only after the first ruin boss falls AND you hold this much
+  // gold, so they never drop in the opening minutes. Source mapping lives in data/armor.ts.
+  relicGoldThreshold: 1000, // gold you must hold before relics can surface
+  relicDropChance: 0.05, // chance per qualifying chore (forage / turnip harvest / chicken pet)
 } as const;

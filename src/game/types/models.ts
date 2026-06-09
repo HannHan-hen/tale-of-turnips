@@ -109,7 +109,8 @@ export interface GameState {
   threat: ThreatState;
   armor: ArmorState;
   affection: Record<string, NpcAffectionState>;
-  bossDefeated: boolean;
+  firstBossDefeated: boolean; // any dungeon boss bested — gates the hidden Starless relics
+  bossDefeated: boolean; // the final boss (the Ruin Heart) — ends the game
   stats: Stats;
 }
 

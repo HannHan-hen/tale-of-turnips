@@ -30,6 +30,7 @@ import {
   threatBand,
 } from '../systems/ThreatSystem';
 import { findNearestTarget } from '../systems/InteractionSystem';
+import { rollRelicDrop, type RelicSource } from '../systems/RelicDropSystem';
 import { InputSystem } from '../systems/InputSystem';
 import { add, has } from '../systems/InventorySystem';
 import { movePlayer, type Bounds } from '../systems/PlayerController';
@@ -38,7 +39,7 @@ import { advanceWorldClock } from '../systems/WorldClockSystem';
 import { usePlot as resolvePlotInteraction } from '../systems/CropInteractionSystem';
 import { openCache as resolveCacheInteraction } from '../systems/CacheInteractionSystem';
 import { buildSolidGrid, isSolidAt, type SolidGrid } from '../systems/CollisionSystem';
-import { ArmorPieceId, EnemyId, InteractionKind, ItemId, MapId, NpcId, SceneKey } from '../types/ids';
+import { ArmorPieceId, CropId, EnemyId, InteractionKind, ItemId, MapId, NpcId, SceneKey } from '../types/ids';
 import type { CropInstance, Facing, InteractionTarget } from '../types/models';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
@@ -567,6 +568,7 @@ export class WorldScene extends Phaser.Scene {
         this.removeCropSprite(result.crop);
         this.toast(`Harvested ${result.cropDef.displayName}.`);
         this.game.events.emit(UiEvent.Hud);
+        if (result.crop.cropId === CropId.Turnip) this.tryRelicFind('turnip', 'turnip patch');
         break;
       case 'no_seeds':
         this.toast(`No ${result.cropDef.displayName} seeds — press 1/2/3 to switch seed.`);
@@ -644,6 +646,7 @@ export class WorldScene extends Phaser.Scene {
       this.store.state.stats.monstersDefeated += 1;
       // A boss eases threat once a day; ordinary monsters ease it on every kill.
       if (def.isBoss) {
+        this.store.state.firstBossDefeated = true; // unlocks the hidden Starless relics
         claimBossThreatReduction(this.store.state.threat, def.enemyId, day);
       } else {
         reduceThreat(this.store.state.threat);
@@ -803,6 +806,7 @@ export class WorldScene extends Phaser.Scene {
       this.toast('Petted chicken!');
     }
     this.game.events.emit(UiEvent.Hud);
+    this.tryRelicFind('chicken', "chicken's nest");
   }
 
   private harvestBushAction(bushId: string): void {
@@ -817,9 +821,27 @@ export class WorldScene extends Phaser.Scene {
       this.refreshBushTextures();
       this.toast('Gathered berries.');
       this.game.events.emit(UiEvent.Hud);
+      this.tryRelicFind('bush', 'berry bush');
     } else {
       this.toast('Inventory full.');
     }
+  }
+
+  // A rare Starless relic may turn up during a chore once the gate is met. Reuses the same
+  // collect-piece path as the boss chests (auto-equip, recompute loadout, heal, set milestone).
+  private tryRelicFind(source: RelicSource, where: string): void {
+    const pieceId = rollRelicDrop(this.store.state, source);
+    if (!pieceId) return;
+    const result = resolveCacheInteraction(this.store.state, pieceId);
+    if (result.kind !== 'collected') return;
+    this.loadout = result.loadout;
+    this.toast(`Tucked in the ${where}: the ${result.piece.displayName}! (${result.piece.blurb})`);
+    if (result.setComplete) {
+      this.time.delayedCall(1200, () =>
+        this.toast(`The ${SET_NAME} is whole. Its power thrums through you…`),
+      );
+    }
+    this.game.events.emit(UiEvent.Hud);
   }
 
   private openCache(cacheId: string, pieceId: ArmorPieceId): void {
