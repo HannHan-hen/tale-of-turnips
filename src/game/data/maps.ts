@@ -4,7 +4,11 @@
 
 import { ArmorPieceId, ChestId, EnemyId, MapId, NpcId } from '../types/ids';
 
-export const TILE = 32; // pixel size of one tile
+// The world tile size now derives from the global SCALE knob (see data/scale.ts). Imported for
+// local use and re-exported so the many existing `import { TILE } from '../data/maps'` call
+// sites keep working.
+import { TILE } from './scale';
+export { TILE };
 
 export type FloorKind = 'grass' | 'wood' | 'stone';
 
