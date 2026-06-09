@@ -22,7 +22,7 @@ import {
 } from './sprites/farmer';
 import { JAY, SEED_SELLER, BLACKSMITH, VILLAGER } from './sprites/characters';
 import { CHICKEN } from './sprites/chicken';
-import { CROP_MOUND, CROP_SPROUT, CROP_LEAFY, TURNIP, CARROT, PUMPKIN } from './sprites/crops';
+import { CROP_MOUND, CROP_SPROUT, CROP_LEAFY, TURNIP, CARROT, RADISH } from './sprites/crops';
 import { BUSH_FULL, BUSH_EMPTY } from './sprites/bushes';
 import { TREE } from './sprites/trees';
 import { RUIN_MITE, SHADE_PUP, CROP_NIBBLER, RUIN_HEART } from './sprites/enemies';
@@ -42,10 +42,10 @@ import {
 import {
   ICON_TURNIP,
   ICON_CARROT,
-  ICON_PUMPKIN,
+  ICON_RADISH,
   ICON_TURNIP_SEED,
   ICON_CARROT_SEED,
-  ICON_PUMPKIN_SEED,
+  ICON_RADISH_SEED,
   ICON_EGG,
   ICON_BERRY,
   ICON_SWORD,
@@ -347,10 +347,10 @@ function buildArmorIcons(scene: Phaser.Scene): void {
 function buildIcons(scene: Phaser.Scene): void {
   paintSprite(scene, TextureKey.IconTurnip, ICON_TURNIP);
   paintSprite(scene, TextureKey.IconCarrot, ICON_CARROT);
-  paintSprite(scene, TextureKey.IconPumpkin, ICON_PUMPKIN);
+  paintSprite(scene, TextureKey.IconRadish, ICON_RADISH);
   paintSprite(scene, TextureKey.IconTurnipSeed, ICON_TURNIP_SEED);
   paintSprite(scene, TextureKey.IconCarrotSeed, ICON_CARROT_SEED);
-  paintSprite(scene, TextureKey.IconPumpkinSeed, ICON_PUMPKIN_SEED);
+  paintSprite(scene, TextureKey.IconRadishSeed, ICON_RADISH_SEED);
   paintSprite(scene, TextureKey.IconEgg, ICON_EGG);
   paintSprite(scene, TextureKey.IconBerry, ICON_BERRY);
   paintSprite(scene, TextureKey.IconSword, ICON_SWORD);
@@ -367,7 +367,7 @@ function buildCropStages(scene: Phaser.Scene): void {
   const ripe: Record<CropId, PixelSprite> = {
     [CropId.Turnip]: TURNIP,
     [CropId.Carrot]: CARROT,
-    [CropId.Pumpkin]: PUMPKIN,
+    [CropId.Radish]: RADISH,
   };
 
   for (const cropId of Object.keys(CROPS) as CropId[]) {

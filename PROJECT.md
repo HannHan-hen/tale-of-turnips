@@ -81,7 +81,7 @@ InteractionTarget{ kind, ref }                   // what the interact key acts o
 **NPC definition:** `id`, `displayName`, `mapId`, `position`, `dialogueByAffectionTier`,
 `dialogueByStoryProgress`, `specialGiftItemIds`, `lovedGiftItemIds`.
 
-**Crop definition:** `cropId`, `seedItem`, `harvestItem`, `growthDuration`, `growthStages`,
+**Crop definition:** `cropId`, `seedItem`, `harvestItem`, `growthDays`, `growthStages`,
 optional `waterRequirement`, sell value (via the harvest item).
 
 **Shop definition:** `shopId`, `npcName`, `items[]`, `prices`, optional `unlockCondition`.
@@ -227,7 +227,7 @@ thing implemented in code; everything below it lives here until its turn.**
 3. **Village + shops — done.** village map, signpost link from the farm, NPCs (seed seller,
    blacksmith, hint villager), and data-driven shop purchasing via a keyboard shop screen.
 4. **Animals & more crops — done.** chickens (pet once/day → egg), bushes (forage + regrow),
-   carrot & pumpkin crops, a number-key seed selector, and a day counter.
+   radish & carrot crops, a number-key seed selector, and a day counter.
 5. **Ruins + combat — done.** ruins map (reached via the village), player hearts with
    i-frames, a one-button swing, two data-driven enemies with chase AI and loot drops, and
    a gentle faint-and-retreat on defeat.

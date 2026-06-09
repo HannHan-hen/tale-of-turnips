@@ -30,7 +30,7 @@ npm run dev      # local dev server (open the printed URL)
 - **Interact** — `E` (plant/harvest, sell at the shipping box, open chests, talk to NPCs,
   open ruin caches, use doors/signposts)
 - **Attack** — `Space` or `J` (a short swing in the way you're facing)
-- **Choose seed to plant** — number keys `1` / `2` / `3` (turnip / carrot / pumpkin)
+- **Choose seed to plant** — number keys `1` / `2` / `3` (turnip / radish / carrot)
 - **Menus** (chest, shop, talk) — arrow keys to move, `Space`/`Enter` to confirm, `Esc` to
   close
 

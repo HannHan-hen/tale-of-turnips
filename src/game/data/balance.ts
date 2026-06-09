@@ -3,11 +3,11 @@
 
 export const Balance = {
   tickMs: 1500, // real milliseconds per growth tick
-  dayLengthTicks: 40, // ticks per in-game day (drives daily resets)
+  dayLengthTicks: 20, // ticks per in-game day (drives daily resets)
   bushRegrowTicks: 16, // ticks for a foraged bush to bear fruit again
   berryYield: 2, // berries gathered per ready bush
   startingGold: 50,
-  startingSeeds: 5,
+  startingSeeds: 12,
   inventoryCapacity: 24, // number of stacks the backpack can hold
   chestCapacity: 30, // number of stacks a chest can hold
   playerSpeed: 130, // pixels per second

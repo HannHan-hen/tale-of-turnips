@@ -528,7 +528,7 @@ export class WorldScene extends Phaser.Scene {
         this.game.events.emit(UiEvent.Hud);
         break;
       case 'no_seeds':
-        this.toast(`No ${result.cropDef.displayName} seeds.`);
+        this.toast(`No ${result.cropDef.displayName} seeds — press 1/2/3 to switch seed.`);
         break;
       case 'growing':
         this.toast('Still growing…');
@@ -673,10 +673,23 @@ export class WorldScene extends Phaser.Scene {
 
   private onNewDay(): void {
     this.game.events.emit(UiEvent.Hud);
+    this.playDayTransition();
     // If a fresh day pushes the farm over the edge while you're home, raiders arrive.
     if (this.def.mapId === MapId.Farm && isFarmUnderThreat(this.store.state.threat) && !this.hasRaiders()) {
       this.startFarmRaid();
     }
+  }
+
+  // A brief dusk wink so the day rolling over reads on screen, not just on the HUD. Purely
+  // cosmetic and non-blocking; the simulation keeps running underneath. Tweak the durations
+  // and dusk tint freely.
+  private playDayTransition(): void {
+    const cam = this.cameras.main;
+    if (cam.fadeEffect.isRunning) return; // don't stack winks if days roll over quickly
+    cam.fadeOut(220, 22, 26, 52); // fade to a soft night navy
+    cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+      cam.fadeIn(520, 22, 26, 52); // and back to dawn
+    });
   }
 
   private hasRaiders(): boolean {

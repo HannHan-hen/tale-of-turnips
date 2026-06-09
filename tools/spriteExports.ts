@@ -22,7 +22,7 @@ import {
   CROP_LEAFY,
   TURNIP,
   CARROT,
-  PUMPKIN,
+  RADISH,
 } from '../src/game/assets/sprites/crops';
 import { BUSH_FULL, BUSH_EMPTY } from '../src/game/assets/sprites/bushes';
 import { RUIN_MITE, SHADE_PUP, CROP_NIBBLER, RUIN_HEART } from '../src/game/assets/sprites/enemies';
@@ -42,10 +42,10 @@ import {
 import {
   ICON_TURNIP,
   ICON_CARROT,
-  ICON_PUMPKIN,
+  ICON_RADISH,
   ICON_TURNIP_SEED,
   ICON_CARROT_SEED,
-  ICON_PUMPKIN_SEED,
+  ICON_RADISH_SEED,
   ICON_EGG,
   ICON_BERRY,
   ICON_SWORD,
@@ -82,7 +82,7 @@ export const SPRITES = {
   cropLeafy: CROP_LEAFY,
   turnip: TURNIP,
   carrot: CARROT,
-  pumpkin: PUMPKIN,
+  radish: RADISH,
   bushFull: BUSH_FULL,
   bushEmpty: BUSH_EMPTY,
   ruinMite: RUIN_MITE,
@@ -102,10 +102,10 @@ export const SPRITES = {
   stall: STALL,
   iconTurnip: ICON_TURNIP,
   iconCarrot: ICON_CARROT,
-  iconPumpkin: ICON_PUMPKIN,
+  iconRadish: ICON_RADISH,
   iconTurnipSeed: ICON_TURNIP_SEED,
   iconCarrotSeed: ICON_CARROT_SEED,
-  iconPumpkinSeed: ICON_PUMPKIN_SEED,
+  iconRadishSeed: ICON_RADISH_SEED,
   iconEgg: ICON_EGG,
   iconBerry: ICON_BERRY,
   iconSword: ICON_SWORD,

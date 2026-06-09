@@ -1,20 +1,29 @@
 // Farming logic. Deterministic crop growth based on the tick counter. No Phaser here —
 // scenes read these results to choose which crop texture to show.
 
-import { CROPS } from '../data/crops';
+import { Balance } from '../data/balance';
+import { CROPS, type CropDef } from '../data/crops';
 import type { CropId, MapId } from '../types/ids';
 import type { CropInstance, MapState } from '../types/models';
 
-// Current visual stage (0-based) of a crop at the given tick.
+// Total ticks from planting to maturity, derived from the crop's day count and the day length.
+export function ticksToMature(def: CropDef): number {
+  return def.growthDays * Balance.dayLengthTicks;
+}
+
+// Current visual stage (0-based) of a crop at the given tick. The growth span is divided
+// evenly into (growthStages - 1) steps; integer math keeps the maturity boundary exact.
 export function growthStage(crop: CropInstance, currentTick: number): number {
   const def = CROPS[crop.cropId];
   const elapsed = Math.max(0, currentTick - crop.plantedTick);
-  const stage = Math.floor(elapsed / def.ticksPerStage);
+  const steps = def.growthStages - 1;
+  const stage = Math.floor((elapsed * steps) / ticksToMature(def));
   return Math.min(stage, def.growthStages - 1);
 }
 
 export function isMature(crop: CropInstance, currentTick: number): boolean {
-  return growthStage(crop, currentTick) >= CROPS[crop.cropId].growthStages - 1;
+  const def = CROPS[crop.cropId];
+  return Math.max(0, currentTick - crop.plantedTick) >= ticksToMature(def);
 }
 
 export function cropAt(map: MapState, tileX: number, tileY: number): CropInstance | undefined {
