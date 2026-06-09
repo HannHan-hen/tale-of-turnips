@@ -4,6 +4,7 @@
 import Phaser from 'phaser';
 import { TextureKey } from '../data/assetKeys';
 import { palette, toCss } from '../data/palette';
+import { px, fs } from '../data/scale';
 import { ARMOR_ORDER, ARMOR_PIECES, SET_NAME } from '../data/armor';
 import { CROP_ORDER, CROPS } from '../data/crops';
 import { ITEMS } from '../data/items';
@@ -14,7 +15,7 @@ import { SceneKey } from '../types/ids';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
 
-const SLOT_W = 58;
+const SLOT_W = 58; // base px; scaled by px() at use
 
 export class UIScene extends Phaser.Scene {
   private store!: GameStateStore;
@@ -39,74 +40,76 @@ export class UIScene extends Phaser.Scene {
     const w = this.scale.width;
     const h = this.scale.height;
 
-    this.add.rectangle(0, 0, w, 28, palette.uiPanel, 0.85).setOrigin(0, 0);
+    this.add.rectangle(0, 0, w, px(28), palette.uiPanel, 0.85).setOrigin(0, 0);
 
-    const label = { fontFamily: 'monospace', fontSize: '13px' };
-    this.dayText = this.add.text(10, 7, '', { ...label, color: toCss(palette.uiInk) });
-    this.goldText = this.add.text(70, 7, '', { ...label, color: toCss(palette.gold) });
+    const label = { fontFamily: 'monospace', fontSize: fs(13) };
+    this.dayText = this.add.text(px(10), px(7), '', { ...label, color: toCss(palette.uiInk) });
+    this.goldText = this.add.text(px(70), px(7), '', { ...label, color: toCss(palette.gold) });
 
     // hearts
     this.heartImages = [];
     for (let i = 0; i < this.store.player.maxHp; i++) {
-      this.heartImages.push(this.add.image(140 + i * 16, 14, TextureKey.HeartFull));
+      this.heartImages.push(this.add.image(px(140) + i * px(16), px(14), TextureKey.HeartFull));
     }
 
     // threat readout (only shows when pressure is building)
-    this.threatText = this.add.text(232, 7, '', { ...label, color: toCss(palette.heartRed) });
+    this.threatText = this.add.text(px(232), px(7), '', { ...label, color: toCss(palette.heartRed) });
 
     // Seed selector on the right: one slot per crop (icon + count), selected one highlighted.
-    const startX = w - CROP_ORDER.length * SLOT_W - 6;
-    this.selectHighlight = this.add.rectangle(0, 14, SLOT_W - 4, 24, palette.uiHighlight, 1).setOrigin(0.5);
+    const startX = w - CROP_ORDER.length * px(SLOT_W) - px(6);
+    this.selectHighlight = this.add
+      .rectangle(0, px(14), px(SLOT_W) - px(4), px(24), palette.uiHighlight, 1)
+      .setOrigin(0.5);
     this.seedCountTexts = [];
     this.slotXs = [];
     CROP_ORDER.forEach((cropId, i) => {
-      const x = startX + i * SLOT_W;
+      const x = startX + i * px(SLOT_W);
       this.slotXs.push(x);
-      this.add.image(x, 14, ITEMS[CROPS[cropId].seedItem].iconKey).setScale(0.27);
-      const t = this.add.text(x + 12, 7, '', { ...label, color: toCss(palette.uiInk) });
+      this.add.image(x, px(14), ITEMS[CROPS[cropId].seedItem].iconKey).setScale(0.4);
+      const t = this.add.text(x + px(12), px(7), '', { ...label, color: toCss(palette.uiInk) });
       this.seedCountTexts.push(t);
     });
 
     // Starless Set tracker, bottom-left (dim until each piece is found).
-    this.add.text(10, h - 32, SET_NAME, {
+    this.add.text(px(10), h - px(32), SET_NAME, {
       fontFamily: 'monospace',
-      fontSize: '10px',
+      fontSize: fs(10),
       color: toCss(palette.starlessTrim),
     });
     this.setIcons = ARMOR_ORDER.map((pieceId, i) =>
-      this.add.image(18 + i * 18, h - 14, ARMOR_PIECES[pieceId].iconKey).setScale(0.25),
+      this.add.image(px(18) + i * px(18), h - px(14), ARMOR_PIECES[pieceId].iconKey).setScale(0.375),
     );
 
     // Hidden until there's a prompt: an empty Text with a backgroundColor still paints its
     // padding, which would leave a stray box sitting at the bottom of the screen.
     this.promptText = this.add
-      .text(w / 2, h - 16, '', {
+      .text(w / 2, h - px(16), '', {
         fontFamily: 'monospace',
-        fontSize: '13px',
+        fontSize: fs(13),
         color: toCss(palette.uiInk),
         backgroundColor: 'rgba(58,48,71,0.85)',
-        padding: { x: 6, y: 3 },
+        padding: { x: px(6), y: px(3) },
       })
       .setOrigin(0.5)
       .setVisible(false);
 
     // Quiet reminder that the menu (continue / restart) is one key away.
     this.add
-      .text(w - 8, h - 6, '[Esc] Menu', {
+      .text(w - px(8), h - px(6), '[Esc] Menu', {
         fontFamily: 'monospace',
-        fontSize: '10px',
+        fontSize: fs(10),
         color: toCss(palette.uiInk),
       })
       .setOrigin(1, 1)
       .setAlpha(0.55);
 
     this.toastText = this.add
-      .text(w / 2, h - 44, '', {
+      .text(w / 2, h - px(44), '', {
         fontFamily: 'monospace',
-        fontSize: '14px',
+        fontSize: fs(14),
         color: toCss(palette.uiInk),
         align: 'center',
-        wordWrap: { width: w - 40 },
+        wordWrap: { width: w - px(40) },
       })
       .setOrigin(0.5)
       .setAlpha(0);

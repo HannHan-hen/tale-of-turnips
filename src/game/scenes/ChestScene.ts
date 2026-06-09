@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import { ITEMS } from '../data/items';
 import { palette, toCss } from '../data/palette';
+import { px, fs } from '../data/scale';
 import { GameStateStore } from '../state/GameStateStore';
 import { spaceFor, transfer } from '../systems/InventorySystem';
 import { saveGame } from '../save/SaveSystem';
@@ -15,12 +16,12 @@ import { STORE_KEY } from './BootScene';
 
 type ColumnKey = 'backpack' | 'chest';
 
-const ROWS_TOP = 132;
-const LINE_H = 24;
-const COL_WIDTH = 170;
+const ROWS_TOP = px(132);
+const LINE_H = px(24);
+const COL_WIDTH = px(170);
 const COLUMNS: Record<ColumnKey, { icon: number; text: number; left: number; header: number }> = {
-  backpack: { icon: 96, text: 116, left: 80, header: 80 },
-  chest: { icon: 300, text: 320, left: 284, header: 284 },
+  backpack: { icon: px(96), text: px(116), left: px(80), header: px(80) },
+  chest: { icon: px(300), text: px(320), left: px(284), header: px(284) },
 };
 
 export class ChestScene extends Phaser.Scene {
@@ -65,24 +66,26 @@ export class ChestScene extends Phaser.Scene {
 
     // dim backdrop + panel
     this.add.rectangle(0, 0, w, h, palette.skyNight, 0.55).setOrigin(0, 0);
-    this.add.rectangle(w / 2, h / 2, 408, 268, palette.uiPanel, 0.98).setStrokeStyle(2, palette.outline);
+    this.add
+      .rectangle(w / 2, h / 2, px(408), px(268), palette.uiPanel, 0.98)
+      .setStrokeStyle(px(2), palette.outline);
 
-    const title = { fontFamily: 'monospace', fontSize: '16px', color: toCss(palette.uiInk) };
-    this.add.text(w / 2, 84, 'Storage', title).setOrigin(0.5);
+    const title = { fontFamily: 'monospace', fontSize: fs(16), color: toCss(palette.uiInk) };
+    this.add.text(w / 2, px(84), 'Storage', title).setOrigin(0.5);
 
-    const header = { fontFamily: 'monospace', fontSize: '13px', color: toCss(palette.gold) };
-    this.add.text(COLUMNS.backpack.header, 108, 'Backpack', header).setOrigin(0, 0.5);
-    this.add.text(COLUMNS.chest.header, 108, 'Chest', header).setOrigin(0, 0.5);
+    const header = { fontFamily: 'monospace', fontSize: fs(13), color: toCss(palette.gold) };
+    this.add.text(COLUMNS.backpack.header, px(108), 'Backpack', header).setOrigin(0, 0.5);
+    this.add.text(COLUMNS.chest.header, px(108), 'Chest', header).setOrigin(0, 0.5);
 
     this.add
-      .text(w / 2, h - 40, '↑↓ select   ←→ switch   [Space] move   [Esc] close', {
+      .text(w / 2, h - px(40), '↑↓ select   ←→ switch   [Space] move   [Esc] close', {
         fontFamily: 'monospace',
-        fontSize: '11px',
+        fontSize: fs(11),
         color: toCss(palette.uiInk),
       })
       .setOrigin(0.5);
 
-    this.cursor = this.add.rectangle(0, 0, COL_WIDTH, 22, palette.uiHighlight, 1).setOrigin(0, 0.5);
+    this.cursor = this.add.rectangle(0, 0, COL_WIDTH, px(22), palette.uiHighlight, 1).setOrigin(0, 0.5);
 
     const kb = this.input.keyboard!;
     this.keys = {
@@ -124,7 +127,7 @@ export class ChestScene extends Phaser.Scene {
 
   private renderColumn(colKey: ColumnKey, inv: Inventory): number {
     const col = COLUMNS[colKey];
-    const rowStyle = { fontFamily: 'monospace', fontSize: '12px', color: toCss(palette.uiInk) };
+    const rowStyle = { fontFamily: 'monospace', fontSize: fs(12), color: toCss(palette.uiInk) };
     if (inv.slots.length === 0) {
       const empty = this.add
         .text(col.text, ROWS_TOP, '(empty)', { ...rowStyle, color: toCss(palette.wall) })
@@ -134,7 +137,7 @@ export class ChestScene extends Phaser.Scene {
     }
     inv.slots.forEach((stack, i) => {
       const y = ROWS_TOP + i * LINE_H;
-      const icon = this.add.image(col.icon, y, ITEMS[stack.itemId].iconKey).setScale(0.27);
+      const icon = this.add.image(col.icon, y, ITEMS[stack.itemId].iconKey).setScale(0.42);
       const label = this.add
         .text(col.text, y, `${ITEMS[stack.itemId].displayName} x${stack.count}`, rowStyle)
         .setOrigin(0, 0.5);

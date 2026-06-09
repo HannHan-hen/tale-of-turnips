@@ -11,6 +11,7 @@ import { ENEMIES } from '../data/enemies';
 import { CROP_ORDER, CROPS } from '../data/crops';
 import { ITEMS } from '../data/items';
 import { MAPS, TILE, tileCenter, type ExitDef, type MapDef } from '../data/maps';
+import { px } from '../data/scale';
 import { NPCS } from '../data/npcs';
 import { CombatController } from '../combat/CombatController';
 import { GameStateStore } from '../state/GameStateStore';
@@ -368,10 +369,10 @@ export class WorldScene extends Phaser.Scene {
     const mapW = def.widthTiles * TILE;
     const mapH = def.heightTiles * TILE;
     if (def.wallThickness > 0) {
-      const m = def.wallThickness * TILE + 6;
+      const m = def.wallThickness * TILE + px(6);
       return { minX: m, minY: m, maxX: mapW - m, maxY: mapH - m };
     }
-    return { minX: 12, minY: 16, maxX: mapW - 12, maxY: mapH - 6 };
+    return { minX: px(12), minY: px(16), maxX: mapW - px(12), maxY: mapH - px(6) };
   }
 
   // --- interaction ---

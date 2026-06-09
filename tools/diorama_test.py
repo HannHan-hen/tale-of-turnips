@@ -17,9 +17,9 @@ import sys
 from PIL import Image, ImageDraw
 from process_player_test import frames, place
 
-TILE = 48
+TILE = 96
 COLS, ROWS = 11, 8
-SCALE = 2
+SCALE = 1
 OUT = os.path.join(os.path.dirname(__file__), "out")
 PROPS = os.path.join(os.path.dirname(__file__), "..", "src", "assets", "props")
 
@@ -51,7 +51,7 @@ def prop(name):
 
 
 def main():
-    placed = place(frames(sys.argv[1]), 24, 32)   # real 24x32 player frames
+    placed = place(frames(sys.argv[1]), 72, 96)   # real 24x32 player frames
     cycle = [placed[0], placed[1], placed[2], placed[1]]
 
     # static props: (image, anchor x, baseline y) — origin bottom-center like the engine

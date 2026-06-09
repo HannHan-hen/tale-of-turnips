@@ -89,6 +89,9 @@ tests/                    # Vitest pure-logic tests
 
 These files are safe to edit without touching game logic:
 
+- `src/game/data/scale.ts` — the global render resolution. `SCALE` multiplies tile size, every
+  procedural texture, world distances, and UI so the whole game scales as one. Changing it
+  also means re-exporting the raster assets at the matching footprints (`tools/process_*.py`).
 - `src/game/data/items.ts` — item names, sell prices, stack behaviour.
 - `src/game/data/crops.ts` — crop seed/harvest items, growth duration & stages, seed order.
 - `src/game/data/maps.ts` — map layouts, spawn points, plots, chests, shipping box, chicken,
