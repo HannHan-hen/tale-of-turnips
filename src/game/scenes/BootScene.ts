@@ -4,13 +4,21 @@
 
 import Phaser from 'phaser';
 import { buildTextures, buildPlayerAnimations } from '../assets/TextureFactory';
+import { TextureKey } from '../data/assetKeys';
 import { SceneKey } from '../types/ids';
+// Generated raster assets (see src/assets/SOURCES.md). Imported so Vite fingerprints the URL
+// and respects the configured base path; loaded under an assetKey like every other texture.
+import titleBackdropUrl from '../../assets/title_backdrop.jpg';
 
 export const STORE_KEY = 'store';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
     super(SceneKey.Boot);
+  }
+
+  preload(): void {
+    this.load.image(TextureKey.TitleBackdrop, titleBackdropUrl);
   }
 
   create(): void {
