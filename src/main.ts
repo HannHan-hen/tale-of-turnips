@@ -5,6 +5,7 @@ import { palette, toCss } from './game/data/palette';
 import { MAPS, TILE } from './game/data/maps';
 import { MapId } from './game/types/ids';
 import { BootScene } from './game/scenes/BootScene';
+import { TitleScene } from './game/scenes/TitleScene';
 import { WorldScene } from './game/scenes/WorldScene';
 import { ChestScene } from './game/scenes/ChestScene';
 import { ShopScene } from './game/scenes/ShopScene';
@@ -27,5 +28,5 @@ new Phaser.Game({
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   // UI is listed last so the HUD/toast render on top of the modal overlays.
-  scene: [BootScene, WorldScene, ChestScene, ShopScene, TalkScene, EndScene, UIScene],
+  scene: [BootScene, TitleScene, WorldScene, ChestScene, ShopScene, TalkScene, EndScene, UIScene],
 });

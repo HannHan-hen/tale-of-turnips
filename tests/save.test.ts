@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createNewGameState } from '../src/game/state/newGameState';
-import { clearSave, loadGame, migrate, saveGame, SAVE_KEY, SAVE_VERSION } from '../src/game/save/SaveSystem';
+import { clearSave, hasSave, loadGame, migrate, saveGame, SAVE_KEY, SAVE_VERSION } from '../src/game/save/SaveSystem';
 
 // Minimal in-memory localStorage so the save system can be exercised in Node.
 function memoryStorage(): Storage {
@@ -48,6 +48,18 @@ describe('SaveSystem', () => {
 
     expect(localStorage.getItem(SAVE_KEY)).toBeNull();
     expect(localStorage.getItem('story-of-turnips/save')).toBeNull();
+  });
+
+  it('reports whether a resumable save exists (current or legacy key)', () => {
+    expect(hasSave()).toBe(false);
+    saveGame(createNewGameState());
+    expect(hasSave()).toBe(true);
+
+    clearSave();
+    expect(hasSave()).toBe(false);
+
+    localStorage.setItem('story-of-turnips/save', 'legacy');
+    expect(hasSave()).toBe(true);
   });
 
   it('returns a fresh game when no save exists', () => {
