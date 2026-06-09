@@ -139,3 +139,18 @@ systems, not Phaser rendering.
 - Do exactly the requested step; leave the rest in the backlog.
 - Keep it small, polished, and stable over feature-complete-but-broken.
 - Run `npm run typecheck` and `npm run test` before considering a step done.
+
+### Ephemeral remote environment (read this)
+
+This repo is often worked on in Claude Code's web/remote containers, which are **ephemeral and
+can be reclaimed or reset without warning** — notably if the person steps away from the session
+for a while (this has happened more than once). The container is then re-cloned fresh from the
+remote, so **anything not pushed is lost**. Rules of thumb:
+
+- Commit and push after every meaningful step; treat unpushed work as disposable.
+- If files seem to have vanished or reverted, the container was probably reset — `git fetch`
+  and check `origin/<branch>`; recent work is usually safe there and recoverable by
+  fast-forwarding, not gone.
+- Generated assets the designer uploads are also transient — re-commit them promptly, and keep
+  the generation prompt in `src/assets/SOURCES.md` so they can be reproduced if the upload is
+  gone.
