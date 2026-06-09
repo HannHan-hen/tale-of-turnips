@@ -32,16 +32,17 @@ export const CROPS: Record<CropId, CropDef> = {
     harvestYield: 2,
     displayName: 'Carrot',
   },
-  [CropId.Pumpkin]: {
-    cropId: CropId.Pumpkin,
-    seedItem: ItemId.PumpkinSeed,
-    harvestItem: ItemId.Pumpkin,
+  [CropId.Radish]: {
+    cropId: CropId.Radish,
+    seedItem: ItemId.RadishSeed,
+    harvestItem: ItemId.Radish,
     growthStages: 4,
-    ticksPerStage: 6,
-    harvestYield: 1,
-    displayName: 'Pumpkin',
+    ticksPerStage: 2,
+    harvestYield: 2,
+    displayName: 'Radish',
   },
 };
 
 // Display/selection order for the seed selector. New crops appear here.
-export const CROP_ORDER: CropId[] = [CropId.Turnip, CropId.Carrot, CropId.Pumpkin];
+// Basic starter (turnip) first, then the shop seeds (radish, carrot).
+export const CROP_ORDER: CropId[] = [CropId.Turnip, CropId.Radish, CropId.Carrot];

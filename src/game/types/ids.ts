@@ -6,8 +6,8 @@ export const ItemId = {
   Turnip: 'turnip',
   CarrotSeed: 'carrot_seed',
   Carrot: 'carrot',
-  PumpkinSeed: 'pumpkin_seed',
-  Pumpkin: 'pumpkin',
+  RadishSeed: 'radish_seed',
+  Radish: 'radish',
   Egg: 'egg',
   Berry: 'berry',
   WornSword: 'worn_sword',
@@ -20,7 +20,7 @@ export type ItemId = (typeof ItemId)[keyof typeof ItemId];
 export const CropId = {
   Turnip: 'turnip',
   Carrot: 'carrot',
-  Pumpkin: 'pumpkin',
+  Radish: 'radish',
 } as const;
 export type CropId = (typeof CropId)[keyof typeof CropId];
 

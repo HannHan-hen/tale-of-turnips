@@ -47,18 +47,20 @@ export const ICON_CARROT = build(
   },
 );
 
-export const ICON_PUMPKIN = build(
+export const ICON_RADISH = build(
   20,
   20,
-  { k: palette.pumpkin, K: palette.pumpkinDark, R: palette.pumpkinRib, l: palette.leafDark },
+  { k: palette.radish, K: palette.radishDark, t: palette.radishTip, l: palette.leaf, L: palette.leafDark },
   (r) => {
-    r('l', 9, 3, 2, 4); // stem
-    r('k', 4, 7, 12, 9); // body
-    r('k', 5, 6, 10, 11);
-    r('R', 9, 6, 2, 11); // center rib
-    r('K', 6, 7, 1, 9); // side ribs
-    r('K', 13, 7, 1, 9);
-    r('K', 5, 14, 10, 2); // bottom shadow
+    r('l', 6, 2, 2, 4); // greens
+    r('l', 12, 2, 2, 4);
+    r('L', 9, 1, 2, 5);
+    r('k', 5, 7, 10, 7); // round root
+    r('k', 6, 6, 8, 1);
+    r('k', 7, 14, 6, 1);
+    r('K', 12, 8, 1, 6); // shadow
+    r('t', 8, 15, 4, 3); // pale tip
+    r('t', 9, 18, 2, 1);
   },
 );
 
@@ -80,7 +82,7 @@ function makeSeed(tint: number): PixelSprite {
 }
 export const ICON_TURNIP_SEED = makeSeed(palette.bulbTop);
 export const ICON_CARROT_SEED = makeSeed(palette.carrot);
-export const ICON_PUMPKIN_SEED = makeSeed(palette.pumpkin);
+export const ICON_RADISH_SEED = makeSeed(palette.radish);
 
 // --- forage ---
 export const ICON_EGG = build(20, 20, { e: palette.egg, E: palette.chickenShade, w: palette.uiInk }, (r) => {

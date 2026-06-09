@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { Balance } from '../src/game/data/balance';
 import { ITEMS } from '../src/game/data/items';
 import { NPCS } from '../src/game/data/npcs';
 import { SHOPS, availableItems } from '../src/game/data/shops';
@@ -14,8 +15,8 @@ describe('EconomySystem.buy', () => {
     expect(buy(state.player, ItemId.TurnipSeed, 8)).toBe('ok');
     expect(state.player.gold).toBe(92);
     expect(count(state.player.inventory, ItemId.TurnipSeed)).toBe(
-      // 5 starting seeds + 1 bought
-      6,
+      // starting seeds + 1 bought
+      Balance.startingSeeds + 1,
     );
   });
 

@@ -528,7 +528,7 @@ export class WorldScene extends Phaser.Scene {
         this.game.events.emit(UiEvent.Hud);
         break;
       case 'no_seeds':
-        this.toast(`No ${result.cropDef.displayName} seeds.`);
+        this.toast(`No ${result.cropDef.displayName} seeds — press 1/2/3 to switch seed.`);
         break;
       case 'growing':
         this.toast('Still growing…');

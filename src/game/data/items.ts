@@ -39,18 +39,18 @@ export const ITEMS: Record<ItemId, ItemDef> = {
     maxStack: 99,
     iconKey: TextureKey.IconCarrot,
   },
-  [ItemId.PumpkinSeed]: {
-    itemId: ItemId.PumpkinSeed,
-    displayName: 'Pumpkin Seed',
+  [ItemId.RadishSeed]: {
+    itemId: ItemId.RadishSeed,
+    displayName: 'Radish Seed',
     maxStack: 99,
-    iconKey: TextureKey.IconPumpkinSeed,
+    iconKey: TextureKey.IconRadishSeed,
   },
-  [ItemId.Pumpkin]: {
-    itemId: ItemId.Pumpkin,
-    displayName: 'Pumpkin',
-    sellPrice: 44,
+  [ItemId.Radish]: {
+    itemId: ItemId.Radish,
+    displayName: 'Radish',
+    sellPrice: 9,
     maxStack: 99,
-    iconKey: TextureKey.IconPumpkin,
+    iconKey: TextureKey.IconRadish,
   },
   [ItemId.Egg]: {
     itemId: ItemId.Egg,
