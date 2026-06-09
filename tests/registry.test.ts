@@ -29,7 +29,7 @@ describe('data registries are internally consistent', () => {
       expect(ITEMS[crop.seedItem]).toBeDefined();
       expect(ITEMS[crop.harvestItem]).toBeDefined();
       expect(crop.growthStages).toBeGreaterThanOrEqual(2);
-      expect(crop.ticksPerStage).toBeGreaterThan(0);
+      expect(crop.growthDays).toBeGreaterThan(0);
       expect(crop.harvestYield).toBeGreaterThan(0);
     }
   });

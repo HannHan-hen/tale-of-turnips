@@ -81,7 +81,7 @@ InteractionTarget{ kind, ref }                   // what the interact key acts o
 **NPC definition:** `id`, `displayName`, `mapId`, `position`, `dialogueByAffectionTier`,
 `dialogueByStoryProgress`, `specialGiftItemIds`, `lovedGiftItemIds`.
 
-**Crop definition:** `cropId`, `seedItem`, `harvestItem`, `growthDuration`, `growthStages`,
+**Crop definition:** `cropId`, `seedItem`, `harvestItem`, `growthDays`, `growthStages`,
 optional `waterRequirement`, sell value (via the harvest item).
 
 **Shop definition:** `shopId`, `npcName`, `items[]`, `prices`, optional `unlockCondition`.

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { usePlot } from '../src/game/systems/CropInteractionSystem';
 import { createNewGameState } from '../src/game/state/newGameState';
 import { count } from '../src/game/systems/InventorySystem';
+import { ticksToMature } from '../src/game/systems/FarmingSystem';
 import { CROPS } from '../src/game/data/crops';
 import { MAPS } from '../src/game/data/maps';
 import { CropId, ItemId, MapId } from '../src/game/types/ids';
@@ -43,7 +44,7 @@ describe('CropInteractionSystem.usePlot', () => {
     const state = createNewGameState();
     usePlot(state, farm, 0, 0, 0);
     const def = CROPS[CropId.Turnip];
-    const matureTick = def.growthStages * def.ticksPerStage; // safely past maturity
+    const matureTick = ticksToMature(def); // exactly mature
 
     const result = usePlot(state, farm, 0, matureTick, 1);
 
@@ -59,7 +60,7 @@ describe('CropInteractionSystem.usePlot', () => {
     state.player.inventory = { slots: [], capacity: 0 }; // no room for anything
     const def = CROPS[CropId.Turnip];
 
-    const result = usePlot(state, farm, 0, def.growthStages * def.ticksPerStage, 0);
+    const result = usePlot(state, farm, 0, ticksToMature(def), 0);
 
     expect(result.kind).toBe('inventory_full');
     expect(state.maps[MapId.Farm].crops).toHaveLength(1);
