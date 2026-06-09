@@ -39,9 +39,22 @@ should feel like a finished tiny Flash-era toy, not a tech demo.
 5. **Centralize the cross-cutting concerns:** input, save/load, the asset manifest, and map
    transitions each have exactly one home. Do not scatter `localStorage` or asset paths.
 6. **One storage model.** Backpack and chests reuse the same inventory logic.
-7. **Procedural art only.** All textures are drawn in code at boot via
-   `src/game/assets/TextureFactory.ts` using the fixed palette. No ugly placeholders; keep
-   the set small, coherent, and replaceable through `assetKeys`.
+7. **Code-generated art only — never hand-supplied assets.** The designer cannot provide
+   art, so every texture must be produced by code we own and check in, drawing from the fixed
+   palette. No externally-sourced or licensed image files dropped into the repo. Two routes
+   are allowed, and both stay behind `assetKeys` so gameplay never references a pixel:
+   - **Procedural at boot (default):** drawn in code at boot via
+     `src/game/assets/TextureFactory.ts`. This is the baseline for every slice.
+   - **Code-baked raster (optional polish):** a checked-in generator script under `tools/`
+     renders PNGs (software rasterizer, supersampled for smooth shading) into `src/assets/`,
+     which `TextureFactory` loads under the same keys. The generator — not just its output —
+     lives in the repo, so the art is fully reproducible with `npm`/`python3` and no external
+     service. See `tools/bake_sprites_poc.py` for the reference pattern.
+
+   If a real image-generation tool is ever wired into the agent harness, its output is
+   allowed too — but only when committed alongside a documented, re-runnable generation
+   step, and still surfaced through `assetKeys`. Keep the set small, coherent, and swappable.
+   No ugly placeholders.
 8. **Always compiles, always runnable.** No broken imports, no dead half-wired systems, no
    duplicate concepts under different names. Build in **vertical slices** — each slice stays
    playable and visually pleasant.
@@ -62,7 +75,7 @@ src/
     state/                # GameStateStore — owns plain-data game state
     data/                 # Registries: palette, assetKeys, items, crops, maps, balance, ...
     ui/                   # HUD / toast helpers used by UIScene
-    assets/               # TextureFactory (procedural art)
+    assets/               # TextureFactory (procedural + loader for code-baked PNGs)
     save/                 # SaveSystem — the only localStorage I/O
     types/                # ids.ts (typed IDs), models.ts (state interfaces)
 tests/                    # Vitest pure-logic tests

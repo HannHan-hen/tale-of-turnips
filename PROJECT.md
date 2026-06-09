@@ -24,8 +24,10 @@ strongly recommended to win. On victory, show an ending/result screen.
 Cute, cozy, toy-like, readable, whimsical, slightly strange, old-Flash-inspired, small but
 polished. It should feel like a finished tiny toy, not a technical demo.
 
-- **Art is procedural** (drawn in code at boot). Keep the set small so everything looks
-  consistent and finished. Prefer fewer polished objects over many rough ones.
+- **Art is code-generated** — procedural at boot by default, or baked to PNGs by a checked-in
+  generator script (see CLAUDE.md rule 7). Never hand-supplied/licensed asset files. Keep the
+  set small so everything looks consistent and finished. Prefer fewer polished objects over
+  many rough ones.
 - **Limited, harmonious palette** (~12 colors, defined in `src/game/data/palette.ts`).
 - Clear silhouettes. Avoid noisy detail. Avoid style inconsistency.
 - All textures referenced through `assetKeys` so art is replaceable without touching logic.
