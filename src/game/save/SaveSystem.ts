@@ -42,14 +42,16 @@ export function migrate(data: unknown): SaveData | null {
   state.player.selectedCropId ??= CropId.Turnip;
   state.player.maxHp ??= Balance.playerMaxHp;
   state.player.hp ??= state.player.maxHp;
-  state.threat ??= { ruinThreat: 0 };
+  state.threat ??= { ruinThreat: 0, bossThreatDays: {} };
   state.threat.ruinThreat ??= 0;
+  state.threat.bossThreatDays ??= {};
   state.armor ??= { collectedPieces: [] };
   state.armor.collectedPieces ??= [];
   state.affection ??= {};
   for (const npc of Object.values(NPCS)) {
     if (npc.romance) state.affection[npc.npcId] ??= createAffection(npc.npcId);
   }
+  state.firstBossDefeated ??= false;
   state.bossDefeated ??= false;
 
   // Ensure every registered map, chest, chicken, and bush exists, so saves from before an

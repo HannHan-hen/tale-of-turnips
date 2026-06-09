@@ -10,7 +10,7 @@ import { Balance } from '../data/balance';
 import { ENEMIES } from '../data/enemies';
 import { CROP_ORDER, CROPS } from '../data/crops';
 import { ITEMS } from '../data/items';
-import { MAPS, TILE, tileCenter, type MapDef } from '../data/maps';
+import { MAPS, TILE, tileCenter, type ExitDef, type MapDef } from '../data/maps';
 import { NPCS } from '../data/npcs';
 import { CombatController } from '../combat/CombatController';
 import { GameStateStore } from '../state/GameStateStore';
@@ -22,8 +22,15 @@ import { grantMilestone } from '../systems/AffectionSystem';
 import { computeLoadout, hasPiece, recalcMaxHp, type Loadout } from '../systems/EquipmentSystem';
 import { harvestBush, isBushReady } from '../systems/ForagingSystem';
 import { sellAll } from '../systems/EconomySystem';
-import { isFarmUnderThreat, raidSize, reduceThreat, threatBand } from '../systems/ThreatSystem';
+import {
+  claimBossThreatReduction,
+  isFarmUnderThreat,
+  raidSize,
+  reduceThreat,
+  threatBand,
+} from '../systems/ThreatSystem';
 import { findNearestTarget } from '../systems/InteractionSystem';
+import { rollRelicDrop, type RelicSource } from '../systems/RelicDropSystem';
 import { InputSystem } from '../systems/InputSystem';
 import { add, has } from '../systems/InventorySystem';
 import { movePlayer, type Bounds } from '../systems/PlayerController';
@@ -32,7 +39,7 @@ import { advanceWorldClock } from '../systems/WorldClockSystem';
 import { usePlot as resolvePlotInteraction } from '../systems/CropInteractionSystem';
 import { openCache as resolveCacheInteraction } from '../systems/CacheInteractionSystem';
 import { buildSolidGrid, isSolidAt, type SolidGrid } from '../systems/CollisionSystem';
-import { ArmorPieceId, EnemyId, InteractionKind, ItemId, MapId, NpcId, SceneKey } from '../types/ids';
+import { ArmorPieceId, CropId, EnemyId, InteractionKind, ItemId, MapId, NpcId, SceneKey } from '../types/ids';
 import type { CropInstance, Facing, InteractionTarget } from '../types/models';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
@@ -76,6 +83,8 @@ export class WorldScene extends Phaser.Scene {
   private loadout!: Loadout;
   private combat?: CombatController;
   private isRaid = false;
+  private roomCleared = false; // every enemy in this dungeon room is down (this visit)
+  private exitSprites!: Map<number, Phaser.GameObjects.Image>;
   private bounds!: Bounds;
   private solids!: SolidGrid;
   private targets: InteractionTarget[] = [];
@@ -97,6 +106,7 @@ export class WorldScene extends Phaser.Scene {
     this.cropSprites = new Map();
     this.bushSprites = new Map();
     this.cacheSprites = new Map();
+    this.exitSprites = new Map();
     recalcMaxHp(this.store.player, this.store.state.armor);
     this.loadout = computeLoadout(this.store.state.armor, this.store.player.inventory);
     this.combat = undefined;
@@ -110,6 +120,15 @@ export class WorldScene extends Phaser.Scene {
     this.bounds = this.computeBounds();
     this.solids = buildSolidGrid(this.def);
 
+    // The dungeon is re-runnable: every room repopulates each visit so threat can be worked
+    // down again and the final boss re-reached. Only the final boss stays dead once defeated
+    // (it ends the game). A room with no enemies counts as already cleared, so its forward
+    // door and any boss chest are open from the start.
+    const spawns = this.def.enemySpawns.filter(
+      (s) => !(ENEMIES[s.enemyId].endsGame && this.store.state.bossDefeated),
+    );
+    this.roomCleared = spawns.length === 0;
+
     this.drawGround();
     this.drawObjects();
     this.drawEntities();
@@ -117,10 +136,6 @@ export class WorldScene extends Phaser.Scene {
 
     for (const crop of this.store.currentMap().crops) this.addCropSprite(crop);
 
-    // Ruins-style combat: enemies chase the player. A defeated boss never respawns.
-    const spawns = this.def.enemySpawns.filter(
-      (s) => !(ENEMIES[s.enemyId].isBoss && this.store.state.bossDefeated),
-    );
     if (spawns.length > 0) {
       this.combat = new CombatController(this, this.bounds);
       this.combat.spawn(spawns);
@@ -253,16 +268,14 @@ export class WorldScene extends Phaser.Scene {
       const c = tileCenter(chest.tile);
       this.add.image(c.x, c.y, TextureKey.Chest).setOrigin(0.5, 0.7).setDepth(c.y);
     }
-    for (const exit of def.exits) {
+    def.exits.forEach((exit, i) => {
       const c = tileCenter(exit.tile);
-      // A set-gated door shows sealed until the legendary set is whole.
-      const key =
-        exit.requiresSet && !this.loadout.opensBoss ? TextureKey.SealedDoor : EXIT_TEXTURE[exit.art];
-      this.add
-        .image(c.x, c.y, key)
+      const spr = this.add
+        .image(c.x, c.y, this.exitTextureKey(exit))
         .setOrigin(0.5, 0.9)
         .setDepth(c.y - 2);
-    }
+      this.exitSprites.set(i, spr);
+    });
     for (const prop of def.props) {
       const c = tileCenter(prop.tile);
       this.add
@@ -281,8 +294,23 @@ export class WorldScene extends Phaser.Scene {
         .image(c.x, c.y, opened ? TextureKey.CacheOpen : TextureKey.CacheClosed)
         .setOrigin(0.5, 0.8)
         .setDepth(c.y);
+      // A boss chest reads dim until its guardian falls and it unlocks.
+      if (cache.requiresClear && !this.roomCleared && !opened) spr.setAlpha(0.5);
       this.cacheSprites.set(cache.id, spr);
     }
+  }
+
+  // The texture for an exit, accounting for the two ways a door can be sealed.
+  private exitTextureKey(exit: ExitDef): string {
+    if (exit.requiresSet && !this.loadout.opensBoss) return TextureKey.SealedDoor;
+    if (exit.requiresClear && !this.roomCleared) return TextureKey.SealedDoor;
+    return EXIT_TEXTURE[exit.art];
+  }
+
+  // A boss chest stays locked until its room is cleared (the boss is defeated).
+  private cacheLocked(cacheId: string): boolean {
+    const cache = this.def.caches.find((c) => c.id === cacheId);
+    return !!cache?.requiresClear && !this.roomCleared;
   }
 
   // Chickens (with a gentle idle bob) and bushes (texture by readiness).
@@ -409,6 +437,7 @@ export class WorldScene extends Phaser.Scene {
       case InteractionKind.Door: {
         const exit = this.def.exits[target.exitIndex];
         if (exit.requiresSet && !this.loadout.opensBoss) return `Sealed — needs the ${SET_NAME}`;
+        if (exit.requiresClear && !this.roomCleared) return 'Sealed — clear the room first';
         return `${exit.label}  [E]`;
       }
       case InteractionKind.Npc: {
@@ -422,7 +451,9 @@ export class WorldScene extends Phaser.Scene {
           ? 'Gather berries  [E]'
           : 'Bush is bare';
       case InteractionKind.Cache:
-        return hasPiece(this.store.state.armor, target.pieceId) ? 'Empty cache' : `Open cache  [E]`;
+        if (hasPiece(this.store.state.armor, target.pieceId)) return 'Empty chest';
+        if (this.cacheLocked(target.cacheId)) return 'A guardian seals this chest';
+        return 'Open chest  [E]';
       case InteractionKind.Plot: {
         const crop = this.cropAtPlot(target.plotIndex);
         if (!crop) {
@@ -499,6 +530,10 @@ export class WorldScene extends Phaser.Scene {
       this.toast(`A sealed door. The ${SET_NAME} might open it…`);
       return;
     }
+    if (exit.requiresClear && !this.roomCleared) {
+      this.toast('The way ahead is sealed until every monster falls.');
+      return;
+    }
     transitionTo(this.store.state, exit.toMap, exit.toSpawn);
     saveGame(this.store.state);
     this.scene.restart();
@@ -533,6 +568,7 @@ export class WorldScene extends Phaser.Scene {
         this.removeCropSprite(result.crop);
         this.toast(`Harvested ${result.cropDef.displayName}.`);
         this.game.events.emit(UiEvent.Hud);
+        if (result.crop.cropId === CropId.Turnip) this.tryRelicFind('turnip', 'turnip patch');
         break;
       case 'no_seeds':
         this.toast(`No ${result.cropDef.displayName} seeds — press 1/2/3 to switch seed.`);
@@ -603,31 +639,59 @@ export class WorldScene extends Phaser.Scene {
 
     const damage = Balance.attackDamage + this.loadout.bonusDamage;
     const defeated = this.combat!.attackAt(ax, ay, Balance.attackRange, damage);
-    if (defeated.some((d) => d.isBoss)) {
-      this.onVictory();
-      return;
-    }
+    if (defeated.length === 0) return;
+
+    const day = this.store.state.time.day;
     for (const def of defeated) {
       this.store.state.stats.monstersDefeated += 1;
-      reduceThreat(this.store.state.threat); // clearing monsters eases the pressure
-      for (const drop of rollLoot(def)) {
+      // A boss eases threat once a day; ordinary monsters ease it on every kill.
+      if (def.isBoss) {
+        this.store.state.firstBossDefeated = true; // unlocks the hidden Starless relics
+        claimBossThreatReduction(this.store.state.threat, def.enemyId, day);
+      } else {
+        reduceThreat(this.store.state.threat);
+      }
+      const drops = rollLoot(def);
+      for (const drop of drops) {
         if (add(this.store.player.inventory, drop.itemId, drop.count)) {
           this.toast(`Defeated ${def.displayName}! +${drop.count} ${ITEMS[drop.itemId].displayName}`);
         } else {
           this.toast(`Defeated ${def.displayName}!`);
         }
       }
-      if (def.loot.length === 0) this.toast(`Defeated ${def.displayName}!`);
+      if (drops.length === 0) this.toast(`Defeated ${def.displayName}!`);
     }
-    if (defeated.length > 0) {
-      this.game.events.emit(UiEvent.Hud);
-      saveGame(this.store.state);
+    this.game.events.emit(UiEvent.Hud);
+    saveGame(this.store.state);
+
+    // The final boss ends the game; otherwise downing the last foe opens the way forward.
+    if (defeated.some((d) => d.endsGame)) {
+      this.onVictory();
+      return;
     }
+    if (!this.roomCleared && this.combat!.remaining() === 0) this.onRoomCleared();
+  }
+
+  // Clearing a dungeon room unseals its forward door and any boss-reward chest.
+  private onRoomCleared(): void {
+    this.roomCleared = true;
+    this.def.exits.forEach((exit, i) => {
+      if (exit.requiresClear) this.exitSprites.get(i)?.setTexture(this.exitTextureKey(exit));
+    });
+    for (const cache of this.def.caches) {
+      if (cache.requiresClear) this.cacheSprites.get(cache.id)?.setAlpha(1);
+    }
+    this.lastPrompt = null; // re-evaluate the nearby prompt now that things are usable
+    const hasChest = this.def.caches.some((c) => c.requiresClear);
+    this.toast(
+      hasChest
+        ? 'The guardian falls — its chest unlocks and the way opens.'
+        : 'The room falls quiet — the way ahead opens.',
+    );
   }
 
   private onVictory(): void {
     this.store.state.bossDefeated = true;
-    this.store.state.stats.monstersDefeated += 1;
     const jay = this.store.state.affection[NpcId.Jay];
     if (jay) grantMilestone(jay, 'boss', Balance.affectionStorySet * 2);
     saveGame(this.store.state);
@@ -742,6 +806,7 @@ export class WorldScene extends Phaser.Scene {
       this.toast('Petted chicken!');
     }
     this.game.events.emit(UiEvent.Hud);
+    this.tryRelicFind('chicken', "chicken's nest");
   }
 
   private harvestBushAction(bushId: string): void {
@@ -756,24 +821,47 @@ export class WorldScene extends Phaser.Scene {
       this.refreshBushTextures();
       this.toast('Gathered berries.');
       this.game.events.emit(UiEvent.Hud);
+      this.tryRelicFind('bush', 'berry bush');
     } else {
       this.toast('Inventory full.');
     }
   }
 
+  // A rare Starless relic may turn up during a chore once the gate is met. Reuses the same
+  // collect-piece path as the boss chests (auto-equip, recompute loadout, heal, set milestone).
+  private tryRelicFind(source: RelicSource, where: string): void {
+    const pieceId = rollRelicDrop(this.store.state, source);
+    if (!pieceId) return;
+    const result = resolveCacheInteraction(this.store.state, pieceId);
+    if (result.kind !== 'collected') return;
+    this.loadout = result.loadout;
+    this.toast(`Tucked in the ${where}: the ${result.piece.displayName}! (${result.piece.blurb})`);
+    if (result.setComplete) {
+      this.time.delayedCall(1200, () =>
+        this.toast(`The ${SET_NAME} is whole. Its power thrums through you…`),
+      );
+    }
+    this.game.events.emit(UiEvent.Hud);
+  }
+
   private openCache(cacheId: string, pieceId: ArmorPieceId): void {
+    // An already-looted chest is simply empty, even if its room's boss has respawned.
+    if (!hasPiece(this.store.state.armor, pieceId) && this.cacheLocked(cacheId)) {
+      this.toast('A guardian seals this chest. Defeat it first.');
+      return;
+    }
     const result = resolveCacheInteraction(this.store.state, pieceId);
     if (result.kind === 'empty') {
-      this.toast('The cache is empty.');
+      this.toast('The chest is empty.');
       return;
     }
     this.loadout = result.loadout;
-    this.cacheSprites.get(cacheId)?.setTexture(TextureKey.CacheOpen);
+    this.cacheSprites.get(cacheId)?.setTexture(TextureKey.CacheOpen).setAlpha(1);
 
     this.toast(`Found the ${result.piece.displayName}! (${result.piece.blurb})`);
     if (result.setComplete) {
       this.time.delayedCall(1200, () =>
-        this.toast(`The ${SET_NAME} is whole. The ruins' heart can now be reached…`),
+        this.toast(`The ${SET_NAME} is whole. Its power thrums through you…`),
       );
     }
     this.game.events.emit(UiEvent.Hud);

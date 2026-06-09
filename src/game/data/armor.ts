@@ -77,6 +77,26 @@ export const BASIC_GEAR: Partial<Record<ItemId, ArmorEffect>> = {
   [ItemId.PaddedVest]: { bonusHearts: 1 },
 };
 
+// Two pieces (the Gauntlets and Greaves) come from dungeon boss chests. The remaining three
+// are hidden relics that surface as rare finds during everyday chores — gated by the first
+// boss + a gold threshold (see RelicDropSystem). The chore → piece mapping and per-piece
+// chance are designer-tweakable here.
+export type RelicSource = 'bush' | 'turnip' | 'chicken';
+
+export interface RelicDrop {
+  pieceId: ArmorPieceId;
+  source: RelicSource; // the everyday action that can turn it up
+  chance: number; // 0..1 per qualifying action
+}
+
+export const RELIC_DROPS: RelicDrop[] = [
+  // A chicken can only be petted once a day, so it gets the best odds. Bushes and turnips come
+  // up far more often, so their odds stay slim.
+  { pieceId: ArmorPieceId.Helm, source: 'bush', chance: 0.01 },
+  { pieceId: ArmorPieceId.Plate, source: 'turnip', chance: 0.01 },
+  { pieceId: ArmorPieceId.Blade, source: 'chicken', chance: 0.05 },
+];
+
 // Display order (helmet, armor, gloves, boots, weapon).
 export const ARMOR_ORDER: ArmorPieceId[] = [
   ArmorPieceId.Helm,

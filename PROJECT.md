@@ -105,8 +105,12 @@ must not contaminate farming code.
 - **Village:** small utility hub (not a life sim) — seed seller, blacksmith, cute village
   boy NPC, optional hint NPC. *No* schedules, relationship webs, festivals, town management,
   reputation, complex quests, or large dialogue trees.
-- **Ruins:** combat area with monsters, rare drops, legendary equipment pieces, and boss
-  access. Clearing monsters reduces farm threat.
+- **Ruins:** a six-room dungeon (one reused stone-chamber layout). Rooms 1/3/5 hold growing
+  packs of monsters (3 → 6 → 9); each room's forward door stays sealed until it is cleared.
+  Rooms 2 and 4 hold a mini boss guarding a one-time reward chest (an armour piece). Room 6
+  holds the final boss; defeating it ends the game. The dungeon is re-runnable each visit
+  (monsters repopulate) so it stays a threat-management loop. Clearing monsters reduces farm
+  threat; each boss eases it once per day.
 
 Maps are small, data-driven definitions; transitions are centralized; art is replaceable
 without rewriting systems.
@@ -245,6 +249,27 @@ thing implemented in code; everything below it lives here until its turn.**
    monsters, Starless pieces, outcome with Jay) and banks a persistent high score.
 
 **All nine slices are complete — the game is a finished, playable loop end to end.**
+
+### Post-slice reworks
+
+- **Ruins dungeon + progression.** The ruins became a six-room dungeon reusing one room
+  layout (`ruinRoom` in `data/maps.ts`). Rooms 1/3/5 field 3/6/9 monsters; each forward door
+  is locked (`ExitDef.requiresClear`) until every foe is down that visit. Rooms 2/4 hold the
+  Ruin Warden and Ruin Colossus, each guarding a `requiresClear` reward chest (the Starless
+  Gauntlets and Greaves — the two weakest pieces; the rest will be sourced elsewhere later).
+  Room 6 holds the Ruin Heart (`EnemyDef.endsGame`), which ends the game. The dungeon is
+  re-runnable: every room but the final boss repopulates each visit, so threat stays
+  manageable over time. Each boss eases threat once per day per boss
+  (`claimBossThreatReduction`, tracked in `ThreatState.bossThreatDays`); ordinary kills still
+  ease it per kill. The old set-gated sealed door and the standalone boss arena were removed;
+  progression is now combat-gated, not set-gated.
+
+- **Hidden Starless relics.** The three pieces not held in dungeon chests surface as rare
+  finds during everyday chores: the helm while foraging a bush, the plate while harvesting a
+  turnip, the blade while petting a chicken (`RelicDropSystem`, mapping/chance in
+  `data/armor.ts`). They only begin dropping once the first ruin boss has fallen
+  (`GameState.firstBossDefeated`) and the player holds at least `relicGoldThreshold` gold, so
+  the full set stays a mid/late-game goal. Completing it re-enables the set-complete reward.
 
 ## 18. Risks & anti-overengineering guardrails
 

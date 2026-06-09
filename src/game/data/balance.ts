@@ -4,7 +4,7 @@
 export const Balance = {
   tickMs: 1500, // real milliseconds per growth tick
   dayLengthTicks: 20, // ticks per in-game day (drives daily resets)
-  bushRegrowTicks: 16, // ticks for a foraged bush to bear fruit again
+  bushRegrowTicks: 20, // ticks for a foraged bush to bear fruit again (one full day)
   berryYield: 2, // berries gathered per ready bush
   startingGold: 50,
   startingSeeds: 12,
@@ -28,6 +28,7 @@ export const Balance = {
   threatGraceDays: 7, // no threat builds on or before this day
   threatPerDay: 1, // threat gained each day after the grace period
   threatPerKill: 1, // threat removed per monster defeated
+  threatPerBoss: 1, // threat removed when a dungeon boss falls (once per day per boss)
   threatMax: 12, // cap
   farmThreatThreshold: 4, // at/above this, monsters raid the farm
   farmRaidMax: 3, // most raiders that can appear at once
@@ -40,4 +41,10 @@ export const Balance = {
   affectionGiftRepeat: 1, // re-gifting an item type he's already received
   affectionStorySet: 4, // completing the Starless Set
   affectionMax: 30,
+
+  // Hidden Starless relics. The three pieces not guarded by a dungeon boss surface as rare
+  // finds during chores — but only after the first ruin boss falls AND you hold this much
+  // gold, so they never drop in the opening minutes. The per-chore odds and which chore turns
+  // up which piece live in data/armor.ts (RELIC_DROPS).
+  relicGoldThreshold: 1000, // gold you must hold before relics can surface
 } as const;
