@@ -28,6 +28,7 @@ export const Balance = {
   threatGraceDays: 7, // no threat builds on or before this day
   threatPerDay: 1, // threat gained each day after the grace period
   threatPerKill: 1, // threat removed per monster defeated
+  threatPerBoss: 1, // threat removed when a dungeon boss falls (once per day per boss)
   threatMax: 12, // cap
   farmThreatThreshold: 4, // at/above this, monsters raid the farm
   farmRaidMax: 3, // most raiders that can appear at once

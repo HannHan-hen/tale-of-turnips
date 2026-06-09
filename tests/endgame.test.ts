@@ -39,22 +39,51 @@ describe('high score', () => {
   });
 });
 
-describe('boss + sealed door wiring', () => {
-  it('the Ruin Heart is a boss with health', () => {
+describe('dungeon progression wiring', () => {
+  // The six-room dungeon, in order. Each forward step is locked until the room is cleared.
+  const ROOMS = [
+    MapId.Ruins,
+    MapId.Ruins2,
+    MapId.Ruins3,
+    MapId.Ruins4,
+    MapId.Ruins5,
+    MapId.Ruins6,
+  ];
+
+  it('the Ruin Heart is the final boss with health', () => {
     const boss = ENEMIES[EnemyId.RuinHeart];
     expect(boss.isBoss).toBe(true);
+    expect(boss.endsGame).toBe(true);
     expect(boss.maxHp).toBeGreaterThan(0);
   });
 
-  it('the ruins have a set-gated sealed door to the boss arena', () => {
-    const sealed = MAPS[MapId.Ruins].exits.find((e) => e.requiresSet);
-    expect(sealed).toBeDefined();
-    expect(sealed!.toMap).toBe(MapId.BossArena);
+  it('only the final boss ends the game', () => {
+    const enders = Object.values(ENEMIES).filter((e) => e.endsGame);
+    expect(enders.map((e) => e.enemyId)).toEqual([EnemyId.RuinHeart]);
   });
 
-  it('the boss arena spawns the boss', () => {
-    const spawns = MAPS[MapId.BossArena].enemySpawns;
-    expect(spawns.some((s) => ENEMIES[s.enemyId].isBoss)).toBe(true);
+  it('chains the rooms forward, each forward door locked until cleared', () => {
+    for (let i = 0; i < ROOMS.length - 1; i++) {
+      const forward = MAPS[ROOMS[i]].exits.find((e) => e.requiresClear);
+      expect(forward, `room ${ROOMS[i]} forward door`).toBeDefined();
+      expect(forward!.toMap).toBe(ROOMS[i + 1]);
+    }
+  });
+
+  it('gives the final room the game-ending boss and no chest', () => {
+    const final = MAPS[MapId.Ruins6];
+    expect(final.enemySpawns.some((s) => ENEMIES[s.enemyId].endsGame)).toBe(true);
+    expect(final.caches.length).toBe(0);
+    expect(final.exits.some((e) => e.requiresClear)).toBe(false);
+  });
+
+  it('guards each boss-reward chest behind its boss', () => {
+    for (const roomId of [MapId.Ruins2, MapId.Ruins4]) {
+      const room = MAPS[roomId];
+      expect(room.enemySpawns.some((s) => ENEMIES[s.enemyId].isBoss)).toBe(true);
+      expect(room.caches.length).toBe(1);
+      expect(room.caches[0].requiresClear).toBe(true);
+    }
   });
 
   it('a fresh game has not defeated the boss', () => {

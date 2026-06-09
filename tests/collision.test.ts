@@ -68,10 +68,10 @@ describe('movePlayer with collision', () => {
   });
 
   it('keeps tiles within one map distinct (encoding does not collide)', () => {
-    const solids = buildSolidGrid(MAPS[MapId.Ruins]);
-    // Two different cache tiles must both register without aliasing.
-    expect(isSolidAt(solids, 2 * TILE + 1, 2 * TILE + 1)).toBe(true);
+    const solids = buildSolidGrid(MAPS[MapId.Ruins2]);
+    // A boss-chest tile (3,3) and a rubble prop (10,8) must both register without aliasing.
+    expect(isSolidAt(solids, 3 * TILE + 1, 3 * TILE + 1)).toBe(true);
     expect(isSolidAt(solids, 10 * TILE + 1, 8 * TILE + 1)).toBe(true);
-    expect(isSolidAt(solids, 5 * TILE + 1, 5 * TILE + 1)).toBe(false); // open floor
+    expect(isSolidAt(solids, 6 * TILE + 1, 6 * TILE + 1)).toBe(false); // open floor
   });
 });

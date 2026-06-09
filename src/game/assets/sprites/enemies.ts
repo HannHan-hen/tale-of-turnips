@@ -106,6 +106,99 @@ export const CROP_NIBBLER: PixelSprite = {
   ],
 };
 
+// A stout stone guardian, generated so it stays symmetric at any size. A blocky helmeted
+// body with two arms, two legs, glowing eyes, and a pulsing core gem in the chest. Used for
+// the two dungeon mini bosses (the Warden and the larger Colossus).
+function makeGolem(spec: {
+  W: number;
+  H: number;
+  head: [number, number, number, number]; // x0,y0,x1,y1
+  body: [number, number, number, number];
+  arm: [number, number, number]; // inset, y0, y1 — mirrored on both sides
+  leg: [number, number]; // y0, y1 (legs sit under the body, mirrored about center)
+  eyeY: [number, number]; // y0, y1
+  core: [number, number, number, number];
+}): string[] {
+  const { W, H } = spec;
+  const g: string[][] = Array.from({ length: H }, () => Array<string>(W).fill('.'));
+  const fill = (x0: number, y0: number, x1: number, y1: number, ch: string): void => {
+    for (let y = Math.max(0, y0); y <= Math.min(H - 1, y1); y++) {
+      for (let x = Math.max(0, x0); x <= Math.min(W - 1, x1); x++) g[y][x] = ch;
+    }
+  };
+
+  const [hx0, hy0, hx1, hy1] = spec.head;
+  const [bx0, by0, bx1, by1] = spec.body;
+  // Arms hang off the body sides; legs split the body's lower edge into two stumps.
+  fill(0, spec.arm[1], spec.arm[0], spec.arm[2], 's');
+  fill(W - 1 - spec.arm[0], spec.arm[1], W - 1, spec.arm[2], 's');
+  fill(hx0, hy0, hx1, hy1, 's'); // head
+  fill(bx0, by0, bx1, by1, 's'); // body
+  const legW = Math.floor((bx1 - bx0 - 2) / 3);
+  fill(bx0 + 1, spec.leg[0], bx0 + 1 + legW, spec.leg[1], 's');
+  fill(bx1 - 1 - legW, spec.leg[0], bx1 - 1, spec.leg[1], 's');
+
+  // Shading: a lit top-left edge and a darker bottom.
+  fill(hx0, hy0, hx1, hy0, 'H');
+  fill(hx0, hy0, hx0, hy1, 'H');
+  fill(bx0, by1, bx1, by1, 'S');
+  fill(bx0, spec.leg[1], bx1, spec.leg[1], 'S');
+
+  // Glowing eyes, set symmetrically on the head.
+  const eyeIn = Math.round((hx1 - hx0) * 0.28);
+  fill(hx0 + eyeIn, spec.eyeY[0], hx0 + eyeIn + 1, spec.eyeY[1], 'g');
+  fill(hx1 - eyeIn - 1, spec.eyeY[0], hx1 - eyeIn, spec.eyeY[1], 'g');
+
+  // Core gem in the chest.
+  fill(spec.core[0], spec.core[1], spec.core[2], spec.core[3], 'c');
+
+  return g.map((r) => r.join(''));
+}
+
+const GOLEM_LEGEND = {
+  s: palette.stone,
+  S: palette.stoneDark,
+  H: palette.stoneLight,
+  g: palette.glow,
+  c: palette.bossCore,
+};
+
+// Ruin Warden — first dungeon boss. A compact armored golem. 24x24.
+export const RUIN_WARDEN: PixelSprite = {
+  width: 24,
+  height: 24,
+  outline: palette.outline,
+  legend: GOLEM_LEGEND,
+  rows: makeGolem({
+    W: 24,
+    H: 24,
+    head: [7, 2, 16, 8],
+    body: [5, 9, 18, 18],
+    arm: [4, 10, 16],
+    leg: [19, 23],
+    eyeY: [5, 6],
+    core: [10, 12, 13, 15],
+  }),
+};
+
+// Ruin Colossus — second dungeon boss. A bigger, broader, meaner golem. 34x32.
+export const RUIN_COLOSSUS: PixelSprite = {
+  width: 34,
+  height: 32,
+  outline: palette.outline,
+  legend: { ...GOLEM_LEGEND, c: palette.bossGlow },
+  rows: makeGolem({
+    W: 34,
+    H: 32,
+    head: [11, 2, 22, 9],
+    body: [7, 10, 26, 22],
+    arm: [6, 11, 21],
+    leg: [23, 31],
+    eyeY: [6, 7],
+    core: [14, 14, 19, 18],
+  }),
+};
+
 // Ruin Heart — the boss: a looming faceted crystal with a pulsing core and glowing eyes.
 // Generated so the 44x44 gem stays perfectly symmetric.
 function makeRuinHeart(): string[] {

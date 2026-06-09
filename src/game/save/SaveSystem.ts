@@ -42,8 +42,9 @@ export function migrate(data: unknown): SaveData | null {
   state.player.selectedCropId ??= CropId.Turnip;
   state.player.maxHp ??= Balance.playerMaxHp;
   state.player.hp ??= state.player.maxHp;
-  state.threat ??= { ruinThreat: 0 };
+  state.threat ??= { ruinThreat: 0, bossThreatDays: {} };
   state.threat.ruinThreat ??= 0;
+  state.threat.bossThreatDays ??= {};
   state.armor ??= { collectedPieces: [] };
   state.armor.collectedPieces ??= [];
   state.affection ??= {};

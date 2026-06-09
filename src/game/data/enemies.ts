@@ -20,7 +20,8 @@ export interface EnemyDef {
   speed: number; // px/sec when chasing
   textureKey: string;
   loot: LootDrop[];
-  isBoss?: boolean; // defeating it wins the game
+  isBoss?: boolean; // a dungeon boss: clears its room, opens its chest, eases threat once/day
+  endsGame?: boolean; // the final boss — defeating it ends the game
 }
 
 export const ENEMIES: Record<EnemyId, EnemyDef> = {
@@ -56,8 +57,34 @@ export const ENEMIES: Record<EnemyId, EnemyDef> = {
     textureKey: TextureKey.EnemyCropNibbler,
     loot: [],
   },
-  // The ruins' heart. Slow but tanky — beatable once the Starless Set's edge and hearts
-  // are in hand (the sealed door only opens with the full set anyway).
+  // First dungeon boss (room 2). A stout guardian — a real wall after the opening mites,
+  // but fair once you've farmed a little gear. Drops a few shards on the way down.
+  [EnemyId.RuinWarden]: {
+    enemyId: EnemyId.RuinWarden,
+    displayName: 'The Ruin Warden',
+    maxHp: 7,
+    contactDamage: 1,
+    speed: 40,
+    textureKey: TextureKey.EnemyRuinWarden,
+    loot: [{ itemId: ItemId.RuinShard, chance: 1, min: 2, max: 3 }],
+    isBoss: true,
+  },
+  // Second dungeon boss (room 4). Tankier and hits harder; rewards a richer drop.
+  [EnemyId.RuinColossus]: {
+    enemyId: EnemyId.RuinColossus,
+    displayName: 'The Ruin Colossus',
+    maxHp: 12,
+    contactDamage: 2,
+    speed: 38,
+    textureKey: TextureKey.EnemyRuinColossus,
+    loot: [
+      { itemId: ItemId.RuinShard, chance: 1, min: 3, max: 4 },
+      { itemId: ItemId.ShadowWisp, chance: 0.5, min: 1, max: 1 },
+    ],
+    isBoss: true,
+  },
+  // The ruins' heart (room 6): the final boss. Slow but tanky — beatable once you've pushed
+  // through the dungeon and gathered some gear. Defeating it ends the game.
   [EnemyId.RuinHeart]: {
     enemyId: EnemyId.RuinHeart,
     displayName: 'The Ruin Heart',
@@ -67,5 +94,6 @@ export const ENEMIES: Record<EnemyId, EnemyDef> = {
     textureKey: TextureKey.EnemyRuinHeart,
     loot: [],
     isBoss: true,
+    endsGame: true,
   },
 };

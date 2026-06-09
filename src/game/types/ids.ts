@@ -28,9 +28,15 @@ export const MapId = {
   Farm: 'farm',
   House: 'house',
   Village: 'village',
-  Ruins: 'ruins',
   Forest: 'forest',
-  BossArena: 'boss_arena',
+  // The ruins are a six-room dungeon. Ruins is the entrance (room 1); Ruins2..Ruins6 chain
+  // deeper. Rooms 2 and 4 hold a mini boss + reward chest; room 6 holds the final boss.
+  Ruins: 'ruins',
+  Ruins2: 'ruins_2',
+  Ruins3: 'ruins_3',
+  Ruins4: 'ruins_4',
+  Ruins5: 'ruins_5',
+  Ruins6: 'ruins_6',
 } as const;
 export type MapId = (typeof MapId)[keyof typeof MapId];
 
@@ -38,6 +44,9 @@ export const EnemyId = {
   RuinMite: 'ruin_mite',
   ShadePup: 'shade_pup',
   CropNibbler: 'crop_nibbler',
+  // The three dungeon bosses, in order of depth. The Ruin Heart ends the game.
+  RuinWarden: 'ruin_warden',
+  RuinColossus: 'ruin_colossus',
   RuinHeart: 'ruin_heart',
 } as const;
 export type EnemyId = (typeof EnemyId)[keyof typeof EnemyId];

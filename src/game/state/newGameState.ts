@@ -62,7 +62,7 @@ export function createNewGameState(): GameState {
     chickens,
     bushes,
     time: { tick: 0, day: 1 },
-    threat: { ruinThreat: 0 },
+    threat: { ruinThreat: 0, bossThreatDays: {} },
     armor: { collectedPieces: [] },
     affection,
     bossDefeated: false,

@@ -15,6 +15,16 @@ export function reduceThreat(threat: ThreatState, amount: number = Balance.threa
   threat.ruinThreat = Math.max(0, threat.ruinThreat - amount);
 }
 
+// Defeating a dungeon boss eases the threat — but only once per day per boss, so re-running
+// the dungeon the same day can't grind threat to zero. Returns true if the relief applied.
+export function claimBossThreatReduction(threat: ThreatState, enemyId: string, day: number): boolean {
+  const days = (threat.bossThreatDays ??= {});
+  if (days[enemyId] === day) return false;
+  days[enemyId] = day;
+  reduceThreat(threat, Balance.threatPerBoss);
+  return true;
+}
+
 export function isFarmUnderThreat(threat: ThreatState): boolean {
   return threat.ruinThreat >= Balance.farmThreatThreshold;
 }

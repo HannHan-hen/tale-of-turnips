@@ -21,6 +21,7 @@ export interface ExitDef {
   label: string;
   art: 'cottage' | 'door' | 'signpost' | 'sealed'; // how the exit is drawn
   requiresSet?: boolean; // only passable with the full legendary set
+  requiresClear?: boolean; // locked until every enemy in the room is defeated this visit
 }
 
 export interface ChestPlacement {
@@ -43,6 +44,7 @@ export interface CachePlacement {
   id: string;
   pieceId: ArmorPieceId;
   tile: TilePos;
+  requiresClear?: boolean; // a boss-reward chest: locked until the room's boss is defeated
 }
 
 // Purely decorative scenery (no interaction).
@@ -90,6 +92,62 @@ function plotGrid(x0: number, y0: number, cols: number, rows: number): TilePos[]
     }
   }
   return plots;
+}
+
+// The ruins are a six-room dungeon, and every room reuses one stone-chamber layout: a 13x12
+// walled room, entered from the south (the spawn / back door) and leading north through a
+// forward door that stays locked until the room is cleared. Only the contents differ —
+// enemies, an optional boss-reward chest, and where the doors lead. Designers tweak a room by
+// editing one entry below, not the renderer.
+const RUIN_PROPS: PropPlacement[] = [
+  { art: 'rubble', tile: { x: 2, y: 3 } },
+  { art: 'rubble', tile: { x: 10, y: 8 } },
+];
+
+function ruinRoom(spec: {
+  mapId: MapId;
+  enemySpawns: EnemySpawn[];
+  caches?: CachePlacement[];
+  back: { toMap: MapId; toSpawn: TilePos; label: string; art: 'door' | 'signpost' };
+  forward?: MapId; // the next room (forward door, locked until this room is cleared)
+}): MapDef {
+  const exits: ExitDef[] = [
+    {
+      tile: { x: 6, y: 10 },
+      toMap: spec.back.toMap,
+      toSpawn: spec.back.toSpawn,
+      label: spec.back.label,
+      art: spec.back.art,
+    },
+  ];
+  if (spec.forward) {
+    exits.push({
+      tile: { x: 6, y: 1 },
+      toMap: spec.forward,
+      toSpawn: { x: 6, y: 10 },
+      label: 'Deeper into the ruins',
+      art: 'door',
+      requiresClear: true,
+    });
+  }
+  return {
+    mapId: spec.mapId,
+    widthTiles: 13,
+    heightTiles: 12,
+    floor: 'stone',
+    wallThickness: 1,
+    spawnTile: { x: 6, y: 10 },
+    plots: [],
+    shippingBox: undefined,
+    chests: [],
+    npcs: [],
+    props: RUIN_PROPS,
+    chickens: [],
+    bushes: [],
+    enemySpawns: spec.enemySpawns,
+    caches: spec.caches ?? [],
+    exits,
+  };
 }
 
 export const MAPS: Record<MapId, MapDef> = {
@@ -194,53 +252,74 @@ export const MAPS: Record<MapId, MapDef> = {
       },
     ],
   },
-  [MapId.Ruins]: {
+  // Room 1 — the entrance. Three mites bar the forward door.
+  [MapId.Ruins]: ruinRoom({
     mapId: MapId.Ruins,
-    widthTiles: 13,
-    heightTiles: 12,
-    floor: 'stone',
-    wallThickness: 1,
-    spawnTile: { x: 6, y: 10 },
-    plots: [],
-    chests: [],
-    npcs: [],
-    props: [
-      { art: 'rubble', tile: { x: 3, y: 4 } },
-      { art: 'rubble', tile: { x: 9, y: 3 } },
-      { art: 'rubble', tile: { x: 7, y: 6 } },
-    ],
-    chickens: [],
-    bushes: [],
+    back: { toMap: MapId.Farm, toSpawn: { x: 1, y: 8 }, label: 'Leave ruins', art: 'signpost' },
+    forward: MapId.Ruins2,
     enemySpawns: [
       { enemyId: EnemyId.RuinMite, tile: { x: 4, y: 5 } },
-      { enemyId: EnemyId.RuinMite, tile: { x: 8, y: 6 } },
+      { enemyId: EnemyId.RuinMite, tile: { x: 8, y: 5 } },
+      { enemyId: EnemyId.ShadePup, tile: { x: 6, y: 4 } },
+    ],
+  }),
+  // Room 2 — the Ruin Warden guards a reward chest (the Starless Gauntlets).
+  [MapId.Ruins2]: ruinRoom({
+    mapId: MapId.Ruins2,
+    back: { toMap: MapId.Ruins, toSpawn: { x: 6, y: 10 }, label: 'Back', art: 'door' },
+    forward: MapId.Ruins3,
+    enemySpawns: [{ enemyId: EnemyId.RuinWarden, tile: { x: 6, y: 5 } }],
+    caches: [
+      { id: 'cache_warden', pieceId: ArmorPieceId.Gauntlets, tile: { x: 3, y: 3 }, requiresClear: true },
+    ],
+  }),
+  // Room 3 — six foes.
+  [MapId.Ruins3]: ruinRoom({
+    mapId: MapId.Ruins3,
+    back: { toMap: MapId.Ruins2, toSpawn: { x: 6, y: 10 }, label: 'Back', art: 'door' },
+    forward: MapId.Ruins4,
+    enemySpawns: [
+      { enemyId: EnemyId.RuinMite, tile: { x: 3, y: 5 } },
+      { enemyId: EnemyId.RuinMite, tile: { x: 6, y: 5 } },
+      { enemyId: EnemyId.RuinMite, tile: { x: 9, y: 5 } },
+      { enemyId: EnemyId.ShadePup, tile: { x: 4, y: 7 } },
+      { enemyId: EnemyId.ShadePup, tile: { x: 8, y: 7 } },
       { enemyId: EnemyId.ShadePup, tile: { x: 6, y: 3 } },
     ],
+  }),
+  // Room 4 — the Ruin Colossus guards a reward chest (the Starless Greaves).
+  [MapId.Ruins4]: ruinRoom({
+    mapId: MapId.Ruins4,
+    back: { toMap: MapId.Ruins3, toSpawn: { x: 6, y: 10 }, label: 'Back', art: 'door' },
+    forward: MapId.Ruins5,
+    enemySpawns: [{ enemyId: EnemyId.RuinColossus, tile: { x: 6, y: 5 } }],
     caches: [
-      { id: 'cache_helm', pieceId: ArmorPieceId.Helm, tile: { x: 2, y: 2 } },
-      { id: 'cache_plate', pieceId: ArmorPieceId.Plate, tile: { x: 10, y: 2 } },
-      { id: 'cache_gauntlets', pieceId: ArmorPieceId.Gauntlets, tile: { x: 2, y: 8 } },
-      { id: 'cache_greaves', pieceId: ArmorPieceId.Greaves, tile: { x: 10, y: 8 } },
-      { id: 'cache_blade', pieceId: ArmorPieceId.Blade, tile: { x: 6, y: 5 } },
+      { id: 'cache_colossus', pieceId: ArmorPieceId.Greaves, tile: { x: 9, y: 3 }, requiresClear: true },
     ],
-    exits: [
-      {
-        tile: { x: 6, y: 10 },
-        toMap: MapId.Farm,
-        toSpawn: { x: 1, y: 8 },
-        label: 'Leave ruins',
-        art: 'signpost',
-      },
-      {
-        tile: { x: 6, y: 1 },
-        toMap: MapId.BossArena,
-        toSpawn: { x: 5, y: 9 },
-        label: 'Sealed door',
-        art: 'sealed',
-        requiresSet: true,
-      },
+  }),
+  // Room 5 — nine foes, the last gauntlet before the heart.
+  [MapId.Ruins5]: ruinRoom({
+    mapId: MapId.Ruins5,
+    back: { toMap: MapId.Ruins4, toSpawn: { x: 6, y: 10 }, label: 'Back', art: 'door' },
+    forward: MapId.Ruins6,
+    enemySpawns: [
+      { enemyId: EnemyId.RuinMite, tile: { x: 3, y: 5 } },
+      { enemyId: EnemyId.RuinMite, tile: { x: 6, y: 5 } },
+      { enemyId: EnemyId.RuinMite, tile: { x: 9, y: 5 } },
+      { enemyId: EnemyId.ShadePup, tile: { x: 3, y: 7 } },
+      { enemyId: EnemyId.ShadePup, tile: { x: 6, y: 7 } },
+      { enemyId: EnemyId.ShadePup, tile: { x: 9, y: 7 } },
+      { enemyId: EnemyId.ShadePup, tile: { x: 4, y: 4 } },
+      { enemyId: EnemyId.ShadePup, tile: { x: 6, y: 3 } },
+      { enemyId: EnemyId.ShadePup, tile: { x: 8, y: 4 } },
     ],
-  },
+  }),
+  // Room 6 — the final chamber. No chest; defeating the Ruin Heart ends the game.
+  [MapId.Ruins6]: ruinRoom({
+    mapId: MapId.Ruins6,
+    back: { toMap: MapId.Ruins5, toSpawn: { x: 6, y: 10 }, label: 'Retreat', art: 'door' },
+    enemySpawns: [{ enemyId: EnemyId.RuinHeart, tile: { x: 6, y: 5 } }],
+  }),
   [MapId.Forest]: {
     mapId: MapId.Forest,
     widthTiles: 14,
@@ -282,28 +361,6 @@ export const MAPS: Record<MapId, MapDef> = {
         label: 'To farm',
         art: 'signpost',
       },
-    ],
-  },
-  [MapId.BossArena]: {
-    mapId: MapId.BossArena,
-    widthTiles: 11,
-    heightTiles: 11,
-    floor: 'stone',
-    wallThickness: 1,
-    spawnTile: { x: 5, y: 9 },
-    plots: [],
-    chests: [],
-    npcs: [],
-    props: [
-      { art: 'rubble', tile: { x: 2, y: 3 } },
-      { art: 'rubble', tile: { x: 8, y: 3 } },
-    ],
-    chickens: [],
-    bushes: [],
-    enemySpawns: [{ enemyId: EnemyId.RuinHeart, tile: { x: 5, y: 3 } }],
-    caches: [],
-    exits: [
-      { tile: { x: 5, y: 9 }, toMap: MapId.Ruins, toSpawn: { x: 6, y: 1 }, label: 'Retreat', art: 'door' },
     ],
   },
 };

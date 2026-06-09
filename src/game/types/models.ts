@@ -70,6 +70,11 @@ export interface TimeState {
 // defeated; above a threshold, raiders appear on the farm.
 export interface ThreatState {
   ruinThreat: number;
+  // The in-game day each dungeon boss last eased the threat, keyed by enemy id. A boss only
+  // lowers threat once per day, so re-running the dungeon the same day can't grind it down.
+  // Optional so older saves (and the pure threat helpers, which only read ruinThreat) stay
+  // valid; new games and migration always populate it.
+  bossThreatDays?: Record<string, number>;
 }
 
 // Legendary pieces collected (auto-equipped on pickup).

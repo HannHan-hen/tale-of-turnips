@@ -25,7 +25,14 @@ import { CHICKEN } from './sprites/chicken';
 import { CROP_MOUND, CROP_SPROUT, CROP_LEAFY, TURNIP, CARROT, RADISH } from './sprites/crops';
 import { BUSH_FULL, BUSH_EMPTY } from './sprites/bushes';
 import { TREE } from './sprites/trees';
-import { RUIN_MITE, SHADE_PUP, CROP_NIBBLER, RUIN_HEART } from './sprites/enemies';
+import {
+  RUIN_MITE,
+  SHADE_PUP,
+  CROP_NIBBLER,
+  RUIN_WARDEN,
+  RUIN_COLOSSUS,
+  RUIN_HEART,
+} from './sprites/enemies';
 import {
   SHIPPING_BOX,
   DOOR,
@@ -144,7 +151,7 @@ export function buildTextures(scene: Phaser.Scene): void {
   buildRubble(scene);
   buildTree(scene);
   buildEnemies(scene);
-  buildRuinHeart(scene);
+  buildBosses(scene);
   buildSealedDoor(scene);
   buildSlash(scene);
   buildHearts(scene);
@@ -312,7 +319,10 @@ function buildEnemies(scene: Phaser.Scene): void {
   paintSprite(scene, TextureKey.EnemyCropNibbler, CROP_NIBBLER);
 }
 
-function buildRuinHeart(scene: Phaser.Scene): void {
+// The three dungeon bosses.
+function buildBosses(scene: Phaser.Scene): void {
+  paintSprite(scene, TextureKey.EnemyRuinWarden, RUIN_WARDEN);
+  paintSprite(scene, TextureKey.EnemyRuinColossus, RUIN_COLOSSUS);
   paintSprite(scene, TextureKey.EnemyRuinHeart, RUIN_HEART);
 }
 
