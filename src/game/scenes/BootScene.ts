@@ -23,6 +23,13 @@ const portraitUrls = import.meta.glob('../../assets/portraits/*.png', {
   query: '?url',
   import: 'default',
 }) as Record<string, string>;
+// World props (cottage, stall, chest, …), same filename==TextureKey convention. Each PNG is
+// pre-sized to its in-world footprint, so it renders at native size like the procedural prop.
+const propUrls = import.meta.glob('../../assets/props/*.png', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
 
 export const STORE_KEY = 'store';
 
@@ -33,7 +40,7 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     this.load.image(TextureKey.TitleBackdrop, titleBackdropUrl);
-    for (const [path, url] of Object.entries({ ...iconUrls, ...portraitUrls })) {
+    for (const [path, url] of Object.entries({ ...iconUrls, ...portraitUrls, ...propUrls })) {
       const key = path.split('/').pop()!.replace('.png', '');
       this.load.image(key, url);
     }

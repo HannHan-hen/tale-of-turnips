@@ -10,6 +10,7 @@ record every asset's source model and the exact prompt below.
 | `TitleBackdrop` | `title_backdrop.jpg` | ChatGPT (GPT Image) | Title/menu backdrop. Resized to 1280×720, saved as quality-86 progressive JPEG (no alpha needed). |
 | `Icon*` (17 keys) | `icons/<key>.png` | ChatGPT (GPT Image) | Item + armor icons. Generated as two magenta-background grids, then magenta-keyed, trimmed, and centered on 64×64 transparent squares by `tools/process_icons.py`. |
 | `Portrait*` (4 keys) | `portraits/<key>.png` | ChatGPT (GPT Image) | NPC busts (Marigold, Bramble, Pip, Jay) from one 2×2 magenta grid, processed by `tools/process_portraits.py` (tighter key to also remove the drop shadow), centered on 256×256 squares. |
+| props (12 keys) | `props/<key>.png` | ChatGPT (GPT Image) | World props (cottage, stall, shipping_box, chest, door, signpost, anvil, rubble, tree, sealed_door, cache_closed, cache_open) from one 4×3 magenta grid. `tools/process_props.py` keys the magenta, keeps the largest blob (drops neighbor-cell bleed/shadow specks), and resizes each to its exact in-world footprint. |
 
 The icons were generated on a flat magenta (`#FF00FF`) background — the model can't be trusted
 to make real transparency, so we key out a solid color in code instead. Re-run with:
@@ -37,3 +38,9 @@ Head-and-shoulders busts in the cozy cel-shaded style, matching each character's
 (hair/outfit/eyes). Solid flat pure-magenta (#FF00FF) background. The model added a soft drop
 shadow despite the prompt; `tools/process_portraits.py` keys it out with a tighter ramp. Full
 prompt is in the chat history; regenerate and re-run that script.
+
+### `props/` — 4×3 grid (top-down 3/4 view): cottage, market stall, shipping box, chest, door, signpost, anvil, rubble, tree, sealed ruin door, reliquary cache closed, reliquary cache open
+Chunky flat cel-shaded props matching the pixel-art world, drawn straight-on from a slightly
+elevated angle, on flat pure-magenta (#FF00FF). Each is downscaled to its procedural footprint
+(see `props.ts`) so it renders at native size on the 48px grid. Full prompt is in the chat
+history; regenerate and re-run `python3 tools/process_props.py props.png`.
