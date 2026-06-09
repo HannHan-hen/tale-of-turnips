@@ -12,9 +12,15 @@ Run: python3 tools/process_player_test.py /path/to/strip.png
 """
 import os
 import sys
-from PIL import Image
+from PIL import Image, ImageFilter
 from process_icons import key_magenta
 from process_props import keep_largest
+
+
+def sharpen(img):
+    """Unsharp the RGB after a big downscale to recover crispness; keep alpha intact."""
+    rgb = img.convert("RGB").filter(ImageFilter.UnsharpMask(radius=1.2, percent=150, threshold=1))
+    return Image.merge("RGBA", (*rgb.split(), img.split()[3]))
 
 OUT = os.path.join(os.path.dirname(__file__), "out")
 os.makedirs(OUT, exist_ok=True)
@@ -42,7 +48,7 @@ def place(cut, box_w, box_h):
     for fr in cut:
         s = target_h / fr.height
         w, h = max(1, round(fr.width * s)), max(1, round(fr.height * s))
-        r = fr.resize((w, h), Image.LANCZOS)
+        r = sharpen(fr.resize((w, h), Image.LANCZOS))
         canvas = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
         canvas.alpha_composite(r, ((box_w - w) // 2, box_h - FOOT_MARGIN - h))
         out.append(canvas)
