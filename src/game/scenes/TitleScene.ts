@@ -44,7 +44,7 @@ export class TitleScene extends Phaser.Scene {
     this.add.rectangle(0, 0, w, h, palette.skyNight, 0.32).setOrigin(0, 0);
 
     // A friendly turnip mascot crowning the title.
-    this.add.image(w / 2, h * 0.3, TextureKey.IconTurnip).setScale(3);
+    this.add.image(w / 2, h * 0.3, TextureKey.IconTurnip).setScale(0.94);
     this.add
       .text(w / 2, h * 0.3 + 44, 'Tale of Turnips', {
         fontFamily: 'monospace',

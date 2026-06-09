@@ -134,7 +134,7 @@ export class ChestScene extends Phaser.Scene {
     }
     inv.slots.forEach((stack, i) => {
       const y = ROWS_TOP + i * LINE_H;
-      const icon = this.add.image(col.icon, y, ITEMS[stack.itemId].iconKey).setScale(0.85);
+      const icon = this.add.image(col.icon, y, ITEMS[stack.itemId].iconKey).setScale(0.27);
       const label = this.add
         .text(col.text, y, `${ITEMS[stack.itemId].displayName} x${stack.count}`, rowStyle)
         .setOrigin(0, 0.5);

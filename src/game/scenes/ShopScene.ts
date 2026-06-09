@@ -70,7 +70,7 @@ export class ShopScene extends Phaser.Scene {
     const rowStyle = { fontFamily: 'monospace', fontSize: '13px', color: toCss(palette.uiInk) };
     this.items.forEach((item, i) => {
       const y = ROWS_TOP + i * LINE_H;
-      this.add.image(w / 2 - 130, y, ITEMS[item.itemId].iconKey).setScale(0.9);
+      this.add.image(w / 2 - 130, y, ITEMS[item.itemId].iconKey).setScale(0.28);
       this.add.text(w / 2 - 112, y, ITEMS[item.itemId].displayName, rowStyle).setOrigin(0, 0.5);
       this.add
         .text(w / 2 + 130, y, `${item.price}g`, { ...rowStyle, color: toCss(palette.gold) })
