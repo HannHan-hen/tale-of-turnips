@@ -62,7 +62,7 @@ export class UIScene extends Phaser.Scene {
     CROP_ORDER.forEach((cropId, i) => {
       const x = startX + i * SLOT_W;
       this.slotXs.push(x);
-      this.add.image(x, 14, ITEMS[CROPS[cropId].seedItem].iconKey).setScale(0.85);
+      this.add.image(x, 14, ITEMS[CROPS[cropId].seedItem].iconKey).setScale(0.27);
       const t = this.add.text(x + 12, 7, '', { ...label, color: toCss(palette.uiInk) });
       this.seedCountTexts.push(t);
     });
@@ -74,7 +74,7 @@ export class UIScene extends Phaser.Scene {
       color: toCss(palette.starlessTrim),
     });
     this.setIcons = ARMOR_ORDER.map((pieceId, i) =>
-      this.add.image(18 + i * 18, h - 14, ARMOR_PIECES[pieceId].iconKey).setScale(0.8),
+      this.add.image(18 + i * 18, h - 14, ARMOR_PIECES[pieceId].iconKey).setScale(0.25),
     );
 
     // Hidden until there's a prompt: an empty Text with a backgroundColor still paints its

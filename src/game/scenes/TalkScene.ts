@@ -59,7 +59,8 @@ export class TalkScene extends Phaser.Scene {
     this.add.rectangle(w / 2, h / 2, 420, 280, palette.uiPanel, 0.98).setStrokeStyle(2, palette.outline);
 
     const npc = NPCS[this.npcId as keyof typeof NPCS];
-    this.add.image(w / 2 - 168, h / 2 - 40, npc.textureKey).setScale(3);
+    // Generated portrait bust in the left column (falls back to the walking sprite).
+    this.add.image(w / 2 - 152, h / 2, npc.portraitKey ?? npc.textureKey).setScale(0.4);
     this.add
       .text(w / 2 - 140, h / 2 - 110, npc.displayName, {
         fontFamily: 'monospace',

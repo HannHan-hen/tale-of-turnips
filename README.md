@@ -5,8 +5,9 @@ berries, brave the ruins for a dramatic legendary armor set, keep your farm safe
 ruin monsters, charm a shy village boy named Jay — and finally still the Ruin Heart. Your
 final gold total is the high score.
 
-Built with **Vite + TypeScript + Phaser 3**. All art is drawn procedurally in code; saves
-use `localStorage`. No backend, no accounts.
+Built with **Vite + TypeScript + Phaser 3**. All art is generated in code — procedurally at
+boot, or baked to PNGs by a checked-in generator (no hand-supplied assets); saves use
+`localStorage`. No backend, no accounts.
 
 ## Play
 

@@ -53,6 +53,12 @@ export const TextureKey = {
   IconArmor: 'icon_armor',
   IconRuinShard: 'icon_ruin_shard',
   IconShadowWisp: 'icon_shadow_wisp',
+  // Generated raster art loaded from src/assets/ (see src/assets/SOURCES.md), not procedural.
+  TitleBackdrop: 'title_backdrop',
+  PortraitMarigold: 'portrait_marigold',
+  PortraitBramble: 'portrait_bramble',
+  PortraitPip: 'portrait_pip',
+  PortraitJay: 'portrait_jay',
 } as const;
 export type TextureKey = (typeof TextureKey)[keyof typeof TextureKey];
 

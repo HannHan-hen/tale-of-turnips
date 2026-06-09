@@ -37,10 +37,14 @@ export class TitleScene extends Phaser.Scene {
     const w = this.scale.width;
     const h = this.scale.height;
 
-    this.add.rectangle(0, 0, w, h, palette.skyNight, 1).setOrigin(0, 0);
+    // Generated farm backdrop, scaled to cover the canvas, with a soft scrim so the mascot
+    // and gold title text stay readable over the bright sky.
+    const bg = this.add.image(w / 2, h / 2, TextureKey.TitleBackdrop).setOrigin(0.5);
+    bg.setScale(Math.max(w / bg.width, h / bg.height));
+    this.add.rectangle(0, 0, w, h, palette.skyNight, 0.32).setOrigin(0, 0);
 
     // A friendly turnip mascot crowning the title.
-    this.add.image(w / 2, h * 0.3, TextureKey.IconTurnip).setScale(3);
+    this.add.image(w / 2, h * 0.3, TextureKey.IconTurnip).setScale(0.94);
     this.add
       .text(w / 2, h * 0.3 + 44, 'Tale of Turnips', {
         fontFamily: 'monospace',
