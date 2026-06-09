@@ -4,6 +4,7 @@
 import Phaser from 'phaser';
 import { ITEMS } from '../data/items';
 import { palette, toCss } from '../data/palette';
+import { NPCS } from '../data/npcs';
 import { availableItems, SHOPS, type ShopItem } from '../data/shops';
 import { GameStateStore } from '../state/GameStateStore';
 import { buy } from '../systems/EconomySystem';
@@ -20,6 +21,7 @@ export class ShopScene extends Phaser.Scene {
   private store!: GameStateStore;
   private items: ShopItem[] = [];
   private shopTitle = 'Shop';
+  private keeperPortrait?: string;
   private index = 0;
   private cursor!: Phaser.GameObjects.Rectangle;
   private goldText!: Phaser.GameObjects.Text;
@@ -44,6 +46,7 @@ export class ShopScene extends Phaser.Scene {
     const shop = SHOPS[data.shopId];
     this.shopTitle = shop.title;
     this.items = availableItems(shop, this.store.state);
+    this.keeperPortrait = Object.values(NPCS).find((n) => n.shopId === data.shopId)?.portraitKey;
     this.index = 0;
   }
 
@@ -53,6 +56,11 @@ export class ShopScene extends Phaser.Scene {
 
     this.add.rectangle(0, 0, w, h, palette.skyNight, 0.55).setOrigin(0, 0);
     this.add.rectangle(w / 2, h / 2, 360, 264, palette.uiPanel, 0.98).setStrokeStyle(2, palette.outline);
+
+    // Shopkeeper portrait tucked into the panel's top-left, above the goods list.
+    if (this.keeperPortrait) {
+      this.add.image(w / 2 - 142, 100, this.keeperPortrait).setScale(0.26);
+    }
 
     this.add
       .text(w / 2, 86, this.shopTitle, {

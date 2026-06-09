@@ -32,6 +32,7 @@ export interface NpcDef {
   npcId: NpcId;
   displayName: string;
   textureKey: string;
+  portraitKey?: string; // generated bust for talk/shop screens (falls back to textureKey)
   shopId?: ShopId; // present = interacting opens this shop
   lines?: string[]; // present = interacting shows a line of dialogue
   romance?: RomanceConfig; // present = interacting opens the talk/affection screen
@@ -42,18 +43,21 @@ export const NPCS: Record<NpcId, NpcDef> = {
     npcId: NpcId.SeedSeller,
     displayName: 'Marigold',
     textureKey: TextureKey.NpcSeedSeller,
+    portraitKey: TextureKey.PortraitMarigold,
     shopId: ShopId.Seeds,
   },
   [NpcId.Blacksmith]: {
     npcId: NpcId.Blacksmith,
     displayName: 'Bramble',
     textureKey: TextureKey.NpcBlacksmith,
+    portraitKey: TextureKey.PortraitBramble,
     shopId: ShopId.Blacksmith,
   },
   [NpcId.Hint]: {
     npcId: NpcId.Hint,
     displayName: 'Old Pip',
     textureKey: TextureKey.NpcVillager,
+    portraitKey: TextureKey.PortraitPip,
     lines: [
       'Plant turnips, sell turnips. Simple as that.',
       'Marigold sells seeds. Bramble forges steel.',
@@ -65,6 +69,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     npcId: NpcId.Jay,
     displayName: 'Jay',
     textureKey: TextureKey.NpcJay,
+    portraitKey: TextureKey.PortraitJay,
     romance: {
       greetingByTier: [
         'Jay looks up, then quickly back at his boots. "Oh— hello."',

@@ -31,13 +31,14 @@ SHEET2 = (5, 1, [
 ])
 
 
-def key_magenta(cell):
+def key_magenta(cell, lo=LO, hi=HI):
     """Return RGBA cell with the flat magenta background turned transparent.
 
     Uses g-deficit = mean(R,B) - G, which is huge for pure magenta (#FF00FF) but
     small for real content — including the purple/indigo icons, whose green
     channel is well above zero. Edge (partial-alpha) pixels get a light despill
-    so no pink halo survives against the dark outlines.
+    so no pink halo survives against the dark outlines. Callers can tighten
+    lo/hi (e.g. portraits, which have a darkened-magenta drop shadow to remove).
     """
     cell = cell.convert("RGB")
     px = cell.load()
@@ -48,12 +49,12 @@ def key_magenta(cell):
         for x in range(w):
             r, g, b = px[x, y]
             gd = (r + b) / 2 - g
-            if gd <= LO:
+            if gd <= lo:
                 a = 255
-            elif gd >= HI:
+            elif gd >= hi:
                 a = 0
             else:
-                a = round(255 * (HI - gd) / (HI - LO))
+                a = round(255 * (hi - gd) / (hi - lo))
             if 0 < a < 255:  # edge: despill toward the green channel
                 r = min(r, g + 30)
                 b = min(b, g + 30)
