@@ -4,7 +4,7 @@
 export const Balance = {
   tickMs: 1500, // real milliseconds per growth tick
   dayLengthTicks: 20, // ticks per in-game day (drives daily resets)
-  bushRegrowTicks: 16, // ticks for a foraged bush to bear fruit again
+  bushRegrowTicks: 20, // ticks for a foraged bush to bear fruit again (one full day)
   berryYield: 2, // berries gathered per ready bush
   startingGold: 50,
   startingSeeds: 12,
@@ -44,7 +44,7 @@ export const Balance = {
 
   // Hidden Starless relics. The three pieces not guarded by a dungeon boss surface as rare
   // finds during chores — but only after the first ruin boss falls AND you hold this much
-  // gold, so they never drop in the opening minutes. Source mapping lives in data/armor.ts.
+  // gold, so they never drop in the opening minutes. The per-chore odds and which chore turns
+  // up which piece live in data/armor.ts (RELIC_DROPS).
   relicGoldThreshold: 1000, // gold you must hold before relics can surface
-  relicDropChance: 0.05, // chance per qualifying chore (forage / turnip harvest / chicken pet)
 } as const;

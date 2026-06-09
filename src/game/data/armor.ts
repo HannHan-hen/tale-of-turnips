@@ -5,7 +5,6 @@
 
 import { ArmorPieceId, ItemId } from '../types/ids';
 import { TextureKey } from './assetKeys';
-import { Balance } from './balance';
 
 export const SET_NAME = 'Starless Set';
 
@@ -91,9 +90,11 @@ export interface RelicDrop {
 }
 
 export const RELIC_DROPS: RelicDrop[] = [
-  { pieceId: ArmorPieceId.Helm, source: 'bush', chance: Balance.relicDropChance },
-  { pieceId: ArmorPieceId.Plate, source: 'turnip', chance: Balance.relicDropChance },
-  { pieceId: ArmorPieceId.Blade, source: 'chicken', chance: Balance.relicDropChance },
+  // A chicken can only be petted once a day, so it gets the best odds. Bushes and turnips come
+  // up far more often, so their odds stay slim.
+  { pieceId: ArmorPieceId.Helm, source: 'bush', chance: 0.01 },
+  { pieceId: ArmorPieceId.Plate, source: 'turnip', chance: 0.01 },
+  { pieceId: ArmorPieceId.Blade, source: 'chicken', chance: 0.05 },
 ];
 
 // Display order (helmet, armor, gloves, boots, weapon).

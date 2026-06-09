@@ -82,7 +82,7 @@ These files are safe to edit without touching game logic:
 - `src/game/data/armor.ts` — legendary set name, pieces, per-piece effects, and the hidden
   relic finds (`RELIC_DROPS`: which chore turns up which piece, and at what chance).
 - `src/game/data/balance.ts` — tick length, starting gold, combat tuning, threat rates, and
-  the relic gate (`relicGoldThreshold`, `relicDropChance`).
+  the relic gold gate (`relicGoldThreshold`); per-chore relic odds live in `armor.ts`.
 - (Later) `loot.ts`, dialogue tables.
 
 If you add a new tweakable, put it in `data/` and document it here.
