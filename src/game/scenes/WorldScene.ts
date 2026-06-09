@@ -159,6 +159,13 @@ export class WorldScene extends Phaser.Scene {
     const dt = deltaMs / 1000;
     const player = this.store.player;
 
+    // Open the title menu (Continue / restart from the beginning). Save first so a later
+    // "Continue" resumes exactly here.
+    if (this.controls.menuJustPressed()) {
+      this.openMenu();
+      return;
+    }
+
     const move = this.controls.getMovement();
     movePlayer(player, move, Balance.playerSpeed + this.loadout.bonusSpeed, dt, this.bounds, (x, y) =>
       isSolidAt(this.solids, x, y),
@@ -628,6 +635,15 @@ export class WorldScene extends Phaser.Scene {
     this.game.events.emit(UiEvent.Hud);
     this.scene.pause();
     this.scene.launch(SceneKey.End);
+  }
+
+  // Return to the title screen, where the player can resume or restart from the beginning.
+  // Stop the HUD and this scene; TitleScene relaunches both when a game begins.
+  private openMenu(): void {
+    saveGame(this.store.state);
+    this.game.events.emit(UiEvent.Prompt, null);
+    this.scene.stop(SceneKey.UI);
+    this.scene.start(SceneKey.Title);
   }
 
   private takeDamage(amount: number): void {

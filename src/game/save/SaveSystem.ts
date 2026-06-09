@@ -112,6 +112,13 @@ export function clearSave(): void {
   store?.removeItem(LEGACY_SAVE_KEY);
 }
 
+// Whether a resumable game exists, so the title screen can offer "Continue".
+export function hasSave(): boolean {
+  const store = storage();
+  if (!store) return false;
+  return Boolean(store.getItem(SAVE_KEY) ?? store.getItem(LEGACY_SAVE_KEY));
+}
+
 const HIGHSCORE_KEY = 'tale-of-turnips/highscore';
 const LEGACY_HIGHSCORE_KEY = 'story-of-turnips/highscore';
 

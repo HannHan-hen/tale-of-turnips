@@ -77,6 +77,8 @@ export class UIScene extends Phaser.Scene {
       this.add.image(18 + i * 18, h - 14, ARMOR_PIECES[pieceId].iconKey).setScale(0.8),
     );
 
+    // Hidden until there's a prompt: an empty Text with a backgroundColor still paints its
+    // padding, which would leave a stray box sitting at the bottom of the screen.
     this.promptText = this.add
       .text(w / 2, h - 16, '', {
         fontFamily: 'monospace',
@@ -85,7 +87,18 @@ export class UIScene extends Phaser.Scene {
         backgroundColor: 'rgba(58,48,71,0.85)',
         padding: { x: 6, y: 3 },
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setVisible(false);
+
+    // Quiet reminder that the menu (continue / restart) is one key away.
+    this.add
+      .text(w - 8, h - 6, '[Esc] Menu', {
+        fontFamily: 'monospace',
+        fontSize: '10px',
+        color: toCss(palette.uiInk),
+      })
+      .setOrigin(1, 1)
+      .setAlpha(0.55);
 
     this.toastText = this.add
       .text(w / 2, h - 44, '', {
@@ -99,7 +112,7 @@ export class UIScene extends Phaser.Scene {
       .setAlpha(0);
 
     const onHud = () => this.refreshHud();
-    const onPrompt = (text: string | null) => this.promptText.setText(text ?? '');
+    const onPrompt = (text: string | null) => this.promptText.setText(text ?? '').setVisible(!!text);
     const onToast = (text: string) => this.showToast(text);
 
     this.game.events.on(UiEvent.Hud, onHud);

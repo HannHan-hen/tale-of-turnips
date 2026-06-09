@@ -73,6 +73,7 @@ export type ChestId = (typeof ChestId)[keyof typeof ChestId];
 
 export const SceneKey = {
   Boot: 'boot',
+  Title: 'title',
   World: 'world',
   UI: 'ui',
   Chest: 'chest',

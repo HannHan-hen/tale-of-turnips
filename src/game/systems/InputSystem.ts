@@ -10,6 +10,7 @@ export class InputSystem {
   private wasd: Record<'W' | 'A' | 'S' | 'D', Phaser.Input.Keyboard.Key>;
   private interactKeys: Phaser.Input.Keyboard.Key[];
   private attackKeys: Phaser.Input.Keyboard.Key[];
+  private menuKeys: Phaser.Input.Keyboard.Key[];
   private hotkeys: Phaser.Input.Keyboard.Key[];
 
   constructor(scene: Phaser.Scene) {
@@ -19,6 +20,7 @@ export class InputSystem {
     const codes = Phaser.Input.Keyboard.KeyCodes;
     this.interactKeys = [kb.addKey(codes.E)];
     this.attackKeys = [kb.addKey(codes.SPACE), kb.addKey(codes.J)];
+    this.menuKeys = [kb.addKey(codes.ESC)];
     this.hotkeys = [
       kb.addKey(codes.ONE),
       kb.addKey(codes.TWO),
@@ -48,6 +50,11 @@ export class InputSystem {
 
   attackJustPressed(): boolean {
     return this.attackKeys.some((k) => Phaser.Input.Keyboard.JustDown(k));
+  }
+
+  // Open the title/menu screen (used to restart from the beginning).
+  menuJustPressed(): boolean {
+    return this.menuKeys.some((k) => Phaser.Input.Keyboard.JustDown(k));
   }
 
   // Returns the 0-based number-key index pressed this frame (1->0, 2->1, ...), or undefined.
