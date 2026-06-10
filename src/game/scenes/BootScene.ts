@@ -37,6 +37,12 @@ const playerUrls = import.meta.glob('../../assets/player/*.png', {
   query: '?url',
   import: 'default',
 }) as Record<string, string>;
+// NPC world sprites (npc_seed_seller, npc_blacksmith, npc_villager, npc_jay); filename == key.
+const npcUrls = import.meta.glob('../../assets/npcs/*.png', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
 
 export const STORE_KEY = 'store';
 
@@ -47,7 +53,7 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     this.load.image(TextureKey.TitleBackdrop, titleBackdropUrl);
-    const generated = { ...iconUrls, ...portraitUrls, ...propUrls, ...playerUrls };
+    const generated = { ...iconUrls, ...portraitUrls, ...propUrls, ...playerUrls, ...npcUrls };
     for (const [path, url] of Object.entries(generated)) {
       const key = path.split('/').pop()!.replace('.png', '');
       this.load.image(key, url);

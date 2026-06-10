@@ -12,6 +12,7 @@ record every asset's source model and the exact prompt below.
 | `Portrait*` (4 keys) | `portraits/<key>.png` | ChatGPT (GPT Image) | NPC busts (Marigold, Bramble, Pip, Jay) from one 2×2 magenta grid, processed by `tools/process_portraits.py` (tighter key to also remove the drop shadow), centered on 256×256 squares. |
 | props (12 keys) | `props/<key>.png` | ChatGPT (GPT Image) | World props (cottage, stall, shipping_box, chest, door, signpost, anvil, rubble, tree, sealed_door, cache_closed, cache_open) from one 4×3 magenta grid. `tools/process_props.py` keys the magenta, keeps the largest blob (drops neighbor-cell bleed/shadow specks), and resizes each to its exact in-world footprint. |
 | player (9 keys) | `player/<key>.png` | ChatGPT (GPT Image) | Farmer walk frames: 3 magenta strips (front/back/side), each `[step-left, stand, step-right]`. `tools/process_player.py` keys + keeps-largest, scales each direction by one stand-derived factor (so she doesn't resize mid-walk), bottom-centers on the 72×96 footprint, and mirrors the left-facing side strip to face right (engine flips for left). |
+| npcs (4 keys) | `npcs/<key>.png` | ChatGPT (GPT Image) | Static front-facing NPC world sprites (Marigold, Bramble, Pip, Jay) from one 2×2 magenta grid, matching the farmer's chibi style. `tools/process_npcs.py` keys + keeps-largest, fits each to the 72×96 footprint so they stand eye-to-eye with the player. |
 
 The icons were generated on a flat magenta (`#FF00FF`) background — the model can't be trusted
 to make real transparency, so we key out a solid color in code instead. Re-run with:
@@ -51,3 +52,8 @@ A cute blonde farmer girl in beige overalls over a cream shirt, brown boots, in 
 cel-shaded style, on flat pure-magenta (#FF00FF). Each strip keeps the same character/size/pose
 except the legs and arms. Full prompt is in the chat history; regenerate and re-run
 `python3 tools/process_player.py front.png back.png side.png`.
+
+### `npcs/` — 2×2 grid: Marigold (seed seller), Bramble (blacksmith), Old Pip (villager), Jay
+Static front-facing full-body sprites matching the farmer's chibi proportions and rendering, on
+flat pure-magenta (#FF00FF). Full prompt is in the chat history; regenerate and re-run
+`python3 tools/process_npcs.py grid.png`.
