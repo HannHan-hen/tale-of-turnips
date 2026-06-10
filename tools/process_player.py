@@ -76,13 +76,16 @@ def gif(path, placed, bg):
     flat[0].save(path, save_all=True, append_images=flat[1:], duration=125, loop=0, disposal=2)
 
 
+# The engine stores side art facing RIGHT and flips it for left (setFlipX). Set this True only
+# if your supplied side strip faces LEFT, so it gets mirrored to face right.
+SIDE_FACES_LEFT = False
+
+
 def main():
     args = dict(zip(["front", "back", "side"], sys.argv[1:4]))
     for direction, path in args.items():
         frames = cut(path)
-        # The engine stores side art facing RIGHT and flips it for left (setFlipX). The supplied
-        # side strip faces left, so mirror it here.
-        if direction == "side":
+        if direction == "side" and SIDE_FACES_LEFT:
             frames = [f.transpose(Image.FLIP_LEFT_RIGHT) for f in frames]
         placed = place(frames)
         for key, frame in zip(STRIPS[direction], placed):

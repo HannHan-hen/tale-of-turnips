@@ -8,6 +8,11 @@ export const BASE_TILE = 32; // authoring grid: one logical tile, as the pixel a
 export const SCALE = 3; // render multiplier (TILE 32 -> 96, player 24x32 -> 72x96, etc.)
 export const TILE = BASE_TILE * SCALE; // actual world tile size in pixels
 
+// Extra on-screen size for the cast (player + NPCs) so they read bigger than their tile
+// footprint — a common cozy-RPG look. Applied as a render scale; collisions/distances are
+// unaffected. 1 = same as tile footprint.
+export const CHAR_SCALE = 1.5;
+
 /** Scale a base pixel measurement (UI offsets, panel sizes) to render size. */
 export const px = (n: number): number => n * SCALE;
 /** Scale a base font size to a render-size CSS string, e.g. fs(12) -> "36px". */

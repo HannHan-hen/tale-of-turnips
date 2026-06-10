@@ -11,7 +11,7 @@ import { ENEMIES } from '../data/enemies';
 import { CROP_ORDER, CROPS } from '../data/crops';
 import { ITEMS } from '../data/items';
 import { MAPS, TILE, tileCenter, type ExitDef, type MapDef } from '../data/maps';
-import { px } from '../data/scale';
+import { px, CHAR_SCALE } from '../data/scale';
 import { NPCS } from '../data/npcs';
 import { CombatController } from '../combat/CombatController';
 import { GameStateStore } from '../state/GameStateStore';
@@ -143,7 +143,10 @@ export class WorldScene extends Phaser.Scene {
     }
 
     const p = this.store.player;
-    this.playerSprite = this.add.sprite(p.x, p.y, TextureKey.Player).setOrigin(0.5, 0.9);
+    this.playerSprite = this.add
+      .sprite(p.x, p.y, TextureKey.Player)
+      .setOrigin(0.5, 0.9)
+      .setScale(CHAR_SCALE);
     this.playerSprite.play(PlayerAnim.IdleDown);
 
     this.controls = new InputSystem(this);
@@ -286,7 +289,11 @@ export class WorldScene extends Phaser.Scene {
     }
     for (const npc of def.npcs) {
       const c = tileCenter(npc.tile);
-      this.add.image(c.x, c.y, NPCS[npc.npcId].textureKey).setOrigin(0.5, 0.9).setDepth(c.y);
+      this.add
+        .image(c.x, c.y, NPCS[npc.npcId].textureKey)
+        .setOrigin(0.5, 0.9)
+        .setScale(CHAR_SCALE)
+        .setDepth(c.y);
     }
     for (const cache of def.caches) {
       const c = tileCenter(cache.tile);
