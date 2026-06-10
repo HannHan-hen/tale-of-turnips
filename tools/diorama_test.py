@@ -51,8 +51,10 @@ def prop(name):
 
 
 def main():
-    placed = place(frames(sys.argv[1]), 72, 96)   # real 24x32 player frames
-    cycle = [placed[0], placed[1], placed[2], placed[1]]
+    # Use the real exported player frames (front walk) straight from src/assets/player.
+    PLAYER = os.path.join(os.path.dirname(__file__), "..", "src", "assets", "player")
+    load = lambda n: Image.open(os.path.join(PLAYER, n + ".png")).convert("RGBA")
+    cycle = [load("player_down_a"), load("player"), load("player_down_b"), load("player")]
 
     # static props: (image, anchor x, baseline y) — origin bottom-center like the engine
     statics = [

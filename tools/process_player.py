@@ -79,7 +79,12 @@ def gif(path, placed, bg):
 def main():
     args = dict(zip(["front", "back", "side"], sys.argv[1:4]))
     for direction, path in args.items():
-        placed = place(cut(path))
+        frames = cut(path)
+        # The engine stores side art facing RIGHT and flips it for left (setFlipX). The supplied
+        # side strip faces left, so mirror it here.
+        if direction == "side":
+            frames = [f.transpose(Image.FLIP_LEFT_RIGHT) for f in frames]
+        placed = place(frames)
         for key, frame in zip(STRIPS[direction], placed):
             frame.save(os.path.join(OUT, key + ".png"))
         gif(os.path.join(PREVIEW, f"player_{direction}.gif"), placed, (139, 191, 90, 255))
