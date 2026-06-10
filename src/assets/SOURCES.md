@@ -13,6 +13,7 @@ record every asset's source model and the exact prompt below.
 | props (12 keys) | `props/<key>.png` | ChatGPT (GPT Image) | World props (cottage, stall, shipping_box, chest, door, signpost, anvil, rubble, tree, sealed_door, cache_closed, cache_open) from one 4×3 magenta grid. `tools/process_props.py` keys the magenta, keeps the largest blob (drops neighbor-cell bleed/shadow specks), and resizes each to its exact in-world footprint. |
 | player (9 keys) | `player/<key>.png` | ChatGPT (GPT Image) | Farmer walk frames: 3 magenta strips (front/back/side), each `[step-left, stand, step-right]`. `tools/process_player.py` keys + keeps-largest, scales each direction by one stand-derived factor (so she doesn't resize mid-walk), bottom-centers on the 72×96 footprint, and mirrors the left-facing side strip to face right (engine flips for left). |
 | npcs (4 keys) | `npcs/<key>.png` | ChatGPT (GPT Image) | Static front-facing NPC world sprites (Marigold, Bramble, Pip, Jay) from one 2×2 magenta grid, matching the farmer's chibi style. `tools/process_npcs.py` keys + keeps-largest, fits each to the 72×96 footprint so they stand eye-to-eye with the player. |
+| forage (chicken, chicken_b, bush_full, bush_empty) | `forage/<key>.png` | ChatGPT (GPT Image) | Chicken (two bob frames) and the berry bush (full/empty) from one 2×2 magenta grid. `tools/process_forage.py` keys + keeps-largest, fits chicken to 66×66 and bush to 90×78. The two chicken frames drive a `chicken_idle` bob anim; the procedural single-frame chicken falls back to a tween. |
 
 The icons were generated on a flat magenta (`#FF00FF`) background — the model can't be trusted
 to make real transparency, so we key out a solid color in code instead. Re-run with:
@@ -57,3 +58,9 @@ except the legs and arms. Full prompt is in the chat history; regenerate and re-
 Static front-facing full-body sprites matching the farmer's chibi proportions and rendering, on
 flat pure-magenta (#FF00FF). Full prompt is in the chat history; regenerate and re-run
 `python3 tools/process_npcs.py grid.png`.
+
+### `forage/` — 2×2 grid: chicken (standing), chicken (tucked), bush with berries, bush empty
+Cute cozy top-down farm objects matching the world style, on flat pure-magenta (#FF00FF). The
+two bush states are the same bush (berries vs none) so they swap in place; the two chicken poses
+animate a gentle bob. Full prompt is in the chat history; regenerate and re-run
+`python3 tools/process_forage.py grid.png`.

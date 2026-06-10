@@ -3,7 +3,7 @@
 // without changing any gameplay code (which only ever references the keys).
 
 import Phaser from 'phaser';
-import { cropTextureKey, PlayerAnim, PlayerFrame, TextureKey } from '../data/assetKeys';
+import { ChickenAnim, cropTextureKey, PlayerAnim, PlayerFrame, TextureKey } from '../data/assetKeys';
 import { CROPS } from '../data/crops';
 import { palette } from '../data/palette';
 import { BASE_TILE, SCALE } from '../data/scale';
@@ -247,6 +247,21 @@ export function buildPlayerAnimations(scene: Phaser.Scene): void {
     [PlayerFrame.SideWalkA, PlayerFrame.SideStand, PlayerFrame.SideWalkB, PlayerFrame.SideStand],
     8,
   );
+}
+
+// The chicken's gentle bob, but only when both raster frames are present. With just the
+// procedural single frame this is skipped and WorldScene falls back to a position tween.
+export function buildChickenAnimations(scene: Phaser.Scene): void {
+  if (scene.anims.exists(ChickenAnim.Idle)) return;
+  if (!scene.textures.exists(TextureKey.Chicken) || !scene.textures.exists(TextureKey.ChickenTucked)) {
+    return;
+  }
+  scene.anims.create({
+    key: ChickenAnim.Idle,
+    frames: [{ key: TextureKey.Chicken }, { key: TextureKey.ChickenTucked }],
+    frameRate: 2,
+    repeat: -1,
+  });
 }
 
 function buildShippingBox(scene: Phaser.Scene): void {

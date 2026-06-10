@@ -3,7 +3,7 @@
 // setup out of the gameplay scene. The shared store lives in the registry under STORE_KEY.
 
 import Phaser from 'phaser';
-import { buildTextures, buildPlayerAnimations } from '../assets/TextureFactory';
+import { buildTextures, buildPlayerAnimations, buildChickenAnimations } from '../assets/TextureFactory';
 import { TextureKey } from '../data/assetKeys';
 import { SceneKey } from '../types/ids';
 // Generated raster assets (see src/assets/SOURCES.md). Imported so Vite fingerprints the URL
@@ -43,6 +43,12 @@ const npcUrls = import.meta.glob('../../assets/npcs/*.png', {
   query: '?url',
   import: 'default',
 }) as Record<string, string>;
+// Foraging set: chicken (+ tucked bob frame) and the full/empty berry bush; filename == key.
+const forageUrls = import.meta.glob('../../assets/forage/*.png', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
 
 export const STORE_KEY = 'store';
 
@@ -53,7 +59,14 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     this.load.image(TextureKey.TitleBackdrop, titleBackdropUrl);
-    const generated = { ...iconUrls, ...portraitUrls, ...propUrls, ...playerUrls, ...npcUrls };
+    const generated = {
+      ...iconUrls,
+      ...portraitUrls,
+      ...propUrls,
+      ...playerUrls,
+      ...npcUrls,
+      ...forageUrls,
+    };
     for (const [path, url] of Object.entries(generated)) {
       const key = path.split('/').pop()!.replace('.png', '');
       this.load.image(key, url);
@@ -63,6 +76,7 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     buildTextures(this);
     buildPlayerAnimations(this);
+    buildChickenAnimations(this);
     this.scene.start(SceneKey.Title);
   }
 }

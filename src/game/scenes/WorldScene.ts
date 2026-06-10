@@ -4,7 +4,7 @@
 // systems and data — not here. Switching maps is a scene restart after a state transition.
 
 import Phaser from 'phaser';
-import { cropTextureKey, PlayerAnim, TextureKey } from '../data/assetKeys';
+import { ChickenAnim, cropTextureKey, PlayerAnim, TextureKey } from '../data/assetKeys';
 import { SET_NAME } from '../data/armor';
 import { Balance } from '../data/balance';
 import { ENEMIES } from '../data/enemies';
@@ -327,15 +327,20 @@ export class WorldScene extends Phaser.Scene {
     const tick = this.store.state.time.tick;
     for (const hen of def.chickens) {
       const c = tileCenter(hen.tile);
-      const spr = this.add.image(c.x, c.y, TextureKey.Chicken).setOrigin(0.5, 0.9).setDepth(c.y);
-      this.tweens.add({
-        targets: spr,
-        y: c.y - 3,
-        duration: 600,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.inOut',
-      });
+      // Two-frame bob if the raster frames loaded; otherwise a gentle position tween.
+      if (this.anims.exists(ChickenAnim.Idle)) {
+        this.add.sprite(c.x, c.y, TextureKey.Chicken).setOrigin(0.5, 0.9).setDepth(c.y).play(ChickenAnim.Idle);
+      } else {
+        const spr = this.add.image(c.x, c.y, TextureKey.Chicken).setOrigin(0.5, 0.9).setDepth(c.y);
+        this.tweens.add({
+          targets: spr,
+          y: c.y - 3,
+          duration: 600,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.inOut',
+        });
+      }
     }
     for (const bush of def.bushes) {
       const c = tileCenter(bush.tile);
