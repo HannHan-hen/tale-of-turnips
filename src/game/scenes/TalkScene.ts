@@ -6,6 +6,7 @@ import Phaser from 'phaser';
 import { ITEMS } from '../data/items';
 import { NPCS, type RomanceConfig } from '../data/npcs';
 import { palette, toCss } from '../data/palette';
+import { px, fs } from '../data/scale';
 import { GameStateStore } from '../state/GameStateStore';
 import { saveGame } from '../save/SaveSystem';
 import { canGift, giveGift, isGiftable, talk, tierIndex, tierName } from '../systems/AffectionSystem';
@@ -15,8 +16,8 @@ import type { NpcAffectionState } from '../types/models';
 import { UiEvent } from '../ui/uiEvents';
 import { STORE_KEY } from './BootScene';
 
-const ROWS_TOP = 196;
-const LINE_H = 26;
+const ROWS_TOP = px(196);
+const LINE_H = px(26);
 
 export class TalkScene extends Phaser.Scene {
   private store!: GameStateStore;
@@ -56,42 +57,44 @@ export class TalkScene extends Phaser.Scene {
     const h = this.scale.height;
 
     this.add.rectangle(0, 0, w, h, palette.skyNight, 0.6).setOrigin(0, 0);
-    this.add.rectangle(w / 2, h / 2, 420, 280, palette.uiPanel, 0.98).setStrokeStyle(2, palette.outline);
+    this.add
+      .rectangle(w / 2, h / 2, px(420), px(280), palette.uiPanel, 0.98)
+      .setStrokeStyle(px(2), palette.outline);
 
     const npc = NPCS[this.npcId as keyof typeof NPCS];
     // Generated portrait bust in the left column (falls back to the walking sprite).
-    this.add.image(w / 2 - 152, h / 2, npc.portraitKey ?? npc.textureKey).setScale(0.4);
+    this.add.image(w / 2 - px(152), h / 2, npc.portraitKey ?? npc.textureKey).setScale(1.2);
     this.add
-      .text(w / 2 - 140, h / 2 - 110, npc.displayName, {
+      .text(w / 2 - px(140), h / 2 - px(110), npc.displayName, {
         fontFamily: 'monospace',
-        fontSize: '16px',
+        fontSize: fs(16),
         color: toCss(palette.uiInk),
       })
       .setOrigin(0.5, 0);
     this.tierText = this.add
-      .text(w / 2 - 140, h / 2 - 88, '', {
+      .text(w / 2 - px(140), h / 2 - px(88), '', {
         fontFamily: 'monospace',
-        fontSize: '10px',
+        fontSize: fs(10),
         color: toCss(palette.starlessTrim),
       })
       .setOrigin(0.5, 0);
 
-    this.lineText = this.add.text(w / 2 - 96, h / 2 - 96, '', {
+    this.lineText = this.add.text(w / 2 - px(96), h / 2 - px(96), '', {
       fontFamily: 'monospace',
-      fontSize: '13px',
+      fontSize: fs(13),
       color: toCss(palette.uiInk),
-      wordWrap: { width: 270 },
-      lineSpacing: 3,
+      wordWrap: { width: px(270) },
+      lineSpacing: px(3),
     });
 
     this.cursor = this.add
-      .rectangle(w / 2 - 100, ROWS_TOP, 290, 22, palette.uiHighlight, 1)
+      .rectangle(w / 2 - px(100), ROWS_TOP, px(290), px(22), palette.uiHighlight, 1)
       .setOrigin(0, 0.5);
 
     this.add
-      .text(w / 2, h - 30, '↑↓ select   [Space] choose   [Esc] back/leave', {
+      .text(w / 2, h - px(30), '↑↓ select   [Space] choose   [Esc] back/leave', {
         fontFamily: 'monospace',
-        fontSize: '11px',
+        fontSize: fs(11),
         color: toCss(palette.uiInk),
       })
       .setOrigin(0.5);
@@ -141,8 +144,8 @@ export class TalkScene extends Phaser.Scene {
     this.tierText.setText(`Jay ${tierName(this.aff.points)}`);
 
     const rows = this.currentRows();
-    const x = this.scale.width / 2 - 92;
-    const style = { fontFamily: 'monospace', fontSize: '14px', color: toCss(palette.uiInk) };
+    const x = this.scale.width / 2 - px(92);
+    const style = { fontFamily: 'monospace', fontSize: fs(14), color: toCss(palette.uiInk) };
     if (this.mode === 'gift' && rows.length === 0) {
       this.rowObjs.push(
         this.add

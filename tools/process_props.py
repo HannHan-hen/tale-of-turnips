@@ -13,14 +13,16 @@ Run: python3 tools/process_props.py /path/to/props.png
 """
 import os
 import sys
-from PIL import Image
+from PIL import Image, ImageFilter
 from process_icons import key_magenta  # shared chroma keyer
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "src", "assets", "props")
 os.makedirs(OUT, exist_ok=True)
 
 COLS, ROWS = 4, 3
-# key value -> (footprint width, height) in px, matching the procedural sprites in props.ts.
+SCALE = 3  # must match src/game/data/scale.ts — props render at native size on the TILE grid
+# key value -> base (footprint width, height) in px, matching the procedural sprites in props.ts.
+# Multiplied by SCALE below so the raster prop fills the same world space as the scaled tiles.
 PROPS = [
     ("cottage", 60, 56), ("stall", 56, 44), ("shipping_box", 30, 26), ("chest", 28, 22),
     ("door", 22, 28), ("signpost", 24, 30), ("anvil", 30, 26), ("rubble", 30, 22),
@@ -67,8 +69,10 @@ def fit(prop, w, h):
     if bbox:
         prop = prop.crop(bbox)
     scale = min(w / prop.width, h / prop.height)
-    return prop.resize((max(1, round(prop.width * scale)), max(1, round(prop.height * scale))),
-                       Image.LANCZOS)
+    out = prop.resize((max(1, round(prop.width * scale)), max(1, round(prop.height * scale))),
+                      Image.LANCZOS)
+    rgb = out.convert("RGB").filter(ImageFilter.UnsharpMask(radius=1.2, percent=130, threshold=1))
+    return Image.merge("RGBA", (*rgb.split(), out.split()[3]))
 
 
 def main():
@@ -78,7 +82,7 @@ def main():
         c, r = i % COLS, i // COLS
         box = (round(c * W / COLS), round(r * H / ROWS),
                round((c + 1) * W / COLS), round((r + 1) * H / ROWS))
-        fit(key_magenta(sheet.crop(box)), w, h).save(os.path.join(OUT, key + ".png"))
+        fit(key_magenta(sheet.crop(box)), w * SCALE, h * SCALE).save(os.path.join(OUT, key + ".png"))
 
     # contact sheet on grass green (#8bbf5a) — the real backdrop — to expose any halo/shadow
     out = os.path.join(os.path.dirname(__file__), "out")

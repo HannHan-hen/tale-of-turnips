@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import { TextureKey } from '../data/assetKeys';
 import { palette, toCss } from '../data/palette';
+import { px, fs } from '../data/scale';
 import { GameStateStore } from '../state/GameStateStore';
 import { createNewGameState } from '../state/newGameState';
 import { recalcMaxHp } from '../systems/EquipmentSystem';
@@ -44,18 +45,18 @@ export class TitleScene extends Phaser.Scene {
     this.add.rectangle(0, 0, w, h, palette.skyNight, 0.32).setOrigin(0, 0);
 
     // A friendly turnip mascot crowning the title.
-    this.add.image(w / 2, h * 0.3, TextureKey.IconTurnip).setScale(0.94);
+    this.add.image(w / 2, h * 0.3, TextureKey.IconTurnip).setScale(1.41);
     this.add
-      .text(w / 2, h * 0.3 + 44, 'Tale of Turnips', {
+      .text(w / 2, h * 0.3 + px(44), 'Tale of Turnips', {
         fontFamily: 'monospace',
-        fontSize: '26px',
+        fontSize: fs(26),
         color: toCss(palette.gold),
       })
       .setOrigin(0.5);
     this.add
-      .text(w / 2, h * 0.3 + 72, 'A cozy farming adventure', {
+      .text(w / 2, h * 0.3 + px(72), 'A cozy farming adventure', {
         fontFamily: 'monospace',
-        fontSize: '12px',
+        fontSize: fs(12),
         color: toCss(palette.uiInk),
       })
       .setOrigin(0.5);
@@ -63,18 +64,18 @@ export class TitleScene extends Phaser.Scene {
     const best = loadHighScore();
     if (best > 0) {
       this.add
-        .text(w / 2, h * 0.3 + 92, `Best harvest: ${best}g`, {
+        .text(w / 2, h * 0.3 + px(92), `Best harvest: ${best}g`, {
           fontFamily: 'monospace',
-          fontSize: '11px',
+          fontSize: fs(11),
           color: toCss(palette.starlessTrim),
         })
         .setOrigin(0.5);
     }
 
     this.hint = this.add
-      .text(w / 2, h - 24, '', {
+      .text(w / 2, h - px(24), '', {
         fontFamily: 'monospace',
-        fontSize: '11px',
+        fontSize: fs(11),
         color: toCss(palette.uiInk),
       })
       .setOrigin(0.5)
@@ -134,9 +135,9 @@ export class TitleScene extends Phaser.Scene {
     const baseY = this.scale.height * 0.62;
     options.forEach((opt, i) => {
       const t = this.add
-        .text(w / 2, baseY + i * 30, opt.label, {
+        .text(w / 2, baseY + i * px(30), opt.label, {
           fontFamily: 'monospace',
-          fontSize: '16px',
+          fontSize: fs(16),
           color: toCss(palette.uiInk),
         })
         .setOrigin(0.5)

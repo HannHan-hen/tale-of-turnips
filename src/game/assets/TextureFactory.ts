@@ -6,7 +6,7 @@ import Phaser from 'phaser';
 import { cropTextureKey, PlayerAnim, PlayerFrame, TextureKey } from '../data/assetKeys';
 import { CROPS } from '../data/crops';
 import { palette } from '../data/palette';
-import { TILE } from '../data/maps';
+import { BASE_TILE, SCALE } from '../data/scale';
 import { CropId } from '../types/ids';
 import { resolvePixels, type PixelSprite } from './sprites/spriteGrid';
 import {
@@ -80,7 +80,7 @@ function make(
   if (scene.textures.exists(key)) return;
   const g = scene.add.graphics();
   draw(g);
-  g.generateTexture(key, w, h);
+  g.generateTexture(key, w * SCALE, h * SCALE);
   g.destroy();
 }
 
@@ -93,7 +93,7 @@ function rect(
   h: number,
 ): void {
   g.fillStyle(color, 1);
-  g.fillRect(x, y, w, h);
+  g.fillRect(x * SCALE, y * SCALE, w * SCALE, h * SCALE);
 }
 
 // Paint a pixel-grid sprite (see sprites/spriteGrid) into a texture, one pixel per cell.
@@ -104,9 +104,9 @@ function paintSprite(scene: Phaser.Scene, key: string, sprite: PixelSprite): voi
   const g = scene.add.graphics();
   for (const px of resolvePixels(sprite)) {
     g.fillStyle(px.color, 1);
-    g.fillRect(px.x, px.y, 1, 1);
+    g.fillRect(px.x * SCALE, px.y * SCALE, SCALE, SCALE);
   }
-  g.generateTexture(key, sprite.width, sprite.height);
+  g.generateTexture(key, sprite.width * SCALE, sprite.height * SCALE);
   g.destroy();
 }
 
@@ -125,9 +125,9 @@ function paintSpriteInto(
   const g = scene.add.graphics();
   for (const px of resolvePixels(sprite)) {
     g.fillStyle(px.color, 1);
-    g.fillRect(ox + px.x, oy + px.y, 1, 1);
+    g.fillRect((ox + px.x) * SCALE, (oy + px.y) * SCALE, SCALE, SCALE);
   }
-  g.generateTexture(key, texW, texH);
+  g.generateTexture(key, texW * SCALE, texH * SCALE);
   g.destroy();
 }
 
@@ -162,8 +162,8 @@ export function buildTextures(scene: Phaser.Scene): void {
 }
 
 function buildGrassTile(scene: Phaser.Scene): void {
-  make(scene, TextureKey.GrassTile, TILE, TILE, (g) => {
-    rect(g, palette.grass, 0, 0, TILE, TILE);
+  make(scene, TextureKey.GrassTile, BASE_TILE, BASE_TILE, (g) => {
+    rect(g, palette.grass, 0, 0, BASE_TILE, BASE_TILE);
     // a few darker and lighter tufts for gentle texture
     rect(g, palette.grassDark, 5, 7, 3, 3);
     rect(g, palette.grassDark, 22, 18, 3, 3);
@@ -173,33 +173,33 @@ function buildGrassTile(scene: Phaser.Scene): void {
 }
 
 function buildSoilTile(scene: Phaser.Scene): void {
-  make(scene, TextureKey.SoilTile, TILE, TILE, (g) => {
-    rect(g, palette.soilDark, 0, 0, TILE, TILE);
-    rect(g, palette.soil, 2, 2, TILE - 4, TILE - 4);
+  make(scene, TextureKey.SoilTile, BASE_TILE, BASE_TILE, (g) => {
+    rect(g, palette.soilDark, 0, 0, BASE_TILE, BASE_TILE);
+    rect(g, palette.soil, 2, 2, BASE_TILE - 4, BASE_TILE - 4);
     // furrow lines
-    rect(g, palette.soilDark, 6, 4, 2, TILE - 8);
-    rect(g, palette.soilDark, 15, 4, 2, TILE - 8);
-    rect(g, palette.soilDark, 24, 4, 2, TILE - 8);
+    rect(g, palette.soilDark, 6, 4, 2, BASE_TILE - 8);
+    rect(g, palette.soilDark, 15, 4, 2, BASE_TILE - 8);
+    rect(g, palette.soilDark, 24, 4, 2, BASE_TILE - 8);
   });
 }
 
 function buildWoodFloorTile(scene: Phaser.Scene): void {
-  make(scene, TextureKey.WoodFloor, TILE, TILE, (g) => {
-    rect(g, palette.floorWood, 0, 0, TILE, TILE);
+  make(scene, TextureKey.WoodFloor, BASE_TILE, BASE_TILE, (g) => {
+    rect(g, palette.floorWood, 0, 0, BASE_TILE, BASE_TILE);
     // plank seams
-    rect(g, palette.floorWoodDark, 0, 10, TILE, 1);
-    rect(g, palette.floorWoodDark, 0, 21, TILE, 1);
+    rect(g, palette.floorWoodDark, 0, 10, BASE_TILE, 1);
+    rect(g, palette.floorWoodDark, 0, 21, BASE_TILE, 1);
     rect(g, palette.floorWoodDark, 10, 0, 1, 10);
     rect(g, palette.floorWoodDark, 22, 11, 1, 10);
   });
 }
 
 function buildWallTile(scene: Phaser.Scene): void {
-  make(scene, TextureKey.Wall, TILE, TILE, (g) => {
-    rect(g, palette.wallDark, 0, 0, TILE, TILE);
-    rect(g, palette.wall, 1, 1, TILE - 2, TILE - 3);
+  make(scene, TextureKey.Wall, BASE_TILE, BASE_TILE, (g) => {
+    rect(g, palette.wallDark, 0, 0, BASE_TILE, BASE_TILE);
+    rect(g, palette.wall, 1, 1, BASE_TILE - 2, BASE_TILE - 3);
     // brick seams
-    rect(g, palette.wallDark, 0, 15, TILE, 1);
+    rect(g, palette.wallDark, 0, 15, BASE_TILE, 1);
     rect(g, palette.wallDark, 15, 0, 1, 15);
   });
 }
@@ -295,11 +295,11 @@ function buildBushes(scene: Phaser.Scene): void {
 }
 
 function buildStoneFloorTile(scene: Phaser.Scene): void {
-  make(scene, TextureKey.StoneFloor, TILE, TILE, (g) => {
-    rect(g, palette.stoneFloorDark, 0, 0, TILE, TILE);
-    rect(g, palette.stoneFloor, 1, 1, TILE - 2, TILE - 2);
+  make(scene, TextureKey.StoneFloor, BASE_TILE, BASE_TILE, (g) => {
+    rect(g, palette.stoneFloorDark, 0, 0, BASE_TILE, BASE_TILE);
+    rect(g, palette.stoneFloor, 1, 1, BASE_TILE - 2, BASE_TILE - 2);
     // cracked flagstones
-    rect(g, palette.stoneFloorDark, 0, 16, TILE, 1);
+    rect(g, palette.stoneFloorDark, 0, 16, BASE_TILE, 1);
     rect(g, palette.stoneFloorDark, 16, 0, 1, 16);
     rect(g, palette.stoneFloorDark, 8, 16, 1, 16);
   });
@@ -384,9 +384,9 @@ function buildCropStages(scene: Phaser.Scene): void {
     const stages = CROPS[cropId].growthStages;
     for (let stage = 0; stage < stages; stage++) {
       const sprite = stage >= stages - 1 ? ripe[cropId] : early[Math.min(stage, early.length - 1)];
-      const ox = Math.floor((TILE - sprite.width) / 2);
-      const oy = TILE - sprite.height - 2; // sit on the soil, a couple px from the bottom
-      paintSpriteInto(scene, cropTextureKey(cropId, stage), sprite, TILE, TILE, ox, oy);
+      const ox = Math.floor((BASE_TILE - sprite.width) / 2);
+      const oy = BASE_TILE - sprite.height - 2; // sit on the soil, a couple px from the bottom
+      paintSpriteInto(scene, cropTextureKey(cropId, stage), sprite, BASE_TILE, BASE_TILE, ox, oy);
     }
   }
 }

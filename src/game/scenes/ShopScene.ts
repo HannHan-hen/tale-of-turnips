@@ -4,6 +4,7 @@
 import Phaser from 'phaser';
 import { ITEMS } from '../data/items';
 import { palette, toCss } from '../data/palette';
+import { px, fs } from '../data/scale';
 import { NPCS } from '../data/npcs';
 import { availableItems, SHOPS, type ShopItem } from '../data/shops';
 import { GameStateStore } from '../state/GameStateStore';
@@ -55,40 +56,44 @@ export class ShopScene extends Phaser.Scene {
     const h = this.scale.height;
 
     this.add.rectangle(0, 0, w, h, palette.skyNight, 0.55).setOrigin(0, 0);
-    this.add.rectangle(w / 2, h / 2, 360, 264, palette.uiPanel, 0.98).setStrokeStyle(2, palette.outline);
+    this.add
+      .rectangle(w / 2, h / 2, px(360), px(264), palette.uiPanel, 0.98)
+      .setStrokeStyle(px(2), palette.outline);
 
     // Shopkeeper portrait tucked into the panel's top-left, above the goods list.
     if (this.keeperPortrait) {
-      this.add.image(w / 2 - 142, 100, this.keeperPortrait).setScale(0.26);
+      this.add.image(w / 2 - px(142), px(100), this.keeperPortrait).setScale(0.78);
     }
 
     this.add
-      .text(w / 2, 86, this.shopTitle, {
+      .text(w / 2, px(86), this.shopTitle, {
         fontFamily: 'monospace',
-        fontSize: '16px',
+        fontSize: fs(16),
         color: toCss(palette.uiInk),
       })
       .setOrigin(0.5);
     this.goldText = this.add
-      .text(w / 2, 110, '', { fontFamily: 'monospace', fontSize: '13px', color: toCss(palette.gold) })
+      .text(w / 2, px(110), '', { fontFamily: 'monospace', fontSize: fs(13), color: toCss(palette.gold) })
       .setOrigin(0.5);
 
-    this.cursor = this.add.rectangle(w / 2, ROWS_TOP, 300, 24, palette.uiHighlight, 1).setOrigin(0.5);
+    this.cursor = this.add
+      .rectangle(w / 2, px(ROWS_TOP), px(300), px(24), palette.uiHighlight, 1)
+      .setOrigin(0.5);
 
-    const rowStyle = { fontFamily: 'monospace', fontSize: '13px', color: toCss(palette.uiInk) };
+    const rowStyle = { fontFamily: 'monospace', fontSize: fs(13), color: toCss(palette.uiInk) };
     this.items.forEach((item, i) => {
-      const y = ROWS_TOP + i * LINE_H;
-      this.add.image(w / 2 - 130, y, ITEMS[item.itemId].iconKey).setScale(0.28);
-      this.add.text(w / 2 - 112, y, ITEMS[item.itemId].displayName, rowStyle).setOrigin(0, 0.5);
+      const y = px(ROWS_TOP) + i * px(LINE_H);
+      this.add.image(w / 2 - px(130), y, ITEMS[item.itemId].iconKey).setScale(0.42);
+      this.add.text(w / 2 - px(112), y, ITEMS[item.itemId].displayName, rowStyle).setOrigin(0, 0.5);
       this.add
-        .text(w / 2 + 130, y, `${item.price}g`, { ...rowStyle, color: toCss(palette.gold) })
+        .text(w / 2 + px(130), y, `${item.price}g`, { ...rowStyle, color: toCss(palette.gold) })
         .setOrigin(1, 0.5);
     });
 
     this.add
-      .text(w / 2, h - 40, '↑↓ select   [Space] buy   [Esc] close', {
+      .text(w / 2, h - px(40), '↑↓ select   [Space] buy   [Esc] close', {
         fontFamily: 'monospace',
-        fontSize: '11px',
+        fontSize: fs(11),
         color: toCss(palette.uiInk),
       })
       .setOrigin(0.5);
@@ -126,7 +131,7 @@ export class ShopScene extends Phaser.Scene {
   private refresh(): void {
     this.goldText.setText(`Your gold: ${this.store.player.gold}`);
     this.cursor.setVisible(this.items.length > 0);
-    this.cursor.setPosition(this.scale.width / 2, ROWS_TOP + this.index * LINE_H);
+    this.cursor.setPosition(this.scale.width / 2, px(ROWS_TOP) + this.index * px(LINE_H));
   }
 
   private buySelected(): void {

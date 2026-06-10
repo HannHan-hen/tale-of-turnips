@@ -15,7 +15,7 @@ from PIL import Image
 OUT = os.path.join(os.path.dirname(__file__), "..", "src", "assets", "icons")
 os.makedirs(OUT, exist_ok=True)
 
-CANVAS = 64       # final square size
+CANVAS = 128     # final square size (headroom for the 3x world canvas)
 MARGIN = 4        # transparent padding inside the canvas
 LO, HI = 95, 175  # magenta "g-deficit" ramp: <=LO opaque, >=HI transparent
 

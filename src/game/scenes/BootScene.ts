@@ -30,6 +30,13 @@ const propUrls = import.meta.glob('../../assets/props/*.png', {
   query: '?url',
   import: 'default',
 }) as Record<string, string>;
+// Player walk frames (player, player_down_a/b, player_up*, player_side*); filename == the
+// PlayerFrame texture key. With these loaded, TextureFactory's buildPlayer falls back out.
+const playerUrls = import.meta.glob('../../assets/player/*.png', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
 
 export const STORE_KEY = 'store';
 
@@ -40,7 +47,8 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     this.load.image(TextureKey.TitleBackdrop, titleBackdropUrl);
-    for (const [path, url] of Object.entries({ ...iconUrls, ...portraitUrls, ...propUrls })) {
+    const generated = { ...iconUrls, ...portraitUrls, ...propUrls, ...playerUrls };
+    for (const [path, url] of Object.entries(generated)) {
       const key = path.split('/').pop()!.replace('.png', '');
       this.load.image(key, url);
     }
