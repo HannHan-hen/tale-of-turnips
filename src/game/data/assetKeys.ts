@@ -19,6 +19,7 @@ export const TextureKey = {
   NpcVillager: 'npc_villager',
   NpcJay: 'npc_jay',
   Chicken: 'chicken',
+  ChickenTucked: 'chicken_b', // second idle frame (loaded raster only; drives the bob anim)
   BushFull: 'bush_full',
   BushEmpty: 'bush_empty',
   StoneFloor: 'tile_stone_floor',
@@ -86,6 +87,10 @@ export const PlayerAnim = {
   IdleSide: 'farmer_idle_side',
   WalkSide: 'farmer_walk_side',
 } as const;
+
+// Other looping animations registered at boot. The chicken bob only exists when both raster
+// frames are loaded (the procedural chicken has a single frame and uses a tween instead).
+export const ChickenAnim = { Idle: 'chicken_idle' } as const;
 export type PlayerAnim = (typeof PlayerAnim)[keyof typeof PlayerAnim];
 
 // Crop textures are generated per growth stage: crop_<cropId>_<stage>.
